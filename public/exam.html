@@ -1,0 +1,192 @@
+
+    <!DOCTYPE html>
+    <html lang="he">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>מבחן</title>
+        <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                direction: rtl;
+                margin: 0;
+                padding: 0;
+                background-color: #f4f4f4;
+                color: #333;
+            }
+            h1, h2 {
+                text-align: center;
+                color: #2c3e50;
+            }
+            .container {
+                width: 80%;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #fff;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+            .question {
+                margin-bottom: 20px;
+                padding: 10px;
+                background-color: #ecf0f1;
+                border-radius: 5px;
+            }
+            .question p {
+                font-size: 18px;
+                margin: 5px 0;
+            }
+            .options {
+                margin-left: 20px;
+                font-size: 16px;
+            }
+            .options p {
+                margin-bottom: 5px;
+            }
+            .answer {
+                font-weight: bold;
+                color: #27ae60;
+                display: none;
+            }
+            .open-question {
+                padding: 15px;
+                background-color: #f8f9fa;
+                border-radius: 5px;
+                margin-bottom: 20px;
+            }
+            .open-question p {
+                font-size: 18px;
+            }
+            .answer-text {
+                font-size: 16px;
+                color: #34495e;
+                margin-top: 10px;
+                display: none;
+            }
+            .show-answer-btn {
+                margin-top: 10px;
+                padding: 5px 10px;
+                background-color: #2980b9;
+                color: white;
+                border: none;
+                border-radius: 3px;
+                cursor: pointer;
+            }
+            .show-answer-btn:hover {
+                background-color: #3498db;
+            }
+        </style>
+        <script>
+            function toggleAnswer(id) {
+                var answer = document.getElementById(id);
+                if (answer.style.display === "none") {
+                    answer.style.display = "block";
+                } else {
+                    answer.style.display = "none";
+                }
+            }
+        </script>
+    </head>
+    <body>
+
+    <div class="container">
+        <h1>מבחן</h1>
+
+        <h2>שאלות רב-ברירה</h2>
+    
+        <div class="question">
+            <p>מהו Re(T⁻¹(2 + i))?</p>
+            <div class="options">
+        <p>א. 4</p><p>ב. 2</p><p>ג. −3</p><p>ד. 1</p><p>ה. −2</p>
+            </div>
+            <button class="show-answer-btn" onclick="toggleAnswer('answer0')">הצג תשובה</button>
+            <p id="answer0" class="answer">תשובה נכונה: ב</p>
+        </div>
+        
+        <div class="question">
+            <p>מהי המטריצה המייצגת של T לפי הבסיס B?</p>
+            <div class="options">
+        <p>א. 1/2(-3, 7, 1, -1)</p><p>ב. 1/2(1, 1, 1, -1)</p><p>ג. 1/2(-4, 3, -2, 1)</p><p>ד. −1/2(1, 3, 5, 2)</p><p>ה. −1/2(1, 1, 0, 2)</p>
+            </div>
+            <button class="show-answer-btn" onclick="toggleAnswer('answer1')">הצג תשובה</button>
+            <p id="answer1" class="answer">תשובה נכונה: א</p>
+        </div>
+        
+        <div class="question">
+            <p>מהי הטענה שאיננה נכונה?</p>
+            <div class="options">
+        <p>א. dimSp{T, T², T³, T⁻¹} = 3</p><p>ב. 5T + 2T² = T⁻¹</p><p>ג. 2T² + T³ = T</p><p>ד. כל שלוש הטרנספורמציות T, T², T³ הן כולן איזורפיזמים</p><p>ה. Ker(T²) ⊆ Im(T²)</p>
+            </div>
+            <button class="show-answer-btn" onclick="toggleAnswer('answer2')">הצג תשובה</button>
+            <p id="answer2" class="answer">תשובה נכונה: ד</p>
+        </div>
+        
+        <div class="question">
+            <p>אם A נתונה להיות אנטי-סימטרית ו-ABA אנטי-סימטרית והפיכה, מהי הטענה הנכונה בהכרח?</p>
+            <div class="options">
+        <p>א. B אנטי-סימטרית ו-n זוגי</p><p>ב. B אנטי-סימטרית ו-n אי-זוגי</p><p>ג. B סימטרית ו-n זוגי</p><p>ד. B סימטרית ו-n אי-זוגי</p><p>ה. B הפיכה ו-n אי-זוגי</p>
+            </div>
+            <button class="show-answer-btn" onclick="toggleAnswer('answer3')">הצג תשובה</button>
+            <p id="answer3" class="answer">תשובה נכונה: ה</p>
+        </div>
+        
+        <div class="question">
+            <p>מהי הטענה הלא נכונה בהכרח טרנספורמציה לינארית T ככה ש-T² = 0?</p>
+            <div class="options">
+        <p>א. KerT² ⊆ KerT</p><p>ב. ImT ⊆ KerT</p><p>ג. dim(KerT) ≥ 1/2dim(V)</p><p>ד. T−I היא איזומורפיזם</p><p>ה. אם v ∉ KerT, אז קבוצה {v, T(v)} בלתי תלויה לינארית</p>
+            </div>
+            <button class="show-answer-btn" onclick="toggleAnswer('answer4')">הצג תשובה</button>
+            <p id="answer4" class="answer">תשובה נכונה: ד</p>
+        </div>
+        
+        <div class="question">
+            <p>לאילו ערכי k הטרנספורמציה T מהווה איזומורפיזם?</p>
+            <div class="options">
+        <p>א. k≠1,3</p><p>ב. k≠3</p><p>ג. k≠0,1</p><p>ד. k≠1</p><p>ה. לכל k</p>
+            </div>
+            <button class="show-answer-btn" onclick="toggleAnswer('answer5')">הצג תשובה</button>
+            <p id="answer5" class="answer">תשובה נכונה: א</p>
+        </div>
+        
+        <div class="question">
+            <p>אם המטריצה A נתונה כך ש- det(A) = −14, מהו det(A−1 + 2adj(A))?</p>
+            <div class="options">
+        <p>א. −1/2</p><p>ב. 1/2</p><p>ג. −1/8</p><p>ד. −7/2</p><p>ה. −31/8</p>
+            </div>
+            <button class="show-answer-btn" onclick="toggleAnswer('answer6')">הצג תשובה</button>
+            <p id="answer6" class="answer">תשובה נכונה: א</p>
+        </div>
+        
+        <div class="question">
+            <p>תהי T: V→W טרנספורמציה ליניארית, כאשר V, W מרחבים וקטורים נוצרים סופית מעל שדה F. מהי הטענה הנכונה?</p>
+            <div class="options">
+        <p>א. T אינה בהכרח איזומורפיזם אבל T בהכרח חד-חד ערכית</p><p>ב. T בהכרח איזומורפיזם</p><p>ג. T אינה בהכרח איזומורפיזם אבל T בהכרח על</p><p>ד. T אינה בהכרח על ואינה בהכרח חד-חד ערכית</p><p>ה. לא קיימת T שמקיימת את התנאים בנתון</p>
+            </div>
+            <button class="show-answer-btn" onclick="toggleAnswer('answer7')">הצג תשובה</button>
+            <p id="answer7" class="answer">תשובה נכונה: א</p>
+        </div>
+        
+        <h2>שאלות פתוחות</h2>
+    
+        <div class="open-question">
+            <p>הסבר על היחס בין תכונת האיזומורפיזם והגרעין והדימוי של טרנספורמציה לינארית.</p>
+            <button class="show-answer-btn" onclick="toggleAnswer('open-answer0')">הצג תשובה</button>
+            <p id="open-answer0" class="answer-text">תכונת האיזומורפיזם של טרנספורמציה לינארית דורשת שהגרעין של הטרנספורמציה יהיה {0}, כלומר אין אפס תיוג. הדימוי צריך להיות שווה למרחב היעד כולו, מה שמבטיח פונקציה על.</p>
+        </div>
+        
+        <div class="open-question">
+            <p>דון במשמעות הכפל של מטריצות במרחב מסדר מעל שדה כללי.</p>
+            <button class="show-answer-btn" onclick="toggleAnswer('open-answer1')">הצג תשובה</button>
+            <p id="open-answer1" class="answer-text">כפל מטריצות במרחב מסדר מעל שדה כללי מבטא הרכבת פונקציות לינאריות. התוצאה היא מטריצה שמבצעת העברת וקטורים במרחב היעד כאשר מופעלת על וקטורים מהמוצא.</p>
+        </div>
+        
+        <div class="open-question">
+            <p>פרט על דרכים לקבוע האם טרנספורמציה לינארית היא על בצורה פשוטה.</p>
+            <button class="show-answer-btn" onclick="toggleAnswer('open-answer2')">הצג תשובה</button>
+            <p id="open-answer2" class="answer-text">טרנספורמציה לינארית היא על אם כל וקטור ביעד ניתן לביטוי כמפת תמונת וקטור מהמוצא. האימות נעשה על ידי בדיקת האם הדימוי כולל את כל המרחב היעד.</p>
+        </div>
+        
+    </div>
+
+    </body>
+    </html>
+    
