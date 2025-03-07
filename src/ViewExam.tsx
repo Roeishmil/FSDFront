@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import api, {examApi} from "./api";
 
 const ViewTest: React.FC = () => {
   const [htmlContent, setHtmlContent] = useState<string>("");
@@ -6,12 +7,9 @@ const ViewTest: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch("../public/exam.html")
+    examApi.creatExam()
       .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to load exam file");
-        }
-        return response.text();
+        return response;
       })
       .then((data) => {
         // Create a temporary DOM element to parse the HTML
