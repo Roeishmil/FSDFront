@@ -1,0 +1,93 @@
+.pageContainer {
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+  margin-top: 40px;
+}
+
+.profileContainer {
+  display: flex;
+  justify-content: space-between;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  min-width: 600px;
+  min-height: 270px;
+  gap: 10px;
+}
+
+.imageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 15px;
+}
+
+.profilePic {
+   width: 200px;
+   height: 200px;
+   align-self: center;
+   border-radius: 50%; 
+}
+
+.uploadPicInput{
+  display: none;
+}
+
+.uploadPicIcon{
+  position: absolute; 
+  bottom: 0px; 
+  right: 0px; 
+  cursor: pointer;
+  font-size: 22px;
+}
+
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  flex: 1;
+}
+.formGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+
+.formGroup label {
+  width: 100px;
+  font-weight: bold;
+}
+
+.formGroup input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.buttonContainer {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.editBtn, .saveBtn {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.editBtn {
+  background-color: #007bff;
+  color: white;
+}
+
+.saveBtn {
+  background-color: #28a745;
+  color: white;
+}
