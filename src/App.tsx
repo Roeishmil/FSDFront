@@ -1,14 +1,15 @@
-import React, { useState } from 'react'
-import useUser from "../src/hooks/useUser";
-import { useEffect } from "react";
-
-
-
-import Header from './Header';
+import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import LoginPage from './components/RegistrationPage/LoginPage';
-import SignUpPage from './components/RegistrationPage/SignUpPage';
-import UserProfile from './components/UserProfile/UserProfile';
+import LoginPage from "./components/RegistrationPage/LoginPage";
+import Header from "./Header";
+import ViewExam from "./ViewExam";
+import ViewSummary from "./ViewSummary";
+import UserProfile from "./components/UserProfile/UserProfile";
+import SignUpPage from "./components/RegistrationPage/SignUpPage";
+import { useEffect, useState } from "react";
+import useUser from "./hooks/useUser";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -26,15 +27,17 @@ function App() {
     <Router>
       <div>
         {isAuthenticated && (
+          <div>
             <Header />
+          </div>
         )}
         <div>
           <Routes>
             {isAuthenticated ? (
               <>
-                <Route path="/" />
-                <Route path="/profile" element={<UserProfile />} />
-
+                <Route path="/" element={<UserProfile />} />
+                <Route path="/exam" element={<ViewExam />} />
+                <Route path="/summary" element={<ViewSummary />} />
               </>
             ) : (
               <>
@@ -45,10 +48,10 @@ function App() {
             )}
           </Routes>
         </div>
+        <ToastContainer />
       </div>
     </Router>
   );
 }
 
 export default App;
-

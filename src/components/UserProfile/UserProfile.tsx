@@ -1,12 +1,11 @@
-import { FC, useEffect, useRef, useState } from "react";
-import UserProfileStyle from "./UserProfile.module.css";
+import React, { FC, useEffect, useRef, useState } from "react";
+import UserProfileStyle from "../UserProfile/UserProfile.module.css";
 import Avatar from "../../assets/avatar.png";
 import { INTINAL_DATA_USER, IUser } from "../../Interfaces";
 import axios from "axios";
 import Loader from "../Loader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage } from "@fortawesome/free-solid-svg-icons";
-import PostsPage from "../Posts/PostsPage";
 import useUser from "../../hooks/useUser";
 
 const UserProfile: FC = () => {
@@ -127,7 +126,6 @@ const UserProfile: FC = () => {
           </div>
         </div>
       </div>
-      <PostsPage userPosts={true} />
     </>
   );
 };
