@@ -24,7 +24,7 @@ export interface IComments {
 export interface IUser {
   _id: string;
   email: string;
-  userName: string;
+  username: string;
   password: string;
   fullName: string;
   refreshToken?: string[];
@@ -44,7 +44,7 @@ export interface LastPostElementRefProps {
 export const INTINAL_DATA_USER: IUser = {
   _id: "",
   email: "",
-  userName: "",
+  username: "",
   password: "",
   fullName: "",
   refreshToken: [],

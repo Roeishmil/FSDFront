@@ -6,19 +6,16 @@ import { useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import useUser from "../../hooks/useUser";
+import { userApi } from "../../api";
 
 const schema = z.object({
   email: z.string().email("Invalid email").min(1, "Email is required"),
   fullName: z.string().min(1, "Full Name is required"),
-  userName: z.string().min(1, "User Name is required"),
+  username: z.string().min(1, "User Name is required"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 type FormData = z.infer<typeof schema>;
-
-const api = axios.create({
-  baseURL: "http://localhost:3000",
-});
 
 const SignUpPage: FC = () => {
   const { register, handleSubmit, formState } = useForm<FormData>({ resolver: zodResolver(schema) });
@@ -27,11 +24,12 @@ const SignUpPage: FC = () => {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await api.post("/auth/register", data);
-      localStorage.setItem("accessToken", response.data.accessToken);
-      localStorage.setItem("refreshToken", response.data.refreshToken);
-      localStorage.setItem("user", JSON.stringify(response.data));
-      setUser(response.data);
+      const response = await userApi.register(data);
+      console.log("Signup response", response);
+      localStorage.setItem("accessToken", response.accessToken);
+      localStorage.setItem("refreshToken", response.refreshToken);
+      localStorage.setItem("user", JSON.stringify({ username: response.username, email: response.email }));
+      setUser({ username: response.username, email: response.email });
       navigate("/");
     } catch (error) {
       console.error("Signup failed", error);
@@ -44,15 +42,15 @@ const SignUpPage: FC = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <h2>SignUp</h2>
           <div className={LoginPageStyle.error}>
-            {formState.errors.userName && <div className="text-danger">{formState.errors.userName.message}</div>}
+            {formState.errors.username && <div className="text-danger">{formState.errors.username.message}</div>}
           </div>
           <div className={LoginPageStyle.formGroup}>
             <label>User Name:</label>
             <input
-              id="userName"
+              id="username"
               type="text"
               placeholder="User Name"
-              {...register("userName")}
+              {...register("username")}
               className={LoginPageStyle.inputField}
             />
           </div>

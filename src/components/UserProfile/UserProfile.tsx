@@ -79,14 +79,14 @@ const UserProfile: FC = () => {
                     </div>
 
                     <div className={UserProfileStyle.formGroup}>
-                      <label>Username:</label>
-                      <input type="text" name="userName" value={userData.userName} onChange={handleChange} />
+                      <label>username:</label>
+                      <input type="text" name="username" value={userData.username} onChange={handleChange} />
                     </div>
                   </>
                 ) : (
                   <>
                     <h2>{userData.fullName}</h2>
-                    <p>User Name: {userData.userName}</p>
+                    <p>User Name: {userData.username}</p>
                   </>
                 )}
                 <p>Email: {userData.email}</p>
