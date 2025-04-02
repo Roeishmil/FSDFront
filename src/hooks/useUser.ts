@@ -61,7 +61,6 @@ const userService = {
 };
 
 const useUser = (data?: any) => {
-  console.log("data", data);
   const { user, setUser } = useUserContext();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);

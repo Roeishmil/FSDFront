@@ -1,0 +1,52 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f4f4f4;
+  height: 100vh; /* Full viewport height */
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 40px;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  font-size: 20px;
+  margin-bottom: 30px;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.nav a:hover {
+  color: #007BFF;
+}
+.logoutBtn{
+  margin-top: auto; 
+  padding: 10px;
+  background-color: transparent;
+  text-decoration: underline;
+  font-size: 20px;
+  color: red;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  position: relative;
+  bottom: 10%;
+}

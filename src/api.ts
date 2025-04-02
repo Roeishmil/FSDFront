@@ -7,6 +7,16 @@ export const api = axios.create({
   },
 });
 
+export const fileApi = {
+  uploadFile: (formData: any) => {
+    return api.post(`/users/${formData.username}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
+};
+
 export const examApi = {
   creatExam: async () => {
     const response = await api.get("/gpt/generate-exam");
