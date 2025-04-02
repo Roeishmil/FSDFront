@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import api, {examApi} from "./api";
 
-const ViewTest: React.FC = () => {
+const ViewExam: React.FC = () => {
   const [htmlContent, setHtmlContent] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -81,4 +81,4 @@ const ViewTest: React.FC = () => {
   );
 };
 
-export default ViewTest;
+export default ViewExam;

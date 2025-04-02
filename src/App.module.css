@@ -1,0 +1,27 @@
+.container {
+  display: flex;
+  height: 100vh; 
+}
+
+.authenticatedMain {
+  margin-left: 250px;
+  flex: 1;
+  padding: 20px;
+}
+
+.unauthenticatedMain {
+  margin: 0 auto;
+  flex: 1;
+  padding: 20px;
+  max-width: 600px;
+}
+
+.sidenav {
+  width: 250px; 
+  background-color: #f4f4f4; 
+  padding: 20px; 
+  height: 100%; 
+  position: fixed; 
+  left: 0; 
+  top: 0;
+}
