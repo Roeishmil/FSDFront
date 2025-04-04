@@ -1,43 +1,83 @@
 import React, { useEffect, useState, useRef } from "react";
+import { summaryApi } from "./api";
+
+// Reusable loader component with an inline CSS spinner
+const Loader: React.FC<{ message: string }> = ({ message }) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100vh",
+      }}
+    >
+      <style>{`
+          @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+          }
+          .spinner {
+              width: 50px;
+              height: 50px;
+              border: 6px solid #ccc;
+              border-top: 6px solid #1d72b8;
+              border-radius: 50%;
+              animation: spin 1s linear infinite;
+          }
+      `}</style>
+      <div className="spinner"></div>
+      <p style={{ marginTop: "20px", fontSize: "1.2em", color: "#555" }}>
+        {message}
+      </p>
+    </div>
+  );
+};
 
 const ViewSummary: React.FC = () => {
   const [htmlContent, setHtmlContent] = useState<string>("");
-  const [error, setError] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    fetch("../public/summary.html")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to load summary file");
-        }
-        return response.text();
-      })
-      .then((data) => {
-        // Create a temporary DOM element to parse the HTML
+  const fetchSummary = (retryCount = 0) => {
+    summaryApi
+      .creatSummary()
+      .then((data: string) => {
         const tempDiv = document.createElement("div");
         tempDiv.innerHTML = data;
-        
-        // Remove script tags to prevent inline JS execution issues
+        // Remove script tags for security
         const scriptTags = tempDiv.querySelectorAll("script");
-        scriptTags.forEach(script => script.remove());
-        
-        // Get the cleaned HTML content
+        scriptTags.forEach((script) => script.remove());
         setHtmlContent(tempDiv.innerHTML);
+        setLoading(false);
+        setError(null);
       })
-      .catch(() => {
-        setError(true);
+      .catch((err: unknown) => {
+        console.error("Failed to load the summary content:", err);
+        if (retryCount < 1) {
+          fetchSummary(retryCount + 1);
+        } else {
+          setError("Failed to load the summary content. Please try again later.");
+          setLoading(false);
+        }
       });
+  };
+
+  useEffect(() => {
+    fetchSummary();
   }, []);
 
+  if (loading) {
+    return <Loader message="Loading summary..." />;
+  }
   if (error) {
-    return <div>Failed to load the summary content. Please try again later.</div>;
+    return <div>{error}</div>;
   }
 
   return (
-    <div ref={containerRef}>
-      <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
-    </div>
+    <div ref={containerRef} dangerouslySetInnerHTML={{ __html: htmlContent }} />
   );
 };
 
