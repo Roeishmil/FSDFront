@@ -28,8 +28,16 @@ const SignUpPage: FC = () => {
       console.log("Signup response", response);
       localStorage.setItem("accessToken", response.accessToken);
       localStorage.setItem("refreshToken", response.refreshToken);
-      localStorage.setItem("user", JSON.stringify({ username: response.username, email: response.email }));
-      setUser({ username: response.username, email: response.email });
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          _id: response._id,
+          username: response.username,
+          email: response.email,
+          fullName: response.fullName,
+        })
+      );
+      setUser(response);
       navigate("/");
     } catch (error) {
       console.error("Signup failed", error);
