@@ -41,7 +41,7 @@ const ViewSummary: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const fetchSummary = (retryCount = 0) => {
+  const fetchSummary = () => {
     summaryApi
       .creatSummary()
       .then((data: string) => {
@@ -56,18 +56,26 @@ const ViewSummary: React.FC = () => {
       })
       .catch((err: unknown) => {
         console.error("Failed to load the summary content:", err);
-        if (retryCount < 1) {
-          fetchSummary(retryCount + 1);
-        } else {
-          setError("Failed to load the summary content. Please try again later.");
-          setLoading(false);
-        }
+        setError("Failed to load the summary content. Please try again later.");
+        setLoading(false);
       });
   };
 
   useEffect(() => {
     fetchSummary();
   }, []);
+
+  // Disable all interactions while loading
+  useEffect(() => {
+    if (loading) {
+      document.body.style.pointerEvents = "none";
+    } else {
+      document.body.style.pointerEvents = "auto";
+    }
+    return () => {
+      document.body.style.pointerEvents = "auto";
+    };
+  }, [loading]);
 
   if (loading) {
     return <Loader message="Loading summary..." />;

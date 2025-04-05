@@ -40,9 +40,8 @@ const ViewExam: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const containerRef = useRef<HTMLDivElement>(null);
-  const maxRetries = 5;
 
-  const fetchExam = (retryCount = 0) => {
+  const fetchExam = () => {
     examApi
       .creatExam()
       .then((data: string) => {
@@ -56,16 +55,9 @@ const ViewExam: React.FC = () => {
         setError(null);
       })
       .catch((err: unknown) => {
-        console.error(`Attempt ${retryCount + 1}: Failed to load exam:`, err);
-        if (retryCount < maxRetries) {
-          const delay = Math.pow(2, retryCount) * 1000;
-          setTimeout(() => {
-            fetchExam(retryCount + 1);
-          }, delay);
-        } else {
-          setError("Failed to load the exam content. Please try again later.");
-          setLoading(false);
-        }
+        console.error("Failed to load exam:", err);
+        setError("Failed to load the exam content. Please try again later.");
+        setLoading(false);
       });
   };
 
@@ -73,7 +65,19 @@ const ViewExam: React.FC = () => {
     fetchExam();
   }, []);
 
-  // Optional event delegation for dynamic button clicks
+  // Disable all interactions while loading
+  useEffect(() => {
+    if (loading) {
+      document.body.style.pointerEvents = "none";
+    } else {
+      document.body.style.pointerEvents = "auto";
+    }
+    return () => {
+      document.body.style.pointerEvents = "auto";
+    };
+  }, [loading]);
+
+  // Optional event delegation for dynamic button clicks (for toggling answers)
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
