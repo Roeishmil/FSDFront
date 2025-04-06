@@ -1,6 +1,7 @@
 import axios from "axios";
 import { time } from "console";
 import { register } from "module";
+import { IUser } from "./Interfaces";
 
 const BASE_URL = "http://localhost:3000";
 
@@ -15,6 +16,47 @@ export const api = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+api.interceptors.request.use(
+  async (config) => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+      config.headers.Authorization = `JWT ${accessToken}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      const refreshToken = localStorage.getItem("refreshToken");
+      const response = await api.post("/refresh", { token: refreshToken });
+      const newAccessToken = response.data.accessToken;
+      localStorage.setItem("accessToken", newAccessToken);
+      api.defaults.headers.common["Authorization"] = `JWT ${newAccessToken}`;
+      return api(originalRequest);
+    }
+    return Promise.reject(error);
+  }
+);
+
+export const userService = {
+  updateUser: (userData: IUser) => {
+    return api.put<IUser>(`/users/${userData._id}`, userData);
+  },
+  getUser: (userId: string) => {
+    return api.get<IUser>(`/users/${userId}`);
+  },
+};
 
 export const fileApi = {
   uploadFile: (formData: any) => {
@@ -70,11 +112,11 @@ export const userApi = {
   },
 };
 
-
 export default {
   api,
   examApi,
   summaryApi,
   userApi,
+  userService,
   fileApi,
 };

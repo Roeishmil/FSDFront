@@ -24,6 +24,8 @@
 .nav {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  align-items: center;
   font-size: 20px;
   margin-bottom: 30px;
 }
@@ -31,17 +33,23 @@
 .nav a {
   text-decoration: none;
   color: #333;
-  margin-bottom: 30px;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  border-radius: 8px;
 }
 
 .nav a:hover {
   color: #007BFF;
+  box-shadow: 0 4px 8px rgba(96, 95, 95, 0.2);
 }
 .logoutBtn{
   margin-top: auto; 
   padding: 10px;
   background-color: transparent;
-  text-decoration: underline;
   font-size: 20px;
   color: red;
   border: none;
@@ -49,4 +57,11 @@
   width: 100%;
   position: relative;
   bottom: 10%;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  border-radius: 8px;
+}
+
+.logoutBtn:hover {
+  box-shadow: 0 4px 8px rgba(96, 95, 95, 0.2);
 }
