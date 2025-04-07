@@ -9,7 +9,7 @@ import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import useUser from "../../hooks/useUser";
 
 const schema = z.object({
-  email: z.string().email("Invalid email").min(1, "Email is required"),
+  emailOrusername: z.string().min(1, "Email or username is required"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 type FormData = z.infer<typeof schema>;
@@ -59,15 +59,17 @@ const LoginPage: FC = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <h2>Login</h2>
           <div className={LoginPageStyle.error}>
-            {formState.errors.email && <div className="text-danger">{formState.errors.email.message}</div>}
+            {formState.errors.emailOrusername && (
+              <div className="text-danger">{formState.errors.emailOrusername.message}</div>
+            )}
           </div>
           <div className={LoginPageStyle.formGroup}>
-            <label>Email:</label>
+            <label>Email / username:</label>
             <input
-              id="email"
+              id="emailOrusername"
               type="text"
-              placeholder="Email"
-              {...register("email")}
+              placeholder="email / username"
+              {...register("emailOrusername")}
               className={LoginPageStyle.inputField}
             />
           </div>
