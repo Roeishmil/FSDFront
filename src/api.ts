@@ -69,12 +69,17 @@ export const fileApi = {
 };
 
 export const examApi = {
-  creatExam: (): Promise<string> => {
+  creatExam: (formData: FormData): Promise<string> => {
     // If there is already a pending request, return its promise
     if (examPromise) return examPromise;
     examPromise = axios
-      .get(`${BASE_URL}/gpt/generate-exam`, { responseType: "text",
-        timeout: 300000})
+      .post(`${BASE_URL}/gpt/upload-and-generate-exam`, formData, {
+        responseType: "text",
+        timeout: 300000,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
       .then((response) => {
         examPromise = null; // reset after completion
         return response.data;
