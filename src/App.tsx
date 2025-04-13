@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import useUser from "./hooks/useUser";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import FileUpload from "./components/FileUpload/FileUpload"; 
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -38,6 +39,7 @@ function App() {
                 <Route path="/" element={<UserProfile />} />
                 <Route path="/test" element={<ViewExam />} />
                 <Route path="/summary" element={<ViewSummary />} />
+                <Route path="/upload" element={<FileUpload />} /> 
               </>
             ) : (
               <>
