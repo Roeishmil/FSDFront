@@ -1,20 +1,19 @@
 import axios from "axios";
-import { time } from "console";
-import { register } from "module";
 import { IUser } from "./Interfaces";
 
 const BASE_URL = "http://localhost:3000";
 
-
+// Cache for promises to prevent duplicate requests
 let examPromise: Promise<string> | null = null;
 let summaryPromise: Promise<string> | null = null;
 
-
 export const api = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
+  // Set a reasonable timeout (5 minutes)
+  timeout: 300000,
 });
 
 api.interceptors.request.use(
@@ -25,25 +24,31 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   async (error) => {
+    // If the request was aborted or timed out, don't retry
+    if (error.code === "ECONNABORTED" || axios.isCancel(error)) {
+      return Promise.reject(error);
+    }
+    
     const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      const refreshToken = localStorage.getItem("refreshToken");
-      const response = await api.post("/refresh", { token: refreshToken });
-      const newAccessToken = response.data.accessToken;
-      localStorage.setItem("accessToken", newAccessToken);
-      api.defaults.headers.common["Authorization"] = `JWT ${newAccessToken}`;
-      return api(originalRequest);
+      try {
+        const refreshToken = localStorage.getItem("refreshToken");
+        const response = await api.post("/refresh", { token: refreshToken });
+        const newAccessToken = response.data.accessToken;
+        localStorage.setItem("accessToken", newAccessToken);
+        api.defaults.headers.common["Authorization"] = `JWT ${newAccessToken}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        // If refresh token fails, reject with the original error
+        return Promise.reject(error);
+      }
     }
     return Promise.reject(error);
   }
@@ -69,50 +74,96 @@ export const fileApi = {
 };
 
 export const examApi = {
-  creatExam: (formData: FormData): Promise<string> => {
-    // If there is already a pending request, return its promise
-    if (examPromise) return examPromise;
-    examPromise = axios
-      .post(`${BASE_URL}/gpt/upload-and-generate-exam`, formData, {
-        responseType: "text",
-        timeout: 300000,
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
-      .then((response) => {
-        examPromise = null; // reset after completion
+  /**
+   * Generate exam content.
+   * If a custom prompt is provided (nonempty string), a GET request is sent with the prompt query parameter.
+   * Otherwise, a cached GET request is used.
+   *
+   * @param customPrompt Optional custom prompt for exam generation.
+   * @returns A promise that resolves with the exam HTML.
+   */
+  creatExam: async (customPrompt: string = ""): Promise<string> => {
+    // Cancel any previous request if a new one is made
+    if (examPromise !== null) {
+      // We can't directly cancel the promise, but we can set it to null
+      // so subsequent calls will create a new request
+      examPromise = null;
+    }
+
+    try {
+      if (customPrompt && customPrompt.trim().length > 0) {
+        // Append the prompt as a query parameter
+        const response = await api.get("/gpt/generate-exam", {
+          params: { prompt: customPrompt },
+          responseType: "text",
+        });
         return response.data;
-      })
-      .catch((error) => {
-        examPromise = null; // reset on error
-        throw error;
-      });
-    return examPromise;
+      } else {
+        // Create a new promise for the request
+        examPromise = api
+          .get("/gpt/generate-exam", { responseType: "text" })
+          .then((response) => {
+            examPromise = null;
+            return response.data;
+          })
+          .catch((error) => {
+            examPromise = null;
+            throw error;
+          });
+        return examPromise;
+      }
+    } catch (error) {
+      console.error("Error in creatExam:", error);
+      throw error;
+    }
   },
 };
 
 export const summaryApi = {
-  creatSummary: (): Promise<string> => {
-    if (summaryPromise) return summaryPromise;
-    summaryPromise = axios
-      .get(`${BASE_URL}/gpt/generate-summary`, { responseType: "text",
-        timeout: 300000})
-      .then((response) => {
-        summaryPromise = null;
+  /**
+   * Generate summary content.
+   * If a custom prompt is provided (nonempty string), a GET request is sent with the prompt query parameter.
+   * Otherwise, a cached GET request is used.
+   *
+   * @param customPrompt Optional custom prompt for summary generation.
+   * @returns A promise that resolves with the summary HTML.
+   */
+  creatSummary: async (customPrompt: string = ""): Promise<string> => {
+    // Cancel any previous request if a new one is made
+    if (summaryPromise !== null) {
+      summaryPromise = null;
+    }
+
+    try {
+      if (customPrompt && customPrompt.trim().length > 0) {
+        const response = await api.get("/gpt/generate-summary", {
+          params: { prompt: customPrompt },
+          responseType: "text",
+        });
         return response.data;
-      })
-      .catch((error) => {
-        summaryPromise = null;
-        throw error;
-      });
-    return summaryPromise;
+      } else {
+        summaryPromise = api
+          .get("/gpt/generate-summary", { responseType: "text" })
+          .then((response) => {
+            summaryPromise = null;
+            return response.data;
+          })
+          .catch((error) => {
+            summaryPromise = null;
+            throw error;
+          });
+        return summaryPromise;
+      }
+    } catch (error) {
+      console.error("Error in creatSummary:", error);
+      throw error;
+    }
   },
 };
 
 export const userApi = {
   register: async (data: any) => {
-    const response = await api.post(`${BASE_URL}/auth/register`, data);
+    const response = await api.post(`/auth/register`, data);
     return response.data;
   },
 };

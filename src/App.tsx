@@ -6,6 +6,9 @@ import UserProfile from "./components/UserProfile/UserProfile";
 import SignUpPage from "./components/RegistrationPage/SignUpPage";
 import ViewExam from "./ViewExam";
 import ViewSummary from "./ViewSummary";
+import StudyMetatrails from "./components/StudyMaterial/StudyMaterial";
+import GenerateExam from "./components/Generate/GenerateExam";
+import GenerateSummary from "./components/Generate/GenerateSummary";
 import { useEffect, useState } from "react";
 import useUser from "./hooks/useUser";
 import { ToastContainer } from "react-toastify";
@@ -17,11 +20,7 @@ function App() {
   const { user } = useUser();
 
   useEffect(() => {
-    if (user) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
+    setIsAuthenticated(!!user);
   }, [user]);
 
   return (
@@ -37,6 +36,11 @@ function App() {
             {isAuthenticated ? (
               <>
                 <Route path="/" element={<UserProfile />} />
+                <Route path="/study" element={<StudyMetatrails />} />
+                {/* New generation screen routes */}
+                <Route path="/generate-test" element={<GenerateExam />} />
+                <Route path="/generate-summary" element={<GenerateSummary />} />
+                {/* You can keep the legacy routes if needed, or remove them */}
                 <Route path="/test" element={<ViewExam />} />
                 <Route path="/summary" element={<ViewSummary />} />
                 <Route path="/upload" element={<FileUpload />} /> 
