@@ -2,7 +2,6 @@ import axios from "axios";
 import { IUser } from "./Interfaces";
 
 const BASE_URL = "http://localhost:3000";
-
 // Cache for promises to prevent duplicate requests
 let examPromise: Promise<string> | null = null;
 let summaryPromise: Promise<string> | null = null;
@@ -138,6 +137,25 @@ export const summaryApi = {
   },
 };
 
+export const subjectsApi = {
+  fetchSubjects: async (userId) => {
+    const response = await api.get(`/subjects/user/${userId}`);
+    return response.data;
+  },
+  createSubject: async (data: { title: string; description?: string }) => {
+    const response = await api.post("/subjects", data);
+    return response.data;
+  },
+  deleteSubject: async (subjectId: string) => {
+    const response = await api.delete(`/subjects/${subjectId}`);
+    return response.data;
+  },
+  updateSubject: async (subjectId: string, data: { title: string; description?: string }) => {
+    const response = await api.put(`/subjects/${subjectId}`, data);
+    return response.data;
+  },
+};
+
 export const userApi = {
   register: async (data: any) => {
     const response = await api.post(`/auth/register`, data);
@@ -152,4 +170,5 @@ export default {
   userApi,
   userService,
   fileApi,
+  subjectsApi,
 };
