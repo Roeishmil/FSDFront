@@ -82,11 +82,12 @@ export const examApi = {
    */
   creatExam: async (formData: FormData): Promise<string> => {
     try {
-      const response = await api.post("/gpt/generate-exam", formData, {
+      const response = await api.post("/gpt/upload-and-generate-exam", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+      
       return response.data;
     } catch (error) {
       console.error("Error in creatExam:", error);

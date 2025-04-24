@@ -38,6 +38,7 @@ const GenerateExam: React.FC = () => {
   const [htmlContent, setHtmlContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleGenerate = async () => {
@@ -57,9 +58,9 @@ const GenerateExam: React.FC = () => {
       formData.append("prompt", prompt);
       formData.append("file", uploadedFiles[0]); // Send the first file
 
-      // Call the API to create the exam
-      const data = await examApi.creatExam(formData);
-      setHtmlContent(data);
+      // Call the API to create the exam - fixed to properly handle the response
+      const response = await examApi.creatExam(formData);
+      setHtmlContent(response);
     } catch (err) {
       console.error("Error generating exam:", err);
 
@@ -101,17 +102,6 @@ const GenerateExam: React.FC = () => {
     }
   }, [htmlContent]);
 
-  if (loading) {
-    return <Loader message="Generating exam... This may take up to a minute." />;
-  }
-
-  if (htmlContent) {
-    // Generated content is displayed by injecting the HTML
-    return <div ref={containerRef} />;
-  }
-
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-
   const handleFileSelected = (file: File) => {
     setUploadedFiles((prev) => [...prev, file]);
     console.log("File selected:", file.name);
@@ -134,6 +124,15 @@ const GenerateExam: React.FC = () => {
   const removeFile = (index: number) => {
     setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
   };
+
+  // Render the HTML content in a separate component to ensure the ref is properly attached
+  if (loading) {
+    return <Loader message="Generating exam... This may take up to a minute." />;
+  }
+
+  if (htmlContent) {
+    return <div ref={containerRef} className="html-content-container" />;
+  }
 
   return (
     <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
