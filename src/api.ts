@@ -34,7 +34,7 @@ api.interceptors.response.use(
     if (error.code === "ECONNABORTED" || axios.isCancel(error)) {
       return Promise.reject(error);
     }
-    
+
     const originalRequest = error.config;
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
@@ -76,42 +76,19 @@ export const fileApi = {
 export const examApi = {
   /**
    * Generate exam content.
-   * If a custom prompt is provided (nonempty string), a GET request is sent with the prompt query parameter.
-   * Otherwise, a cached GET request is used.
+   * Sends a POST request with a FormData object containing the prompt and file.
    *
-   * @param customPrompt Optional custom prompt for exam generation.
+   * @param formData A FormData object containing the prompt and file.
    * @returns A promise that resolves with the exam HTML.
    */
-  creatExam: async (customPrompt: string = ""): Promise<string> => {
-    // Cancel any previous request if a new one is made
-    if (examPromise !== null) {
-      // We can't directly cancel the promise, but we can set it to null
-      // so subsequent calls will create a new request
-      examPromise = null;
-    }
-
+  creatExam: async (formData: FormData): Promise<string> => {
     try {
-      if (customPrompt && customPrompt.trim().length > 0) {
-        // Append the prompt as a query parameter
-        const response = await api.get("/gpt/generate-exam", {
-          params: { prompt: customPrompt },
-          responseType: "text",
-        });
-        return response.data;
-      } else {
-        // Create a new promise for the request
-        examPromise = api
-          .get("/gpt/generate-exam", { responseType: "text" })
-          .then((response) => {
-            examPromise = null;
-            return response.data;
-          })
-          .catch((error) => {
-            examPromise = null;
-            throw error;
-          });
-        return examPromise;
-      }
+      const response = await api.post("/gpt/generate-exam", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response.data;
     } catch (error) {
       console.error("Error in creatExam:", error);
       throw error;
