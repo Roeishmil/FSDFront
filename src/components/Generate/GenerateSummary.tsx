@@ -34,8 +34,6 @@ const Loader: React.FC<{ message: string }> = ({ message }) => (
 
 const GenerateSummary: React.FC = () => {
   const [prompt, setPrompt] = useState("");
-  const [numAmerican, setNumAmerican] = useState(0);
-  const [numOpen, setNumOpen] = useState(0);
   const [htmlContent, setHtmlContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,8 +53,6 @@ const GenerateSummary: React.FC = () => {
 
       const formData = new FormData();
       formData.append("prompt", prompt);
-      formData.append("numAmerican", numAmerican.toString());
-      formData.append("numOpen", numOpen.toString());
       formData.append("file", uploadedFiles[0]); // Send first file
 
       const response = await summaryApi.creatSummary(formData);
@@ -165,44 +161,6 @@ const GenerateSummary: React.FC = () => {
           border: "1px solid #ccc",
         }}
       />
-
-      <div style={{ marginBottom: "15px" }}>
-        <label>
-          Number of American Questions:
-          <input
-            type="number"
-            min="0"
-            value={numAmerican}
-            onChange={(e) => setNumAmerican(parseInt(e.target.value, 10) || 0)}
-            style={{
-              marginLeft: "10px",
-              padding: "5px",
-              borderRadius: "4px",
-              border: "1px solid #ccc",
-              width: "80px",
-            }}
-          />
-        </label>
-      </div>
-
-      <div style={{ marginBottom: "15px" }}>
-        <label>
-          Number of Open Questions:
-          <input
-            type="number"
-            min="0"
-            value={numOpen}
-            onChange={(e) => setNumOpen(parseInt(e.target.value, 10) || 0)}
-            style={{
-              marginLeft: "10px",
-              padding: "5px",
-              borderRadius: "4px",
-              border: "1px solid #ccc",
-              width: "80px",
-            }}
-          />
-        </label>
-      </div>
 
       <div className={styles.container}>
         <h1>Upload Files</h1>
