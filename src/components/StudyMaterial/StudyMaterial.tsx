@@ -22,7 +22,7 @@ const StudyMetatrails: React.FC = () => {
           Tests
         </button>
         <button className="study-button" onClick={handleSummaryClick}>
-          Summery
+          Summary
         </button>
       </div>
     </div>
