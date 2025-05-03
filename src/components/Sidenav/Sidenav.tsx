@@ -21,9 +21,8 @@ const Sidenav: FC = () => {
       <div className={SidenavStyle.user}>Hello, {user?.fullName}</div>
       <nav className={SidenavStyle.nav}>
         <Link to="/">profile</Link>
-        <Link to="/study">Study Metatrails</Link>
+        <Link to="/study">Study Material</Link>
         <Link to="/subjects">subjects</Link>
-
       </nav>
       <button className={SidenavStyle.logoutBtn} onClick={handleLogout}>
         Logout

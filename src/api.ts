@@ -99,38 +99,19 @@ export const examApi = {
 export const summaryApi = {
   /**
    * Generate summary content.
-   * If a custom prompt is provided (nonempty string), a GET request is sent with the prompt query parameter.
-   * Otherwise, a cached GET request is used.
+   * Sends a POST request with a FormData object containing the prompt and file.
    *
-   * @param customPrompt Optional custom prompt for summary generation.
+   * @param formData A FormData object containing the prompt and file.
    * @returns A promise that resolves with the summary HTML.
    */
-  creatSummary: async (customPrompt: string = ""): Promise<string> => {
-    // Cancel any previous request if a new one is made
-    if (summaryPromise !== null) {
-      summaryPromise = null;
-    }
-
+  creatSummary: async (formData: FormData): Promise<string> => {
     try {
-      if (customPrompt && customPrompt.trim().length > 0) {
-        const response = await api.get("/gpt/generate-summary", {
-          params: { prompt: customPrompt },
-          responseType: "text",
-        });
-        return response.data;
-      } else {
-        summaryPromise = api
-          .get("/gpt/generate-summary", { responseType: "text" })
-          .then((response) => {
-            summaryPromise = null;
-            return response.data;
-          })
-          .catch((error) => {
-            summaryPromise = null;
-            throw error;
-          });
-        return summaryPromise;
-      }
+      const response = await api.post("/gpt/upload-and-generate-summary", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response.data;
     } catch (error) {
       console.error("Error in creatSummary:", error);
       throw error;
@@ -139,7 +120,7 @@ export const summaryApi = {
 };
 
 export const subjectsApi = {
-  fetchSubjects: async (userId) => {
+  fetchSubjects: async (userId: any) => {
     const response = await api.get(`/subjects/user/${userId}`);
     return response.data;
   },
