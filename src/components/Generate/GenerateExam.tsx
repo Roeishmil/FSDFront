@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { examApi } from "../../api"; // adjust the path as needed
+import { examApi , contentApi } from "../../api"; // adjust the path as needed
 import GoogleDrivePicker from "../googleDrive";
 import styles from "./Generate.module.css";
 
@@ -39,13 +39,19 @@ const GenerateExam: React.FC = () => {
   const [numOpen, setNumOpen] = useState(0);
   const [htmlContent, setHtmlContent] = useState("");
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [examTitle, setExamTitle] = useState("Generated Exam");
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleGenerate = async () => {
     setLoading(true);
     setError(null);
+    setSaveSuccess(false);
+    setSaveError(null);
 
     try {
       // Ensure at least one file is uploaded
@@ -80,6 +86,41 @@ const GenerateExam: React.FC = () => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Save the generated exam to the database
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveError(null);
+    setSaveSuccess(false);
+
+    try {
+      // Get user ID from local storage or context
+      let userId = localStorage.getItem('userId') || ''; // Adjust based on your auth implementation
+      
+      if (!userId) {
+        userId = '67f3bd679937c252dacacee4';
+      }
+
+      // Create the content payload
+      const contentPayload = {
+        userId: userId,
+        content: htmlContent,
+        title: examTitle,
+        contentType: "Exam"
+      };
+
+      // Make API call to save the content
+      const response = await contentApi.createContent(contentPayload);
+
+     
+      setSaveSuccess(true);
+    } catch (err) {
+      console.error("Error saving exam:", err);
+      setSaveError(err instanceof Error ? err.message : "Failed to save exam");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -127,12 +168,100 @@ const GenerateExam: React.FC = () => {
     setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const resetExam = () => {
+    setHtmlContent("");
+    setSaveSuccess(false);
+    setSaveError(null);
+  };
+
   if (loading) {
     return <Loader message="Generating exam... This may take up to a minute." />;
   }
 
+  if (saving) {
+    return <Loader message="Saving exam to your account..." />;
+  }
+
   if (htmlContent) {
-    return <div ref={containerRef} className="html-content-container" />;
+    return (
+      <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+          <h2>Generated Exam</h2>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="text"
+              value={examTitle}
+              onChange={(e) => setExamTitle(e.target.value)}
+              placeholder="Enter exam title"
+              style={{
+                padding: "8px 12px",
+                borderRadius: "4px",
+                border: "1px solid #ccc",
+                width: "250px",
+              }}
+            />
+            <button
+              onClick={handleSave}
+              style={{
+                backgroundColor: "#28a745",
+                color: "white",
+                border: "none",
+                padding: "10px 20px",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "16px",
+              }}
+            >
+              Save Exam
+            </button>
+            <button
+              onClick={resetExam}
+              style={{
+                backgroundColor: "#6c757d",
+                color: "white",
+                border: "none",
+                padding: "10px 20px",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "16px",
+              }}
+            >
+              Back
+            </button>
+          </div>
+        </div>
+
+        {saveSuccess && (
+          <div
+            style={{
+              color: "white",
+              backgroundColor: "#28a745",
+              padding: "12px",
+              borderRadius: "4px",
+              marginBottom: "15px",
+            }}
+          >
+            Exam saved successfully!
+          </div>
+        )}
+
+        {saveError && (
+          <div
+            style={{
+              color: "white",
+              backgroundColor: "#d9534f",
+              padding: "12px",
+              borderRadius: "4px",
+              marginBottom: "15px",
+            }}
+          >
+            {saveError}
+          </div>
+        )}
+
+        <div ref={containerRef} className="html-content-container" />
+      </div>
+    );
   }
 
   return (
