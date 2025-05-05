@@ -39,7 +39,7 @@ function App() {
               <>
                 <Route path="/" element={<UserProfile />} />
                 <Route path="/study" element={<StudyMetatrails />} />
-                <Route path="/generate" element={<Generate />} />
+                <Route path="/generate/:subjectId" element={<Generate />} />
                 {/* New generation screen routes */}
                 <Route path="/generate-test" element={<GenerateExam />} />
                 <Route path="/generate-summary" element={<GenerateSummary />} />

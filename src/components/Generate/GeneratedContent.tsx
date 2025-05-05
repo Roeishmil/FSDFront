@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import styles from "./GeneratedContent.module.css";
 
 type ContentItem = {
@@ -16,8 +17,25 @@ const mockData: ContentItem[] = [
 ];
 
 const GeneratedContent: React.FC = () => {
+  const { subjectId } = useParams();
+  const [contentItems, setContentItems] = useState<ContentItem[]>([]);
   const [filter, setFilter] = useState<"All" | "Test" | "Summary">("All");
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Replace with your real API
+        const allContent = await contentApi.fetchContent();
+        const filtered = allContent.filter((item) => item.subjectId === subjectId);
+        setContentItems(filtered);
+      } catch (err) {
+        console.error("Error fetching content:", err);
+      }
+    };
+
+    fetchData();
+  }, [subjectId]);
 
   const filtered = mockData.filter(
     (item) => (filter === "All" || item.type === filter) && item.title.toLowerCase().includes(search.toLowerCase())
@@ -25,6 +43,7 @@ const GeneratedContent: React.FC = () => {
 
   return (
     <div className={styles.generatedContent}>
+      <h2>Content for Subject ID: {subjectId}</h2>
       <div className={styles.header}>
         <h2>Generated Content</h2>
         <div className={styles.actions}>

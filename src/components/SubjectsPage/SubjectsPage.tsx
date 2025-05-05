@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import SubjectsPageStyle from "./SubjectsPage.module.css";
 import { subjectsApi } from "../../api";
 import useUser from "../../hooks/useUser";
+import { useNavigate } from "react-router-dom";
 
 const schema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -28,6 +29,7 @@ const SubjectsPage: FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { user } = useUser();
+  const navigate = useNavigate();
 
   const { register, handleSubmit, reset, formState } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -113,6 +115,9 @@ const SubjectsPage: FC = () => {
               <li key={subject._id} className={SubjectsPageStyle.subjectItem}>
                 <h3>{subject.title}</h3>
                 <p>{subject.description || "No description provided"}</p>
+                <button className={SubjectsPageStyle.viewButton} onClick={() => navigate(`/generated/${subject._id}`)}>
+                  View Content
+                </button>
                 <button className={SubjectsPageStyle.editButton} onClick={() => handleEdit(subject)}>
                   Edit
                 </button>
