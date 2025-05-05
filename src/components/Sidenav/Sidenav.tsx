@@ -23,6 +23,7 @@ const Sidenav: FC = () => {
         <Link to="/">profile</Link>
         <Link to="/study">Study Material</Link>
         <Link to="/subjects">subjects</Link>
+        <Link to="/generate">Generate</Link>
       </nav>
       <button className={SidenavStyle.logoutBtn} onClick={handleLogout}>
         Logout
