@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./GeneratedContent.module.css"; // נשתמש בקובץ CSS מותאם לסגנון
+import styles from "./GeneratedContent.module.css";
 
 type ContentItem = {
   id: string;
@@ -24,17 +24,17 @@ const GeneratedContent: React.FC = () => {
   );
 
   return (
-    <div className="generated-content">
-      <div className="header">
+    <div className={styles.generatedContent}>
+      <div className={styles.header}>
         <h2>Generated Content</h2>
-        <div className="actions">
-          <button className="black-button">Generate Summary</button>
-          <button className="black-button">Create Test</button>
+        <div className={styles.actions}>
+          <button className={styles.blackButton}>Generate Summary</button>
+          <button className={styles.blackButton}>Create Test</button>
         </div>
       </div>
 
-      <div className="filters">
-        <div className="tabs">
+      <div className={styles.filters}>
+        <div className={styles.tabs}>
           {["All", "Summary", "Test"].map((t) => (
             <button key={t} className={filter === t ? "active" : ""} onClick={() => setFilter(t as any)}>
               {t === "All" ? "All Content" : t + "s"}
@@ -44,18 +44,18 @@ const GeneratedContent: React.FC = () => {
         <input type="text" placeholder="Search content..." value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
 
-      <div className="cards">
+      <div className={styles.cards}>
         {filtered.map((item) => (
-          <div key={item.id} className="card">
-            <div className="card-header">
+          <div key={item.id} className={styles.card}>
+            <div className={styles.cardHeader}>
               <strong>{item.title}</strong>
               <span>{item.date}</span>
             </div>
-            <div className="card-tags">
-              {item.subject && <span className="tag">{item.subject}</span>}
-              <span className="tag">{item.type}</span>
+            <div className={styles.cardTags}>
+              {item.subject && <span className={styles.tag}>{item.subject}</span>}
+              <span className={styles.tag}>{item.type}</span>
             </div>
-            <button className="view-button">👁 View Content</button>
+            <button className={styles.viewButton}>👁 View Content</button>
           </div>
         ))}
       </div>
