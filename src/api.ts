@@ -119,6 +119,18 @@ export const summaryApi = {
   },
 };
 
+export const contentApi ={
+  createContent: async (formData: any) => {
+    try {
+      const response = await api.post("/content", formData);
+      return response.data;
+    } catch (error) {
+      console.error("Error in createContent:", error);
+      throw error;
+    }
+  },
+}
+
 export const subjectsApi = {
   fetchSubjects: async (userId: any) => {
     const response = await api.get(`/subjects/user/${userId}`);
