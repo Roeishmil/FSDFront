@@ -8,12 +8,13 @@ import ViewExam from "./ViewExam";
 import ViewSummary from "./ViewSummary";
 import StudyMetatrails from "./components/StudyMaterial/StudyMaterial";
 import GenerateExam from "./components/Generate/GenerateExam";
+import Generate from "./components/Generate/GeneratedContent";
 import GenerateSummary from "./components/Generate/GenerateSummary";
 import { useEffect, useState } from "react";
 import useUser from "./hooks/useUser";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import FileUpload from "./components/FileUpload/FileUpload"; 
+import FileUpload from "./components/FileUpload/FileUpload";
 import SubjectsPage from "./components/SubjectsPage/SubjectsPage";
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
               <>
                 <Route path="/" element={<UserProfile />} />
                 <Route path="/study" element={<StudyMetatrails />} />
+                <Route path="/generate" element={<Generate />} />
                 {/* New generation screen routes */}
                 <Route path="/generate-test" element={<GenerateExam />} />
                 <Route path="/generate-summary" element={<GenerateSummary />} />
@@ -45,7 +47,7 @@ function App() {
                 <Route path="/test" element={<ViewExam />} />
                 <Route path="/summary" element={<ViewSummary />} />
                 <Route path="/subjects" element={<SubjectsPage />} />
-                <Route path="/upload" element={<FileUpload />} /> 
+                <Route path="/upload" element={<FileUpload />} />
               </>
             ) : (
               <>

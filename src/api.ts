@@ -129,6 +129,24 @@ export const contentApi ={
       throw error;
     }
   },
+  fetchContent: async (userId: any) => {
+    try {
+      const response = await api.get(`/content/user/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error in createContent:", error);
+      throw error;
+    }
+  },
+  updateContent: async (contentId: string, data: { title?: string; subject?: string }) => {
+    try {
+      const response = await api.put(`/content/${contentId}`, data);
+      return response.data;
+    } catch (error) {
+      console.error("Error in updateContent:", error);
+      throw error;
+    }
+  },
 }
 
 export const subjectsApi = {
