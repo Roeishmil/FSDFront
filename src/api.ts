@@ -119,6 +119,38 @@ export const summaryApi = {
   },
 };
 
+
+export const contentApi ={
+  createContent: async (formData: any) => {
+    try {
+      const response = await api.post("/content", formData);
+      return response.data;
+    } catch (error) {
+      console.error("Error in createContent:", error);
+      throw error;
+    }
+  },
+  fetchContent: async (userId: any) => {
+    try {
+      const response = await api.get(`/content/user/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error in createContent:", error);
+      throw error;
+    }
+  },
+  updateContent: async (contentId: string, data: { title?: string; subject?: string }) => {
+    try {
+      const response = await api.put(`/content/${contentId}`, data);
+      return response.data;
+    } catch (error) {
+      console.error("Error in updateContent:", error);
+      throw error;
+    }
+  },
+}
+
+
 export const subjectsApi = {
   fetchSubjects: async (userId: any) => {
     const response = await api.get(`/subjects/user/${userId}`);

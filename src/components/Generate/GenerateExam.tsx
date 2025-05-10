@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { examApi } from "../../api"; // adjust the path as needed
+import { examApi, contentApi, subjectsApi } from "../../api"; 
 import GoogleDrivePicker from "../googleDrive";
 import styles from "./Generate.module.css";
 
@@ -33,15 +33,139 @@ const Loader: React.FC<{ message: string }> = ({ message }) => (
   </div>
 );
 
+// Enhanced component for title/subject editing after generation
+// Enhanced component for title/subject editing after generation
+const ContentMetadata: React.FC<{ 
+  contentId: string, 
+  initialTitle: string,
+  onClose: () => void
+}> = ({ contentId, initialTitle, onClose }) => {
+  const [title, setTitle] = useState(initialTitle);
+  const [subject, setSubject] = useState(""); // Direct subject input instead of selection
+  const [updating, setUpdating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleUpdate = async () => {
+    if (!title.trim()) {
+      setError("Title cannot be empty");
+      return;
+    }
+
+    try {
+      setUpdating(true);
+      // Update content with title and subject as direct text input
+      await contentApi.updateContent(contentId, { 
+        title, 
+        subject // Send the subject text directly instead of an ID
+      });
+      
+      setUpdating(false);
+      onClose();
+    } catch (err) {
+      console.error("Error updating content:", err);
+      setError("Failed to update exam details. Please try again.");
+      setUpdating(false);
+    }
+  };
+
+  return (
+    <div className={styles.metadataOverlay}>
+      <div className={styles.metadataCard}>
+        <h3>Update Exam Details</h3>
+        
+        {error && (
+          <div style={{ color: "white", backgroundColor: "#d9534f", padding: "10px", marginBottom: "15px", borderRadius: "4px" }}>
+            {error}
+          </div>
+        )}
+        
+        <div style={{ marginBottom: "15px" }}>
+          <label>
+            Title:
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "8px",
+                marginTop: "5px",
+                borderRadius: "4px",
+                border: "1px solid #ccc"
+              }}
+            />
+          </label>
+        </div>
+        
+        <div style={{ marginBottom: "15px" }}>
+          <label>
+            Subject:
+            <input
+              type="text"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="Enter subject name"
+              style={{
+                width: "100%",
+                padding: "8px",
+                marginTop: "5px",
+                borderRadius: "4px",
+                border: "1px solid #ccc"
+              }}
+            />
+          </label>
+        </div>
+        
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <button
+            onClick={onClose}
+            style={{
+              backgroundColor: "#6c757d",
+              color: "white",
+              border: "none",
+              padding: "8px 15px",
+              borderRadius: "4px",
+              cursor: "pointer"
+            }}
+          >
+            Skip
+          </button>
+          
+          <button
+            onClick={handleUpdate}
+            disabled={updating || !title.trim()}
+            style={{
+              backgroundColor: "#28a745",
+              color: "white",
+              border: "none",
+              padding: "8px 15px",
+              borderRadius: "4px",
+              cursor: updating || !title.trim() ? "not-allowed" : "pointer"
+            }}
+          >
+            {updating ? "Updating..." : "Save"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const GenerateExam: React.FC = () => {
   const [prompt, setPrompt] = useState("");
-  const [numAmerican, setNumAmerican] = useState(0);
-  const [numOpen, setNumOpen] = useState(0);
+  const [numAmerican, setNumAmerican] = useState(8); // Default value of 8
+  const [numOpen, setNumOpen] = useState(3); // Default value of 3
+  const [difficulty, setDifficulty] = useState("Moderate"); // Default difficulty
   const [htmlContent, setHtmlContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // State for handling saved content
+  const [contentId, setContentId] = useState<string | null>(null);
+  const [showMetadataForm, setShowMetadataForm] = useState(false);
+  const [metadataEdited, setMetadataEdited] = useState(false);
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -55,16 +179,40 @@ const GenerateExam: React.FC = () => {
         return;
       }
 
-      // Create FormData and append the prompt, numAmerican, numOpen, and the first file
+      // Create FormData and append all parameters
       const formData = new FormData();
       formData.append("prompt", prompt);
       formData.append("numAmerican", numAmerican.toString());
       formData.append("numOpen", numOpen.toString());
+      formData.append("difficulty", difficulty); // Add difficulty level
       formData.append("file", uploadedFiles[0]); // Send the first file
+      
+      // Get the user ID from localStorage if available
+      const userId = localStorage.getItem("userId");
+      if (userId) {
+        formData.append("userId", userId);
+      }
 
       // Call the API to create the exam
       const response = await examApi.creatExam(formData);
-      setHtmlContent(response);
+      
+      // Check if the response is an object with html and contentId properties
+      if (typeof response === 'object' && response !== null && 'html' in response) {
+        setHtmlContent(response.html);
+        
+        // If we got a content ID back, save it and show the metadata form
+        if (response.contentId) {
+          console.log("Content ID received:", response.contentId);
+          setContentId(response.contentId);
+          setShowMetadataForm(true);
+        } else {
+          console.error("No contentId in response:", response);
+        }
+      } else {
+        // If the response is just HTML as a string
+        setHtmlContent(response);
+        console.warn("Response was not an object with html/contentId:", response);
+      }
     } catch (err) {
       console.error("Error generating exam:", err);
 
@@ -127,12 +275,77 @@ const GenerateExam: React.FC = () => {
     setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleCloseMetadataForm = () => {
+    setShowMetadataForm(false);
+    setMetadataEdited(true);
+  };
+
+  const handleOpenMetadataForm = () => {
+    if (contentId) {
+      setShowMetadataForm(true);
+    } else {
+      console.error("Cannot open metadata form: contentId is null");
+      setError("Unable to edit exam details. Content ID not found.");
+    }
+  };
+
   if (loading) {
     return <Loader message="Generating exam... This may take up to a minute." />;
   }
 
   if (htmlContent) {
-    return <div ref={containerRef} className="html-content-container" />;
+    return (
+      <>
+        {showMetadataForm && contentId && (
+          <ContentMetadata 
+            contentId={contentId} 
+            initialTitle={`Exam - ${difficulty} - ${new Date().toLocaleDateString()}`}
+            onClose={handleCloseMetadataForm}
+          />
+        )}
+        
+        {error && (
+          <div
+            style={{
+              color: "white",
+              backgroundColor: "#d9534f",
+              padding: "12px",
+              borderRadius: "4px",
+              margin: "10px 20px",
+            }}
+          >
+            {error}
+          </div>
+        )}
+        
+        <div style={{ display: "flex", justifyContent: "flex-end", padding: "10px 20px" }}>
+          {!showMetadataForm && contentId && (
+            <button
+              onClick={handleOpenMetadataForm}
+              style={{
+                backgroundColor: "#007bff",
+                color: "white",
+                border: "none",
+                padding: "8px 15px",
+                borderRadius: "4px",
+                cursor: "pointer",
+                marginBottom: "10px"
+              }}
+            >
+              {metadataEdited ? "Edit Exam Details" : "Set Exam Title & Subject"}
+            </button>
+          )}
+          
+          {!showMetadataForm && !contentId && (
+            <div style={{ color: "#6c757d", padding: "8px 15px", fontSize: "0.9em" }}>
+              Content ID not available - metadata editing disabled
+            </div>
+          )}
+        </div>
+        
+        <div ref={containerRef} className="html-content-container" />
+      </>
+    );
   }
 
   return (
@@ -207,6 +420,28 @@ const GenerateExam: React.FC = () => {
               width: "80px",
             }}
           />
+        </label>
+      </div>
+
+      {/* Difficulty selector */}
+      <div style={{ marginBottom: "15px" }}>
+        <label>
+          Difficulty Level:
+          <select
+            value={difficulty}
+            onChange={(e) => setDifficulty(e.target.value)}
+            style={{
+              marginLeft: "10px",
+              padding: "5px",
+              borderRadius: "4px",
+              border: "1px solid #ccc",
+              width: "120px",
+            }}
+          >
+            <option value="Easy">Easy</option>
+            <option value="Moderate">Moderate</option>
+            <option value="Hard">Hard</option>
+          </select>
         </label>
       </div>
 
