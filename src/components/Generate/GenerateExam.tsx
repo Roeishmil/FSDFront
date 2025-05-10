@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { examApi, contentApi, subjectsApi } from "../../api"; 
+
 import GoogleDrivePicker from "../googleDrive";
 import styles from "./Generate.module.css";
 
@@ -158,8 +159,12 @@ const GenerateExam: React.FC = () => {
   const [difficulty, setDifficulty] = useState("Moderate"); // Default difficulty
   const [htmlContent, setHtmlContent] = useState("");
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [examTitle, setExamTitle] = useState("Generated Exam");
   const containerRef = useRef<HTMLDivElement>(null);
   
   // State for handling saved content
@@ -170,6 +175,8 @@ const GenerateExam: React.FC = () => {
   const handleGenerate = async () => {
     setLoading(true);
     setError(null);
+    setSaveSuccess(false);
+    setSaveError(null);
 
     try {
       // Ensure at least one file is uploaded
@@ -231,6 +238,41 @@ const GenerateExam: React.FC = () => {
     }
   };
 
+  // Save the generated exam to the database
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveError(null);
+    setSaveSuccess(false);
+
+    try {
+      // Get user ID from local storage or context
+      let userId = localStorage.getItem('userId') || ''; // Adjust based on your auth implementation
+      
+      if (!userId) {
+        userId = '67f3bd679937c252dacacee4';
+      }
+
+      // Create the content payload
+      const contentPayload = {
+        userId: userId,
+        content: htmlContent,
+        title: examTitle,
+        contentType: "Exam"
+      };
+
+      // Make API call to save the content
+      const response = await contentApi.createContent(contentPayload);
+
+     
+      setSaveSuccess(true);
+    } catch (err) {
+      console.error("Error saving exam:", err);
+      setSaveError(err instanceof Error ? err.message : "Failed to save exam");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   // Reset errors when prompt changes
   useEffect(() => {
     if (error) setError(null);
@@ -275,6 +317,7 @@ const GenerateExam: React.FC = () => {
     setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
+
   const handleCloseMetadataForm = () => {
     setShowMetadataForm(false);
     setMetadataEdited(true);
@@ -287,10 +330,15 @@ const GenerateExam: React.FC = () => {
       console.error("Cannot open metadata form: contentId is null");
       setError("Unable to edit exam details. Content ID not found.");
     }
+
   };
 
   if (loading) {
     return <Loader message="Generating exam... This may take up to a minute." />;
+  }
+
+  if (saving) {
+    return <Loader message="Saving exam to your account..." />;
   }
 
   if (htmlContent) {
@@ -305,6 +353,7 @@ const GenerateExam: React.FC = () => {
         )}
         
         {error && (
+
           <div
             style={{
               color: "white",
@@ -345,6 +394,7 @@ const GenerateExam: React.FC = () => {
         
         <div ref={containerRef} className="html-content-container" />
       </>
+
     );
   }
 

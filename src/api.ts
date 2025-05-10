@@ -119,7 +119,6 @@ export const summaryApi = {
   },
 };
 
-
 export const contentApi ={
   createContent: async (formData: any) => {
     try {
@@ -149,7 +148,6 @@ export const contentApi ={
     }
   },
 }
-
 
 export const subjectsApi = {
   fetchSubjects: async (userId: any) => {
