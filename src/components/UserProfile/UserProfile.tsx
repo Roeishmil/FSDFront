@@ -4,30 +4,48 @@ import Avatar from "../../assets/avatar.png";
 import { INTINAL_DATA_USER, IUser } from "../../Interfaces";
 import Loader from "../Loader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faImage } from "@fortawesome/free-solid-svg-icons";
+import { faImage, faPen, faSave } from "@fortawesome/free-solid-svg-icons";
 import useUser from "../../hooks/useUser";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { fileApi } from "../../api";
 
+/* ─────────── validation ─────────── */
 const schema = z.object({
   fullName: z.string().min(1, "Full Name is required"),
   username: z.string().min(1, "User Name is required"),
 });
-
 type FormData = z.infer<typeof schema>;
 
 const UserProfile: FC = () => {
-  const { user: fetchedUser, isLoading: userLoading, error: userError, updateUser } = useUser();
+  /* global user */
+  const {
+    user: fetchedUser,
+    isLoading: userLoading,
+    error: userError,
+    updateUser,
+  } = useUser();
+
+  /* local state */
   const [editMode, setEditMode] = useState(false);
-  const [userData, setUserData] = useState<IUser>(fetchedUser || INTINAL_DATA_USER);
+  const [userData, setUserData] = useState<IUser>(
+    fetchedUser || INTINAL_DATA_USER
+  );
   const [refreshTrigger, setRefreshTrigger] = useState(false);
   const [errorFile, setErrorFile] = useState<string | null>(null);
-  const [isLoadingFile, setIsLoadingFile] = useState<boolean>(false);
+  const [isLoadingFile, setIsLoadingFile] = useState(false);
+
+  /* file input */
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { register, handleSubmit, formState, setValue } = useForm<FormData>({
+  /* form */
+  const {
+    register,
+    handleSubmit,
+    formState,
+    setValue,
+  } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
       fullName: userData.fullName,
@@ -35,6 +53,7 @@ const UserProfile: FC = () => {
     },
   });
 
+  /* sync fetched user → local state + form */
   useEffect(() => {
     if (fetchedUser) {
       setUserData(fetchedUser);
@@ -43,132 +62,150 @@ const UserProfile: FC = () => {
     }
   }, [fetchedUser, setValue]);
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  /* ─────────── handlers ─────────── */
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const selectedFile = event.target.files?.[0];
+    if (!selectedFile) return;
 
-    if (selectedFile) {
-      const validImageTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    const validTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+    ];
+    if (!validTypes.includes(selectedFile.type)) {
+      alert("Invalid file type! Please choose JPEG, PNG, GIF, or WebP.");
+      return;
+    }
 
-      if (!validImageTypes.includes(selectedFile.type)) {
-        alert("Invalid file type! Please select an image (JPEG, PNG, GIF, WebP).");
-        return;
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("username", userData.username ?? "");
+
+    try {
+      setIsLoadingFile(true);
+      setErrorFile(null);
+      const res = await fileApi.uploadFile(formData);
+
+      /* update local + global user image */
+      setUserData((p) => ({ ...p, imgUrl: res.data.user.imgUrl }));
+      if (updateUser) {
+        await updateUser(res.data.user);
+        setRefreshTrigger((p) => !p);
       }
-
-      const formData = new FormData();
-      formData.append("file", selectedFile);
-      formData.append("username", userData.username ?? "");
-
-      try {
-        setIsLoadingFile(true);
-        setErrorFile(null);
-        const response = await fileApi.uploadFile(formData);
-
-        console.log("File uploaded successfully:", response.data.user);
-
-        // Update the global state or backend
-        setUserData((prevUserData) => ({
-          ...prevUserData,
-          imgUrl: response.data.user.imgUrl,
-        }));
-
-        // If using a global state, update it here
-        if (updateUser) {
-          setRefreshTrigger((prev) => !prev);
-          await updateUser(response.data.user);
-        }
-        setIsLoadingFile(false);
-      } catch (error) {
-        console.error("Error uploading file:", error);
-        setErrorFile(error instanceof Error ? error.message : String(error));
-      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setErrorFile(msg);
+      console.error("Upload error:", err);
+    } finally {
+      setIsLoadingFile(false);
     }
   };
 
   const handleSave = async (data: FormData) => {
-    const updatedUser = await updateUser({ ...userData, ...data });
-    if (updatedUser) {
-      setUserData(updatedUser);
+    const updated = await updateUser({ ...userData, ...data });
+    if (updated) {
+      setUserData(updated);
       setEditMode(false);
-      setRefreshTrigger((prev) => !prev);
+      setRefreshTrigger((p) => !p);
     }
   };
 
+  /* ─────────── JSX ─────────── */
   return (
-    <>
-      <div className={UserProfileStyle.pageContainer}>
-        <div className={UserProfileStyle.profileContainer}>
-          <div className={userLoading || isLoadingFile ? UserProfileStyle.loaderContiner : ""}>
-            {userError && editMode && <p>{userError}</p>}
-            {errorFile && <p>{errorFile}</p>}
-            {userLoading || isLoadingFile ? (
-              <Loader />
-            ) : (
-              <div className={UserProfileStyle.userInfo}>
-                {editMode ? (
-                  <form onSubmit={handleSubmit(handleSave)}>
-                    <div className={UserProfileStyle.formGroup}>
-                      <label>Full Name:</label>
-                      <input type="text" {...register("fullName")} />
-                    </div>
+    <div className={UserProfileStyle.pageContainer}>
+      <div className={UserProfileStyle.profileCard}>
+        {/* avatar & upload */}
+        <div className={UserProfileStyle.avatarCol}>
+          <div className={UserProfileStyle.avatarWrap}>
+            <img
+              src={userData.imgUrl || Avatar}
+              alt="profile"
+              className={UserProfileStyle.profilePic}
+            />
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              className={UserProfileStyle.uploadPicInput}
+              onChange={handleFileChange}
+            />
+            <FontAwesomeIcon
+              icon={faImage}
+              className={UserProfileStyle.uploadPicIcon}
+              onClick={() => fileInputRef.current?.click()}
+            />
+          </div>
+          {isLoadingFile && <Loader />}
+          {errorFile && <p className={UserProfileStyle.error}>{errorFile}</p>}
+        </div>
 
-                    <div className={UserProfileStyle.formGroup}>
-                      <label>username:</label>
-                      <input type="text" {...register("username")} />
-                    </div>
-
-                    <p>Email: {userData.email}</p>
-
-                    <div className={UserProfileStyle.buttonContainer}>
-                      <button type="submit" className={UserProfileStyle.saveBtn}>
-                        Save
-                      </button>
-                    </div>
-
-                    <div>
-                      {formState.errors.fullName && (
-                        <>
-                          <div className="text-danger">{formState.errors.fullName.message}</div>
-                          <div className="text-danger">{formState.errors.username?.message}</div>
-                        </>
-                      )}
-                    </div>
-                  </form>
-                ) : (
-                  <>
-                    <h2>{userData.fullName}</h2>
-                    <p>User Name: {userData.username}</p>
-                    <p>Email: {userData.email}</p>
-
-                    <div className={UserProfileStyle.buttonContainer}>
-                      <button className={UserProfileStyle.editBtn} onClick={() => setEditMode(true)}>
-                        Edit
-                      </button>
-                    </div>
-                  </>
-                )}
+        {/* info column */}
+        <div className={UserProfileStyle.infoCol}>
+          {userLoading ? (
+            <Loader />
+          ) : userError ? (
+            <p className={UserProfileStyle.error}>{userError}</p>
+          ) : editMode ? (
+            <form onSubmit={handleSubmit(handleSave)}>
+              <div className={UserProfileStyle.formGroup}>
+                <label>Full Name:</label>
+                <input type="text" {...register("fullName")} />
               </div>
-            )}
-          </div>
-          <div className={UserProfileStyle.imageContainer}>
-            <div style={{ display: "flex", justifyContent: "center", position: "relative" }}>
-              <img src={userData.imgUrl ? userData.imgUrl : Avatar} alt="User" className={UserProfileStyle.profilePic} />
-              {/* <input
-                className={UserProfileStyle.uploadPicInput}
-                type="file"
-                ref={fileInputRef}
-                accept="image/*"
-                onChange={handleFileChange}
-              />
-              <FontAwesomeIcon
-                className={UserProfileStyle.uploadPicIcon}
-                onClick={() => fileInputRef.current?.click()}
-                icon={faImage}
-              /> */}
-            </div>
-          </div>
+
+              <div className={UserProfileStyle.formGroup}>
+                <label>Username:</label>
+                <input type="text" {...register("username")} />
+              </div>
+
+              <p className={UserProfileStyle.emailLabel}>
+                Email:&nbsp;{userData.email}
+              </p>
+
+              <div className={UserProfileStyle.buttonRow}>
+                <button type="submit" className={UserProfileStyle.saveBtn}>
+                  <FontAwesomeIcon icon={faSave} />
+                  Save
+                </button>
+              </div>
+
+              {formState.errors.fullName && (
+                <p className={UserProfileStyle.error}>
+                  {formState.errors.fullName.message}
+                </p>
+              )}
+              {formState.errors.username && (
+                <p className={UserProfileStyle.error}>
+                  {formState.errors.username.message}
+                </p>
+              )}
+            </form>
+          ) : (
+            <>
+              <h2 className={UserProfileStyle.fullName}>{userData.fullName}</h2>
+              <p className={UserProfileStyle.field}>
+                <span>User Name:</span>&nbsp;{userData.username}
+              </p>
+              <p className={UserProfileStyle.field}>
+                <span>Email:</span>&nbsp;{userData.email}
+              </p>
+
+              <div className={UserProfileStyle.buttonRow}>
+                <button
+                  className={UserProfileStyle.editBtn}
+                  onClick={() => setEditMode(true)}
+                >
+                  <FontAwesomeIcon icon={faPen} />
+                  Edit
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
