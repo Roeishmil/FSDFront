@@ -1,67 +1,92 @@
-.container {
+/* ------------- Layout ------------- */
+.sidebar {
+  position: fixed;       /* ⬅️ keeps it in place */
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 100vh;
+  overflow-y: auto;
+
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  z-index: 100;          /* sits above page scroll but below modals */
+
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #f4f4f4;
-  height: 100vh; /* Full viewport height */
+  padding: 24px 18px;
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
 }
 
-.user {
+/* ------------- Brand ------------- */
+.brand {
   display: flex;
   align-items: center;
-  margin-bottom: 30px;
-  font-size: 20px;
-  font-weight: bold;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #4f46e5;            /* indigo-600 */
+  margin-bottom: 28px;
 }
 
-.logo {
-  width: 80px;
-  height: 80px;
-  margin-bottom: 40px;
+/* ------------- User card ------------- */
+.userCard {
+  background: #f1f5ff;        /* very light indigo */
+  border-radius: 8px;
+  padding: 14px 12px;
+  margin-bottom: 32px;
+}
+.userName  { font-weight: 600; font-size: 15px; }
+.userEmail {
+  font-size: 13px;
+  color: #6b7280;            /* gray-600 */
+  margin-top: 2px;
 }
 
+/* ------------- Nav links ------------- */
 .nav {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  align-items: center;
-  font-size: 20px;
-  margin-bottom: 30px;
+  gap: 6px;
+  flex: 1 1 auto;            /* push logout to bottom */
 }
 
-.nav a {
-  text-decoration: none;
-  color: #333;
-  width: 100%;
-  align-items: center;
-  justify-content: center;
+.link {
   display: flex;
-  padding-top: 15px;
-  padding-bottom: 15px;
-  border-radius: 8px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  color: #374151;            /* gray-700 */
+  font-size: 15px;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.link:hover {
+  background: #f3f4f6;       /* gray-100 */
 }
 
-.nav a:hover {
-  color: #007BFF;
-  box-shadow: 0 4px 8px rgba(96, 95, 95, 0.2);
+.active {
+  background: #eef2ff;       /* indigo-100 */
+  color: #4338ca;            /* indigo-700 */
 }
-.logoutBtn{
-  margin-top: auto; 
-  padding: 10px;
-  background-color: transparent;
-  font-size: 20px;
-  color: red;
+
+/* ------------- Logout ------------- */
+.logout {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
   border: none;
   cursor: pointer;
-  width: 100%;
-  position: relative;
-  bottom: 10%;
-  padding-top: 15px;
-  padding-bottom: 15px;
-  border-radius: 8px;
+  color: #dc2626;            /* red-600 */
+  font-size: 15px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  transition: background 0.15s ease, transform 0.15s ease;
 }
-
-.logoutBtn:hover {
-  box-shadow: 0 4px 8px rgba(96, 95, 95, 0.2);
+.logout:hover {
+  background: rgba(220, 38, 38, 0.08);
+  transform: translateY(-1px);
 }

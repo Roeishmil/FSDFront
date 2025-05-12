@@ -1,55 +1,56 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import styles from "./GeneratedContent.module.css";
-import { contentApi } from "../../api"; // adjust the path as needed
+import { contentApi } from "../../api";
 
 type ContentItem = {
   id: string;
   title: string;
   date: string;
-  contentType: string; // Changed from "type" to "contentType"
+  contentType: string;
   subject?: string;
   subjectId?: string;
-  content?: string; // HTML content
+  content?: string;
 };
 
-// Modal component for displaying interactive HTML content
+/* ───── Modal component (unchanged logic) ───── */
 const ContentModal: React.FC<{
   item: ContentItem | null;
   onClose: () => void;
 }> = ({ item, onClose }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  
+
   useEffect(() => {
     if (item?.content && iframeRef.current) {
-      // Get the iframe document
-      const iframeDoc = iframeRef.current.contentDocument || 
-                        (iframeRef.current.contentWindow?.document);
-      
-      if (iframeDoc) {
-        // Write the HTML content to the iframe
-        iframeDoc.open();
-        iframeDoc.write(item.content);
-        iframeDoc.close();
+      const doc =
+        iframeRef.current.contentDocument ||
+        iframeRef.current.contentWindow?.document;
+      if (doc) {
+        doc.open();
+        doc.write(item.content);
+        doc.close();
       }
     }
   }, [item?.content]);
 
   if (!item) return null;
 
+
   return (
-    <div className={styles.modalOverlay} onClick={(e) => {
-      // Close the modal when clicking the overlay (but not the content)
-      if (e.target === e.currentTarget) onClose();
-    }}>
+    <div
+      className={styles.modalOverlay}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
       <div className={styles.modalContent}>
         <div className={styles.modalHeader}>
           <h3>{item.title}</h3>
-          <button className={styles.closeButton} onClick={onClose}>×</button>
+          <button className={styles.closeButton} onClick={onClose}>
+            ×
+          </button>
         </div>
         <div className={styles.modalBody}>
           {item.content ? (
-            <iframe 
+            <iframe
               ref={iframeRef}
               className={styles.contentIframe}
               title={item.title}
@@ -63,7 +64,9 @@ const ContentModal: React.FC<{
           <span className={styles.itemMeta}>
             {item.contentType} • {item.date}
           </span>
-          <button className={styles.closeModalBtn} onClick={onClose}>Close</button>
+          <button className={styles.closeModalBtn} onClick={onClose}>
+            Close
+          </button>
         </div>
       </div>
     </div>
@@ -79,88 +82,68 @@ const GeneratedContent: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<ContentItem | null>(null);
 
+  const navigate = useNavigate();
+
+  const handleTestClick = () => {
+    // Navigate to the exam generate screen
+    navigate("/generate-test");
+  };
+
+  const handleSummaryClick = () => {
+    // Navigate to the summary generate screen
+    navigate("/generate-summary");
+  };
+
+
   useEffect(() => {
-    const fetchData = async () => {
+    (async () => {
       try {
         setLoading(true);
-        const userData = localStorage.getItem('user') || '';
-        const parsedData = JSON.parse(userData);
-        // Extract the ID
-        const userId = parsedData._id;
-        // Replace with your real API
-        const allContent = await contentApi.fetchContent(userId);
-        console.log("User content:", allContent);
-        
-        // Make sure the contentType field is correctly set on each item
-        const normalizedContent = allContent.map(item => ({
-          ...item,
-          // Ensure contentType is exactly "Summary" or "Exam" (not lowercase, plural, etc.)
-          contentType: item.contentType === "summary" ? "Summary" : 
-                       item.contentType === "Exam" ? "Exam" : 
-                       item.contentType
+        const stored = JSON.parse(localStorage.getItem("user") || "{}");
+        const userContent = await contentApi.fetchContent(stored._id);
+        console.log("Fetched content:", stored)
+        const normalized = userContent.map((i: any) => ({
+          ...i,
+          contentType:
+            i.contentType === "summary"
+              ? "Summary"
+              : i.contentType === "Exam"
+              ? "Exam"
+              : i.contentType,
         }));
-        
-        const filtered = normalizedContent.filter((item) => item.subjectId === subjectId);
-        console.log("Filtered content:", filtered);
-        setContentItems(filtered);
+        setContentItems(normalized.filter((c: any) => c.subjectId === subjectId));
         setError(null);
-      } catch (err) {
-        console.error("Error fetching content:", err);
+      } catch {
         setError("Failed to fetch content. Please try again later.");
       } finally {
         setLoading(false);
       }
-    };
-
-    fetchData();
+    })();
   }, [subjectId]);
 
-  // Apply filters to contentItems based on search and filter state
-  const filteredContent = contentItems.filter(
-    (item) => {
-      // First, apply contentType filter
-      const typeMatches = filter === "All" || item.contentType === filter;
-      
-      // Then, apply search filter
-      const searchMatches = item.title.toLowerCase().includes(search.toLowerCase());
-      
-      console.log(`Item ${item.title} - ContentType: ${item.contentType}, Filter: ${filter}, Matches: ${typeMatches}`);
-      
-      return typeMatches && searchMatches;
-    }
-  );
+  const filteredContent = contentItems.filter((i) => {
+    const matchesType = filter === "All" || i.contentType === filter;
+    const matchesSearch = i.title.toLowerCase().includes(search.toLowerCase());
+    return matchesType && matchesSearch;
+  });
 
-  // Function to handle viewing content
-  const handleViewContent = (item: ContentItem) => {
-    setSelectedItem(item);
-  };
-
-  // Function to close the modal
-  const closeModal = () => {
-    setSelectedItem(null);
-  };
-
-  // Function to generate a new summary
-  const handleGenerateContent = (contentType: "Summary" | "Exam") => {
-    // Implementation placeholder for generating content
-    console.log(`Generating new ${contentType}`);
-    // This would call your API to create a new summary or Exam
-  };
+  const handleGenerate = (type: "Summary" | "Exam") =>
+    console.log(`Generating ${type}`);
 
   return (
     <div className={styles.generatedContent}>
       <div className={styles.header}>
         <h2>Generated Content for {subjectId}</h2>
         <div className={styles.actions}>
-          <button 
+          <button
             className={styles.blackButton}
-            onClick={() => handleGenerateContent("Summary")}
+            onClick={() => handleSummaryClick()}
           >
-            Generate Summary
+            Create Summary
           </button>
-          <button 
+          <button
             className={styles.blackButton}
-            onClick={() => handleGenerateContent("Exam")}
+            onClick={() => handleTestClick()}
           >
             Create Exam
           </button>
@@ -169,30 +152,21 @@ const GeneratedContent: React.FC = () => {
 
       <div className={styles.filters}>
         <div className={styles.tabs}>
-          <button 
-            className={filter === "All" ? styles.active : ""} 
-            onClick={() => setFilter("All")}
-          >
-            All Content
-          </button>
-          <button 
-            className={filter === "Summary" ? styles.active : ""} 
-            onClick={() => setFilter("Summary")}
-          >
-            Summaries
-          </button>
-          <button 
-            className={filter === "Exam" ? styles.active : ""} 
-            onClick={() => setFilter("Exam")}
-          >
-            Exams
-          </button>
+          {(["All", "Summary", "Exam"] as const).map((t) => (
+            <button
+              key={t}
+              className={filter === t ? styles.active : ""}
+              onClick={() => setFilter(t)}
+            >
+              {t === "All" ? "All Content" : `${t}s`}
+            </button>
+          ))}
         </div>
-        <input 
-          type="text" 
-          placeholder="Search content..." 
-          value={search} 
-          onChange={(e) => setSearch(e.target.value)} 
+        <input
+          type="text"
+          placeholder="Search content..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
@@ -200,21 +174,21 @@ const GeneratedContent: React.FC = () => {
         <div className={styles.loading}>Loading content...</div>
       ) : error ? (
         <div className={styles.error}>{error}</div>
-      ) : filteredContent.length > 0 ? (
+      ) : filteredContent.length ? (
         <div className={styles.cards}>
-          {filteredContent.map((item) => (
-            <div key={item.id} className={styles.card}>
+          {filteredContent.map((c) => (
+            <div key={c.id} className={styles.card}>
               <div className={styles.cardHeader}>
-                <strong>{item.title}</strong>
-                <span>{item.date}</span>
+                <strong>{c.title}</strong>
+                <span>{c.date}</span>
               </div>
               <div className={styles.cardTags}>
-                {item.subject && <span className={styles.tag}>{item.subject}</span>}
-                <span className={styles.tag}>{item.contentType}</span>
+                {c.subject && <span className={styles.tag}>{c.subject}</span>}
+                <span className={styles.tag}>{c.contentType}</span>
               </div>
-              <button 
+              <button
                 className={styles.viewButton}
-                onClick={() => handleViewContent(item)}
+                onClick={() => setSelectedItem(c)}
               >
                 👁 View Content
               </button>
@@ -223,13 +197,12 @@ const GeneratedContent: React.FC = () => {
         </div>
       ) : (
         <div className={styles.noContent}>
-          No content found for this subject. Try adjusting your filters or create new content.
+          No content found for this subject.
         </div>
       )}
 
-      {/* Modal for displaying interactive HTML content */}
       {selectedItem && (
-        <ContentModal item={selectedItem} onClose={closeModal} />
+        <ContentModal item={selectedItem} onClose={() => setSelectedItem(null)} />
       )}
     </div>
   );

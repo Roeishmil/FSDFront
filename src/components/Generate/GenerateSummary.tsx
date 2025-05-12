@@ -1,147 +1,96 @@
+/* src/components/generate/GenerateSummary.tsx */
 import React, { useState, useRef, useEffect } from "react";
 import { summaryApi, contentApi } from "../../api";
-import GoogleDrivePicker from "../googleDrive"; // Same picker component you use
-import styles from "./Generate.module.css"; // Same styles
+import GoogleDrivePicker from "../googleDrive";
+import styles from "./Generate.module.css";
 
-const Loader: React.FC<{ message: string }> = ({ message }) => (
-  <div
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "40px",
-    }}
-  >
-    <style>{`
-      @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-      }
-      .spinner {
-          width: 40px;
-          height: 40px;
-          border: 4px solid #f3f3f3;
-          border-top: 4px solid #3498db;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-      }
-    `}</style>
-    <div className="spinner"></div>
-    <p style={{ marginTop: "20px", fontSize: "1.1em" }}>{message}</p>
+/* ─── loader ─── */
+const Loader: React.FC<{ msg: string }> = ({ msg }) => (
+  <div style={{ padding: "48px 0", textAlign: "center" }}>
+    <div
+      style={{
+        width: 42,
+        height: 42,
+        margin: "0 auto 18px",
+        border: "4px solid #e2e8f0",
+        borderTop: "4px solid #0ea5e9",
+        borderRadius: "50%",
+        animation: "spin 1s linear infinite",
+      }}
+    />
+    <p>{msg}</p>
+    <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
   </div>
 );
 
-// ContentMetadata component for title/subject editing
-const ContentMetadata: React.FC<{ 
-  contentId: string, 
-  initialTitle: string,
-  onClose: () => void
+/* ─── metadata modal ─── */
+const ContentMetadata: React.FC<{
+  contentId: string;
+  initialTitle: string;
+  onClose: () => void;
 }> = ({ contentId, initialTitle, onClose }) => {
   const [title, setTitle] = useState(initialTitle);
-  const [subject, setSubject] = useState(""); // Direct subject input instead of selection
-  const [updating, setUpdating] = useState(false);
+  const [subject, setSubject] = useState("");
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleUpdate = async () => {
+  const save = async () => {
     if (!title.trim()) {
       setError("Title cannot be empty");
       return;
     }
-
     try {
-      setUpdating(true);
-      // Update content with title and subject as direct text input
-      await contentApi.updateContent(contentId, { 
-        title, 
-        subject // Send the subject text directly instead of an ID
-      });
-      
-      setUpdating(false);
+      setBusy(true);
+      await contentApi.updateContent(contentId, { title, subject });
       onClose();
-    } catch (err) {
-      console.error("Error updating content:", err);
-      setError("Failed to update summary details. Please try again.");
-      setUpdating(false);
+    } catch {
+      setError("Failed to update summary details.");
+    } finally {
+      setBusy(false);
     }
   };
 
   return (
-    <div className={styles.metadataOverlay}>
-      <div className={styles.metadataCard}>
+    <div className={styles.metadataOverlay} onClick={onClose}>
+      <div
+        className={styles.metadataCard}
+        onClick={(e) => e.stopPropagation()}
+      >
         <h3>Update Summary Details</h3>
-        
-        {error && (
-          <div style={{ color: "white", backgroundColor: "#d9534f", padding: "10px", marginBottom: "15px", borderRadius: "4px" }}>
-            {error}
-          </div>
-        )}
-        
-        <div style={{ marginBottom: "15px" }}>
-          <label>
-            Title:
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "8px",
-                marginTop: "5px",
-                borderRadius: "4px",
-                border: "1px solid #ccc"
-              }}
-            />
-          </label>
-        </div>
-        
-        <div style={{ marginBottom: "15px" }}>
-          <label>
-            Subject:
-            <input
-              type="text"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder="Enter subject name"
-              style={{
-                width: "100%",
-                padding: "8px",
-                marginTop: "5px",
-                borderRadius: "4px",
-                border: "1px solid #ccc"
-              }}
-            />
-          </label>
-        </div>
-        
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
+
+        {error && <p style={{ color: "#b91c1c" }}>{error}</p>}
+
+        <label className={styles.label}>Title</label>
+        <input
+          className={styles.input}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+
+        <label className={styles.label} style={{ marginTop: 12 }}>
+          Subject
+        </label>
+        <input
+          className={styles.input}
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+          placeholder="Enter subject name"
+        />
+
+        <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
           <button
             onClick={onClose}
-            style={{
-              backgroundColor: "#6c757d",
-              color: "white",
-              border: "none",
-              padding: "8px 15px",
-              borderRadius: "4px",
-              cursor: "pointer"
-            }}
+            className={styles.primaryButton}
+            style={{ background: "#64748b", color: "#fff" }}
           >
-            Skip
+            Cancel
           </button>
-          
           <button
-            onClick={handleUpdate}
-            disabled={updating || !title.trim()}
-            style={{
-              backgroundColor: "#28a745",
-              color: "white",
-              border: "none",
-              padding: "8px 15px",
-              borderRadius: "4px",
-              cursor: updating || !title.trim() ? "not-allowed" : "pointer"
-            }}
+            onClick={save}
+            disabled={busy}
+            className={styles.primaryButton}
           >
-            {updating ? "Updating..." : "Save"}
+            {busy ? "Saving…" : "Save"}
           </button>
         </div>
       </div>
@@ -149,278 +98,243 @@ const ContentMetadata: React.FC<{
   );
 };
 
+/* ─── main component ─── */
 const GenerateSummary: React.FC = () => {
+  /* inputs */
   const [prompt, setPrompt] = useState("");
+
+  /* uploads */
+  const [uploaded, setUploaded] = useState<File[]>([]);
+
+  /* result + meta */
   const [htmlContent, setHtmlContent] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
-  
-  // State for handling saved content
   const [contentId, setContentId] = useState<string | null>(null);
-  const [showMetadataForm, setShowMetadataForm] = useState(false);
-  const [metadataEdited, setMetadataEdited] = useState(false);
+  const [showMeta, setShowMeta] = useState(false);
+  const [metaDone, setMetaDone] = useState(false);
 
+  /* ui flags */
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const hiddenDrivePicker = useRef<HTMLInputElement>(null);
+
+  /* upload helpers */
+  const handleLocalUpload = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setUploaded((p) => [...p, ...Array.from(e.target.files || [])]);
+
+  const handleDriveUpload = (files: File[]) =>
+    setUploaded((p) => [...p, ...files]);
+
+  const removeFile = (i: number) =>
+    setUploaded((p) => p.filter((_, idx) => idx !== i));
+
+  /* generate summary */
   const handleGenerate = async () => {
-    setLoading(true);
-    setError(null);
-
+    if (!uploaded.length) {
+      setError("Please upload at least one PDF or TXT file.");
+      return;
+    }
     try {
-      if (uploadedFiles.length === 0) {
-        setError("Please upload at least one file.");
-        setLoading(false);
-        return;
-      }
+      setLoading(true);
+      setError(null);
 
-      const formData = new FormData();
-      formData.append("prompt", prompt);
-      formData.append("file", uploadedFiles[0]); // Send first file
-      
-      // Get the user ID from localStorage if available
-      const userId = localStorage.getItem("userId");
-      if (userId) {
-        formData.append("userId", userId);
-      }
+      const fd = new FormData();
+      fd.append("prompt", prompt);
+      fd.append("file", uploaded[0]);
 
-      // Call the API to create the summary
-      const response = await summaryApi.creatSummary(formData);
-      
-      // Check if the response is an object with html and contentId properties
-      if (typeof response === 'object' && response !== null && 'html' in response) {
-        setHtmlContent(response.html);
-        
-        // If we got a content ID back, save it and show the metadata form
-        if (response.contentId) {
-          console.log("Content ID received:", response.contentId);
-          setContentId(response.contentId);
-          setShowMetadataForm(true);
-        } else {
-          console.error("No contentId in response:", response);
-        }
+      const uid = localStorage.getItem("userId");
+      if (uid) fd.append("userId", uid);
+
+      const res = await summaryApi.creatSummary(fd);
+
+      if (typeof res === "object" && res && "html" in res) {
+        setHtmlContent(res.html as string);
+        if (res.contentId) setContentId(res.contentId as string);
       } else {
-        // If the response is just HTML as a string
-        setHtmlContent(response);
-        console.warn("Response was not an object with html/contentId:", response);
+        setHtmlContent(res as unknown as string);
       }
-    } catch (err) {
-      console.error("Error generating summary:", err);
-
-      if ((err as any).code === "ERR_NETWORK") {
-        setError("Network error: The server is not responding. Please check your connection and try again.");
-      } else if ((err as any).response?.status === 404) {
-        setError("No input file found. Please upload a PDF or PPTX file first.");
-      } else if ((err as any).response?.status === 500) {
-        setError(
-          `Server error: ${(err as any).response?.data?.message || "Failed to generate summary. Please try again."}`
-        );
-      } else {
-        setError("Failed to generate summary. Please try again later.");
-      }
+    } catch {
+      setError("Failed to generate summary. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (error) setError(null);
-  }, [prompt]);
-
-  useEffect(() => {
-    if (htmlContent && containerRef.current) {
-      containerRef.current.innerHTML = htmlContent;
-
-      const scriptTags = containerRef.current.querySelectorAll("script");
-      scriptTags.forEach((oldScript) => {
-        const newScript = document.createElement("script");
-        Array.from(oldScript.attributes).forEach((attr) => {
-          newScript.setAttribute(attr.name, attr.value);
-        });
-        newScript.text = oldScript.text;
-        oldScript.parentNode?.replaceChild(newScript, oldScript);
+  /* save summary */
+  const handleSave = async () => {
+    if (!htmlContent) return;
+    try {
+      setSaving(true);
+      const uid =
+        localStorage.getItem("userId") || "67f3bd679937c252dacacee4";
+      await contentApi.createContent({
+        userId: uid,
+        content: htmlContent,
+        title: "Generated Summary",
+        contentType: "Summary",
       });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /* write HTML into sandboxed <iframe> */
+  useEffect(() => {
+    if (iframeRef.current && htmlContent) {
+      const doc = iframeRef.current.contentDocument;
+      if (doc) {
+        doc.open();
+        doc.write(htmlContent);
+        doc.close();
+
+        // auto-height
+        setTimeout(() => {
+          if (iframeRef.current) {
+            iframeRef.current.style.height =
+              doc.body.scrollHeight + 30 + "px";
+          }
+        }, 120);
+      }
     }
   }, [htmlContent]);
 
-  const handleFileSelected = (file: File) => {
-    setUploadedFiles((prev) => [...prev, file]);
-    console.log("File selected:", file.name);
-  };
+  /* loaders */
+  if (loading)
+    return <Loader msg="Generating summary… This may take a minute." />;
+  if (saving) return <Loader msg="Saving summary to your account…" />;
 
-  const handleLocalFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      const newFiles = Array.from(files);
-      setUploadedFiles((prev) => [...prev, ...newFiles]);
-      console.log(
-        "Files uploaded:",
-        newFiles.map((f) => f.name)
-      );
-    }
-  };
-
-  const removeFile = (index: number) => {
-    setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleCloseMetadataForm = () => {
-    setShowMetadataForm(false);
-    setMetadataEdited(true);
-  };
-
-  const handleOpenMetadataForm = () => {
-    if (contentId) {
-      setShowMetadataForm(true);
-    } else {
-      console.error("Cannot open metadata form: contentId is null");
-      setError("Unable to edit summary details. Content ID not found.");
-    }
-  };
-
-  if (loading) {
-    return <Loader message="Generating summary... This may take up to a minute." />;
-  }
-
+  /* ------------ rendered summary ------------ */
   if (htmlContent) {
     return (
       <>
-        {showMetadataForm && contentId && (
-          <ContentMetadata 
-            contentId={contentId} 
-            initialTitle={`Summary - ${new Date().toLocaleDateString()}`}
-            onClose={handleCloseMetadataForm}
+        {showMeta && contentId && (
+          <ContentMetadata
+            contentId={contentId}
+            initialTitle="Summary"
+            onClose={() => {
+              setShowMeta(false);
+              setMetaDone(true);
+            }}
           />
         )}
-        
+
         {error && (
-          <div
-            style={{
-              color: "white",
-              backgroundColor: "#d9534f",
-              padding: "12px",
-              borderRadius: "4px",
-              margin: "10px 20px",
-            }}
-          >
-            {error}
-          </div>
+          <p style={{ color: "#b91c1c", margin: "12px 0" }}>{error}</p>
         )}
-        
-        <div style={{ display: "flex", justifyContent: "flex-end", padding: "10px 20px" }}>
-          {!showMetadataForm && contentId && (
+
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+          {contentId && (
             <button
-              onClick={handleOpenMetadataForm}
-              style={{
-                backgroundColor: "#007bff",
-                color: "white",
-                border: "none",
-                padding: "8px 15px",
-                borderRadius: "4px",
-                cursor: "pointer",
-                marginBottom: "10px"
-              }}
+              onClick={() => setShowMeta(true)}
+              className={styles.primaryButton}
+              style={{ width: 200, height: 40 }}
             >
-              {metadataEdited ? "Edit Summary Details" : "Set Summary Title & Subject"}
+              {metaDone ? "Edit Summary Details" : "Set Summary Details"}
             </button>
           )}
-          
-          {!showMetadataForm && !contentId && (
-            <div style={{ color: "#6c757d", padding: "8px 15px", fontSize: "0.9em" }}>
-              Content ID not available - metadata editing disabled
-            </div>
-          )}
+
+          <button
+            onClick={handleSave}
+            className={styles.primaryButton}
+            style={{ width: 160, height: 40 }}
+          >
+            Save
+          </button>
         </div>
-        
-        <div ref={containerRef} className="html-content-container" />
+
+        <iframe
+          ref={iframeRef}
+          title="generated-summary"
+          style={{ width: "100%", border: "none"}}
+        />
       </>
     );
   }
 
+  /* ------------ initial form ------------ */
   return (
-    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
-      <h2>Generate Summary</h2>
-
-      {error && (
-        <div
-          style={{
-            color: "white",
-            backgroundColor: "#d9534f",
-            padding: "12px",
-            borderRadius: "4px",
-            marginBottom: "15px",
-          }}
-        >
-          {error}
+    <div className={styles.container}>
+      {/* header */}
+      <div className={styles.pageHeader}>
+        <div className={styles.headerIcon}>📝</div>
+        <div>
+          <h2 className={styles.pageTitle}>Generate New Summary</h2>
+          <p className={styles.pageSubtitle}>
+            Upload material and get a polished summary
+          </p>
         </div>
-      )}
-
-      <p>
-        Enter your custom summary prompt below or leave blank to use the default generator. Make sure you've uploaded a
-        PDF file first.
-      </p>
-
-      <textarea
-        placeholder="Enter your custom summary prompt..."
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-        style={{
-          width: "100%",
-          height: "150px",
-          marginBottom: "15px",
-          padding: "10px",
-          borderRadius: "4px",
-          border: "1px solid #ccc",
-        }}
-      />
-
-      <div className={styles.container}>
-        <h1>Upload Files</h1>
-
-        <div className={styles.uploadOptions}>
-          <div className={styles.buttonContainer}>
-            <label className={styles.fileUploadButton}>
-              Upload Local File
-              <input type="file" onChange={handleLocalFileUpload} multiple style={{ display: "none" }} />
-            </label>
-
-            <GoogleDrivePicker onFileSelected={handleFileSelected} />
-          </div>
-        </div>
-
-        {uploadedFiles.length > 0 && (
-          <div className={styles.fileList}>
-            <h2>Uploaded Files</h2>
-            <ul>
-              {uploadedFiles.map((file, index) => (
-                <li key={index} className={styles.fileItem}>
-                  <div className={styles.fileName}>{file.name}</div>
-                  <div className={styles.fileInfo}>
-                    {(file.size / 1024).toFixed(2)} KB • {file.type || "Unknown type"}
-                  </div>
-                  <button className={styles.removeButton} onClick={() => removeFile(index)}>
-                    Remove
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </div>
 
-      <button
-        onClick={handleGenerate}
-        style={{
-          backgroundColor: "#007bff",
-          color: "white",
-          border: "none",
-          padding: "10px 20px",
-          borderRadius: "4px",
-          cursor: "pointer",
-          fontSize: "16px",
-        }}
-      >
-        Generate Summary
-      </button>
+      {/* form card */}
+      <div className={styles.formCard}>
+        <label className={styles.label}>Custom Instructions (optional)</label>
+        <textarea
+          className={`${styles.input} ${styles.textarea}`}
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder="Add any specific requirements…"
+        />
+
+        <h3 className={styles.uploadSectionTitle}>Upload Files</h3>
+
+        <div className={styles.uploadRow}>
+          <label className={styles.dragArea} htmlFor="localFile">
+            <span className={styles.dragIcon}>📄</span>
+            <p>
+              <strong>Click to upload</strong>
+            </p>
+            <p style={{ fontSize: 13, color: "#64748b" }}>
+              Accepts PDF or TXT
+            </p>
+            <input
+              id="localFile"
+              type="file"
+              multiple
+              onChange={handleLocalUpload}
+              style={{ display: "none" }}
+            />
+          </label>
+
+          <span className={styles.orText}>or</span>
+
+          <GoogleDrivePicker
+            className={styles.driveButton}
+            onFilesSelected={handleDriveUpload}
+            ref={hiddenDrivePicker}
+          />
+        </div>
+
+        {uploaded.length > 0 && (
+          <ul className={styles.fileList}>
+            {uploaded.map((f, i) => (
+              <li key={i} className={styles.fileItem}>
+                <span className={styles.fileName}>{f.name}</span>
+                <span className={styles.fileInfo}>
+                  {(f.size / 1024).toFixed(1)} KB
+                </span>
+                <button
+                  className={styles.removeButton}
+                  onClick={() => removeFile(i)}
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {error && (
+          <p style={{ color: "#b91c1c", marginTop: 12, fontWeight: 500 }}>
+            {error}
+          </p>
+        )}
+
+        <button onClick={handleGenerate} className={styles.primaryButton}>
+          Generate Summary
+        </button>
+      </div>
     </div>
   );
 };
