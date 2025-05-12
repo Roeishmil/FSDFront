@@ -107,6 +107,7 @@ const useUser = (data?: any) => {
       const response = await userService.updateUser(userData);
       setUser(response.data);
       localStorage.setItem("user", JSON.stringify(response.data));
+      localStorage.setItem("userId", response.data._id);
       setIsLoading(false);
       return response.data;
     } catch (error) {
