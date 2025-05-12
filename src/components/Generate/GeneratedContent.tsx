@@ -1,12 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import styles from "./GeneratedContent.module.css";
+<<<<<<< Updated upstream
 import { contentApi } from "../../api"; // adjust the path as needed
+=======
+import { contentApi } from "../../api";
+>>>>>>> Stashed changes
 
 type ContentItem = {
   id: string;
   title: string;
   date: string;
+<<<<<<< Updated upstream
   contentType: string; // Changed from "type" to "contentType"
   subject?: string;
   subjectId?: string;
@@ -14,11 +19,21 @@ type ContentItem = {
 };
 
 // Modal component for displaying interactive HTML content
+=======
+  contentType: string;
+  subject?: string;
+  subjectId?: string;
+  content?: string;
+};
+
+/* ───── Modal component (unchanged logic) ───── */
+>>>>>>> Stashed changes
 const ContentModal: React.FC<{
   item: ContentItem | null;
   onClose: () => void;
 }> = ({ item, onClose }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+<<<<<<< Updated upstream
   
   useEffect(() => {
     if (item?.content && iframeRef.current) {
@@ -31,6 +46,18 @@ const ContentModal: React.FC<{
         iframeDoc.open();
         iframeDoc.write(item.content);
         iframeDoc.close();
+=======
+
+  useEffect(() => {
+    if (item?.content && iframeRef.current) {
+      const doc =
+        iframeRef.current.contentDocument ||
+        iframeRef.current.contentWindow?.document;
+      if (doc) {
+        doc.open();
+        doc.write(item.content);
+        doc.close();
+>>>>>>> Stashed changes
       }
     }
   }, [item?.content]);
@@ -38,6 +65,7 @@ const ContentModal: React.FC<{
   if (!item) return null;
 
   return (
+<<<<<<< Updated upstream
     <div className={styles.modalOverlay} onClick={(e) => {
       // Close the modal when clicking the overlay (but not the content)
       if (e.target === e.currentTarget) onClose();
@@ -50,6 +78,22 @@ const ContentModal: React.FC<{
         <div className={styles.modalBody}>
           {item.content ? (
             <iframe 
+=======
+    <div
+      className={styles.modalOverlay}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div className={styles.modalContent}>
+        <div className={styles.modalHeader}>
+          <h3>{item.title}</h3>
+          <button className={styles.closeButton} onClick={onClose}>
+            ×
+          </button>
+        </div>
+        <div className={styles.modalBody}>
+          {item.content ? (
+            <iframe
+>>>>>>> Stashed changes
               ref={iframeRef}
               className={styles.contentIframe}
               title={item.title}
@@ -63,7 +107,13 @@ const ContentModal: React.FC<{
           <span className={styles.itemMeta}>
             {item.contentType} • {item.date}
           </span>
+<<<<<<< Updated upstream
           <button className={styles.closeModalBtn} onClick={onClose}>Close</button>
+=======
+          <button className={styles.closeModalBtn} onClick={onClose}>
+            Close
+          </button>
+>>>>>>> Stashed changes
         </div>
       </div>
     </div>
@@ -80,6 +130,7 @@ const GeneratedContent: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<ContentItem | null>(null);
 
   useEffect(() => {
+<<<<<<< Updated upstream
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -106,10 +157,31 @@ const GeneratedContent: React.FC = () => {
         setError(null);
       } catch (err) {
         console.error("Error fetching content:", err);
+=======
+    (async () => {
+      try {
+        setLoading(true);
+        const stored = JSON.parse(localStorage.getItem("user") || "{}");
+        const userContent = await contentApi.fetchContent(stored._id);
+        console.log("Fetched content:", stored)
+        const normalized = userContent.map((i: any) => ({
+          ...i,
+          contentType:
+            i.contentType === "summary"
+              ? "Summary"
+              : i.contentType === "Exam"
+              ? "Exam"
+              : i.contentType,
+        }));
+        setContentItems(normalized.filter((c: any) => c.subjectId === subjectId));
+        setError(null);
+      } catch {
+>>>>>>> Stashed changes
         setError("Failed to fetch content. Please try again later.");
       } finally {
         setLoading(false);
       }
+<<<<<<< Updated upstream
     };
 
     fetchData();
@@ -146,12 +218,26 @@ const GeneratedContent: React.FC = () => {
     console.log(`Generating new ${contentType}`);
     // This would call your API to create a new summary or Exam
   };
+=======
+    })();
+  }, [subjectId]);
+
+  const filteredContent = contentItems.filter((i) => {
+    const matchesType = filter === "All" || i.contentType === filter;
+    const matchesSearch = i.title.toLowerCase().includes(search.toLowerCase());
+    return matchesType && matchesSearch;
+  });
+
+  const handleGenerate = (type: "Summary" | "Exam") =>
+    console.log(`Generating ${type}`);
+>>>>>>> Stashed changes
 
   return (
     <div className={styles.generatedContent}>
       <div className={styles.header}>
         <h2>Generated Content for {subjectId}</h2>
         <div className={styles.actions}>
+<<<<<<< Updated upstream
           <button 
             className={styles.blackButton}
             onClick={() => handleGenerateContent("Summary")}
@@ -161,6 +247,17 @@ const GeneratedContent: React.FC = () => {
           <button 
             className={styles.blackButton}
             onClick={() => handleGenerateContent("Exam")}
+=======
+          <button
+            className={styles.blackButton}
+            onClick={() => handleGenerate("Summary")}
+          >
+            Generate Summary
+          </button>
+          <button
+            className={styles.blackButton}
+            onClick={() => handleGenerate("Exam")}
+>>>>>>> Stashed changes
           >
             Create Exam
           </button>
@@ -169,6 +266,7 @@ const GeneratedContent: React.FC = () => {
 
       <div className={styles.filters}>
         <div className={styles.tabs}>
+<<<<<<< Updated upstream
           <button 
             className={filter === "All" ? styles.active : ""} 
             onClick={() => setFilter("All")}
@@ -193,6 +291,23 @@ const GeneratedContent: React.FC = () => {
           placeholder="Search content..." 
           value={search} 
           onChange={(e) => setSearch(e.target.value)} 
+=======
+          {(["All", "Summary", "Exam"] as const).map((t) => (
+            <button
+              key={t}
+              className={filter === t ? styles.active : ""}
+              onClick={() => setFilter(t)}
+            >
+              {t === "All" ? "All Content" : `${t}s`}
+            </button>
+          ))}
+        </div>
+        <input
+          type="text"
+          placeholder="Search content..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+>>>>>>> Stashed changes
         />
       </div>
 
@@ -200,6 +315,7 @@ const GeneratedContent: React.FC = () => {
         <div className={styles.loading}>Loading content...</div>
       ) : error ? (
         <div className={styles.error}>{error}</div>
+<<<<<<< Updated upstream
       ) : filteredContent.length > 0 ? (
         <div className={styles.cards}>
           {filteredContent.map((item) => (
@@ -215,6 +331,23 @@ const GeneratedContent: React.FC = () => {
               <button 
                 className={styles.viewButton}
                 onClick={() => handleViewContent(item)}
+=======
+      ) : filteredContent.length ? (
+        <div className={styles.cards}>
+          {filteredContent.map((c) => (
+            <div key={c.id} className={styles.card}>
+              <div className={styles.cardHeader}>
+                <strong>{c.title}</strong>
+                <span>{c.date}</span>
+              </div>
+              <div className={styles.cardTags}>
+                {c.subject && <span className={styles.tag}>{c.subject}</span>}
+                <span className={styles.tag}>{c.contentType}</span>
+              </div>
+              <button
+                className={styles.viewButton}
+                onClick={() => setSelectedItem(c)}
+>>>>>>> Stashed changes
               >
                 👁 View Content
               </button>
@@ -223,6 +356,7 @@ const GeneratedContent: React.FC = () => {
         </div>
       ) : (
         <div className={styles.noContent}>
+<<<<<<< Updated upstream
           No content found for this subject. Try adjusting your filters or create new content.
         </div>
       )}
@@ -230,9 +364,21 @@ const GeneratedContent: React.FC = () => {
       {/* Modal for displaying interactive HTML content */}
       {selectedItem && (
         <ContentModal item={selectedItem} onClose={closeModal} />
+=======
+          No content found for this subject.
+        </div>
+      )}
+
+      {selectedItem && (
+        <ContentModal item={selectedItem} onClose={() => setSelectedItem(null)} />
+>>>>>>> Stashed changes
       )}
     </div>
   );
 };
 
+<<<<<<< Updated upstream
 export default GeneratedContent;
+=======
+export default GeneratedContent;
+>>>>>>> Stashed changes

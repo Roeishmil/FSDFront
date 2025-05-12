@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 /* Existing styles from SubjectsPage.module.css */
 .container {
   padding: 20px;
@@ -371,3 +372,192 @@
 .closeModalBtn:hover {
   background-color: #2980b9;
 }
+=======
+/* ─────────  LAYOUT  ───────── */
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* header */
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+.pageTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;          /* gray-900 */
+}
+
+/* add-subject pill */
+.addButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #0f172a;     /* slate-900 */
+  color: #fff;
+  padding: 0.55rem 1.1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+.addButton:hover { background: #1e293b; }   /* slate-800 */
+
+/* ─────────  SUBJECT GRID  ───────── */
+.subjectList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+}
+
+.subjectItem {
+  position: relative;
+  background: #fff;
+  border: 1px solid #e5e7eb;  /* gray-200 */
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+  transition: box-shadow 0.2s ease;
+}
+.subjectItem:hover {
+  box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
+}
+
+/* pastel strip */
+.accentBar {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+  background: #fef08a;      /* yellow-200 */
+}
+
+/* title / desc */
+.subjectHeader h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+}
+.subjectDescription {
+  font-size: 0.85rem;
+  color: #4b5563;           /* gray-600 */
+  margin-bottom: 0.75rem;
+}
+
+/* counts */
+.countsRow {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.countBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #f9fafb;      /* gray-50 */
+  padding: 0.25rem 0.55rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #111827;
+}
+
+/* actions */
+.actionRow {
+  display: flex;
+  gap: 0.5rem;
+}
+.editButton,
+.deleteButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.65rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+/* edit – pastel yellow */
+.editButton {
+  background: #fef9c3;      /* yellow-100 */
+  color: #92400e;           /* amber-700 */
+}
+.editButton:hover { background: #fef08a; }
+
+/* delete – pastel red */
+.deleteButton {
+  background: #fee2e2;      /* red-100 */
+  color: #991b1b;           /* red-700 */
+}
+.deleteButton:hover { background: #fecaca; }
+
+/* ─────────  MODAL  ───────── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+.modalContent {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  width: 100%;
+  max-width: 460px;
+}
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+.input {
+  border: 1px solid #d1d5db;  /* gray-300 */
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font: inherit;
+}
+.error {
+  color: #dc2626;              /* red-600 */
+  font-size: 0.8rem;
+}
+.modalActions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+.saveButton {
+  background: #0f172a;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+}
+.cancelButton {
+  background: #e5e7eb;         /* gray-200 */
+  color: #111827;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+}
+>>>>>>> Stashed changes

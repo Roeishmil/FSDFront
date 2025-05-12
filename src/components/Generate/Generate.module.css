@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 .container {
   padding: 20px;
   max-width: 800px;
@@ -70,3 +71,116 @@
 .removeButton:hover {
   background-color: #c0392b;
 }
+=======
+/* ───────── layout ───────── */
+.container {
+  padding: 1.5rem;
+  max-width: 880px;
+  margin: 0 auto;
+  font-family: system-ui, sans-serif;
+}
+
+/* section wrapper */
+.uploadOptions {
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  background: #f9fafb;                  /* gray-50 */
+  border: 1px solid #e5e7eb;            /* gray-200 */
+}
+
+/* flex row for upload buttons */
+.buttonContainer {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* local-file & drive buttons share style */
+.fileUploadButton,
+.driveButton {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: .95rem;
+  padding: .55rem 1.1rem;
+  border-radius: .5rem;
+  border: none;
+  transition: background .2s ease;
+  background: #dbeafe;                  /* blue-100 pastel */
+  color: #1e40af;                       /* blue-800 */
+}
+.fileUploadButton:hover,
+.driveButton:hover { background: #bfdbfe; }  /* blue-200 */
+
+/* uploaded-file list */
+.fileList { margin-top: 2rem; }
+
+.fileItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: .75rem 1rem;
+  margin-bottom: .75rem;
+  border-radius: .5rem;
+  background: #fef9c3;                  /* yellow-100 pastel */
+  border-left: 4px solid #fef08a;       /* yellow-200 */
+  box-shadow: 0 1px 2px rgb(0 0 0 / .06);
+}
+
+.fileName { font-weight: 600; flex: 1; }
+
+.fileInfo { color: #4b5563; }           /* gray-600 */
+
+/* pastel danger */
+.removeButton {
+  background: #fee2e2;                  /* red-100 */
+  color: #991b1b;                       /* red-700 */
+  border: none;
+  padding: .4rem .8rem;
+  border-radius: .375rem;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+.removeButton:hover { background: #fecaca; } /* red-200 */
+
+/* ───────── primary action ───────── */
+.primaryButton {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  background: #0f172a;                  /* slate-900 */
+  color: #fff;
+  padding: .65rem 1.3rem;
+  border: none;
+  border-radius: .5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .2s ease, transform .15s ease;
+}
+.primaryButton:hover   { background: #1e293b; transform: translateY(-1px); }
+.primaryButton:active  { transform: translateY(0); }
+
+/* ───────── metadata modal (Exam/Summary) ───────── */
+.metadataOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / .45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 40;
+}
+
+.metadataCard {
+  background: #fff;
+  padding: 2rem;
+  border-radius: .75rem;
+  width: 96%;
+  max-width: 420px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / .12);
+}
+>>>>>>> Stashed changes
