@@ -85,6 +85,7 @@ const GeneratedContent: React.FC = () => {
         setLoading(true);
         const userData = localStorage.getItem('user') || '';
         const parsedData = JSON.parse(userData);
+        console.log("Parsed user data:", parsedData);
         // Extract the ID
         const userId = parsedData._id;
         // Replace with your real API

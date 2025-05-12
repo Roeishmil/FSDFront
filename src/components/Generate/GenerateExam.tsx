@@ -195,10 +195,13 @@ const GenerateExam: React.FC = () => {
       formData.append("file", uploadedFiles[0]); // Send the first file
       
       // Get the user ID from localStorage if available
-      const userId = localStorage.getItem("userId");
+      const user = localStorage.getItem("user");
+      const userId = user ? JSON.parse(user)._id : null;
+      console.log("User ID:", userId);
       if (userId) {
         formData.append("userId", userId);
       }
+      
 
       // Call the API to create the exam
       const response = await examApi.creatExam(formData);
@@ -246,11 +249,9 @@ const GenerateExam: React.FC = () => {
 
     try {
       // Get user ID from local storage or context
-      let userId = localStorage.getItem('userId') || ''; // Adjust based on your auth implementation
-      
-      if (!userId) {
-        userId = '67f3bd679937c252dacacee4';
-      }
+      let userId = localStorage.getItem('user') || ''; // Adjust based on your auth implementation
+      userId = JSON.parse(userId)._id;
+      console.log("User ID:", userId);
 
       // Create the content payload
       const contentPayload = {
