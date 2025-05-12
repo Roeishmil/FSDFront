@@ -29,6 +29,7 @@ const LoginPage: FC = () => {
       localStorage.setItem("accessToken", response.data.accessToken);
       localStorage.setItem("refreshToken", response.data.refreshToken);
       localStorage.setItem("user", JSON.stringify(response.data.user));
+      localStorage.setItem("userId", response.data.user._id);
       setUser(response.data.user);
       navigate("/");
     } catch (error) {
@@ -42,6 +43,8 @@ const LoginPage: FC = () => {
       localStorage.setItem("accessToken", response.data.accessToken);
       localStorage.setItem("refreshToken", response.data.refreshToken);
       localStorage.setItem("user", JSON.stringify(response.data.user));
+      localStorage.setItem("userId", response.data.user._id);
+
       setUser(response.data.user);
       navigate("/");
     } catch (error) {

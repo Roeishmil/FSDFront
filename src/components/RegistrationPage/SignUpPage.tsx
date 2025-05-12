@@ -37,6 +37,7 @@ const SignUpPage: FC = () => {
           fullName: response.fullName,
         })
       );
+      localStorage.setItem("userId", response._id);
       setUser(response);
       navigate("/");
     } catch (error) {
