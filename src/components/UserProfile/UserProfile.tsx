@@ -80,28 +80,54 @@ const UserProfile: FC = () => {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-    formData.append("username", userData.username ?? "");
-
-    try {
-      setIsLoadingFile(true);
-      setErrorFile(null);
-      const res = await fileApi.uploadFile(formData);
-
-      /* update local + global user image */
-      setUserData((p) => ({ ...p, imgUrl: res.data.user.imgUrl }));
-      if (updateUser) {
-        await updateUser(res.data.user);
-        setRefreshTrigger((p) => !p);
-      }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      setErrorFile(msg);
-      console.error("Upload error:", err);
-    } finally {
-      setIsLoadingFile(false);
+    // Make sure we have a user ID
+    if (!userData._id) {
+      setErrorFile("User ID not found. Please try refreshing the page.");
+      return;
     }
+
+    // Create a FormData with just the file
+    // According to usersController.js, the update method expects JSON
+    // So we'll need to convert the file to base64 and update user manually
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        setIsLoadingFile(true);
+        setErrorFile(null);
+
+        // Convert image to base64 string
+        const base64Image = e.target?.result as string;
+
+        // Update user with the image URL
+        const updatedUser = {
+          ...userData,
+          imgUrl: base64Image,
+        };
+
+        // Use updateUser from useUser hook to update profile
+        if (updateUser) {
+          const updated = await updateUser(updatedUser);
+          if (updated) {
+            setUserData(updated);
+            setRefreshTrigger((p) => !p);
+          }
+        }
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        setErrorFile(msg);
+        console.error("Upload error:", err);
+      } finally {
+        setIsLoadingFile(false);
+      }
+    };
+
+    reader.onerror = () => {
+      setErrorFile("Error reading file");
+      setIsLoadingFile(false);
+    };
+
+    // Read file as data URL (base64)
+    reader.readAsDataURL(selectedFile);
   };
 
   const handleSave = async (data: FormData) => {
