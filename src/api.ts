@@ -63,8 +63,17 @@ export const userService = {
 };
 
 export const fileApi = {
-  uploadFile: (formData: any) => {
-    return api.post(`/users/${formData.username}`, formData, {
+  // FIXED: Update to use PUT instead of POST since we're updating a user
+  uploadFile: (formData: FormData, userId: string) => {
+    // Debug log the file being uploaded
+    const file = formData.get('file') as File;
+    if (file) {
+      console.log(`Uploading file: ${file.name}, type: ${file.type}, size: ${file.size}bytes`);
+    }
+    
+    // We need to use PUT since we're updating the user record
+    // According to usersRoute.js, PUT route is /users/:id
+    return api.put(`/users/${userId}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
