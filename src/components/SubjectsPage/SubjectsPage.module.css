@@ -102,6 +102,7 @@
   display: flex;
   gap: 0.5rem;
 }
+.viewButton,
 .editButton,
 .deleteButton {
   flex: 1;
@@ -117,12 +118,22 @@
   transition: background 0.2s ease;
 }
 
-/* edit – pastel yellow */
+
+.viewButton {
+  background: #eff6ff;  /* blue-50 */
+  color: #1e40af;  /* blue-800 */
+}
+.viewButton:hover { background: #dbeafe;}
+
+
+
 .editButton {
   background: #fef9c3;      /* yellow-100 */
   color: #92400e;           /* amber-700 */
 }
+
 .editButton:hover { background: #fef08a; }
+
 
 /* delete – pastel red */
 .deleteButton {
@@ -158,12 +169,60 @@
   box-shadow: 0 10px 25px rgb(0 0 0 / 15%);
 }
 
+.modalContentSubject {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  width: 100%;
+  max-width: 460px;
+}
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+.input {
+  border: 1px solid #d1d5db;  /* gray-300 */
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font: inherit;
+}
+.error {
+  color: #dc2626;              /* red-600 */
+  font-size: 0.8rem;
+}
+.modalActions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+.saveButton {
+  background: #0f172a;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+}
+.cancelButton {
+  background: #e5e7eb;         /* gray-200 */
+  color: #111827;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+}
+  
 .contentViewerHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 2rem;
   border-bottom: 1px solid #e5e7eb;  /* gray-200 */
+  border-radius: 0.75rem;
+  width: 100%;
+  max-width: 460px;
 }
 
 .contentViewerHeader h2 {
@@ -306,27 +365,6 @@
   font-size: 0.75rem;
   padding: 0.2rem 0.5rem;
   border-radius: 0.25rem;
-}
-
-.viewButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  padding: 0.5rem;
-  background: #eff6ff;  /* blue-50 */
-  color: #1e40af;  /* blue-800 */
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  margin-top: 0.5rem;
-}
-
-.viewButton:hover {
-  background: #dbeafe;  /* blue-100 */
 }
 
 .loading, .error, .noContent {
