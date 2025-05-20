@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { examApi, contentApi } from "../../api";
 import GoogleDrivePicker from "../googleDrive";
+import { useSubject } from "../../hooks/useSubject";
 import styles from "./Generate.module.css";
 
 /* ─── loader ─── */
@@ -52,20 +53,13 @@ const ContentMetadata: React.FC<{
 
   return (
     <div className={styles.metadataOverlay} onClick={onClose}>
-      <div
-        className={styles.metadataCard}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className={styles.metadataCard} onClick={(e) => e.stopPropagation()}>
         <h3>Update Exam Details</h3>
 
         {error && <p style={{ color: "#b91c1c" }}>{error}</p>}
 
         <label className={styles.label}>Title</label>
-        <input
-          className={styles.input}
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+        <input className={styles.input} value={title} onChange={(e) => setTitle(e.target.value)} />
 
         <label className={styles.label} style={{ marginTop: 12 }}>
           Subject
@@ -78,18 +72,10 @@ const ContentMetadata: React.FC<{
         />
 
         <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
-          <button
-            onClick={onClose}
-            className={styles.primaryButton}
-            style={{ background: "#64748b", color: "#fff" }}
-          >
+          <button onClick={onClose} className={styles.primaryButton} style={{ background: "#64748b", color: "#fff" }}>
             Cancel
           </button>
-          <button
-            onClick={save}
-            disabled={busy}
-            className={styles.primaryButton}
-          >
+          <button onClick={save} disabled={busy} className={styles.primaryButton}>
             {busy ? "Saving…" : "Save"}
           </button>
         </div>
@@ -104,8 +90,8 @@ const GenerateExam: React.FC = () => {
   const [prompt, setPrompt] = useState("");
   const [numAmerican, setNumAmerican] = useState(8);
   const [numOpen, setNumOpen] = useState(3);
-  const [difficulty, setDifficulty] =
-    useState<"Easy" | "Moderate" | "Hard">("Moderate");
+  const [difficulty, setDifficulty] = useState<"Easy" | "Moderate" | "Hard">("Moderate");
+  const [subject, setSubject] = useState("");
 
   /* uploads */
   const [uploaded, setUploaded] = useState<File[]>([]);
@@ -123,16 +109,15 @@ const GenerateExam: React.FC = () => {
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const hiddenDrivePicker = useRef<HTMLInputElement>(null);
+  const { subjects } = useSubject();
 
   /* upload helpers */
   const handleLocalUpload = (e: React.ChangeEvent<HTMLInputElement>) =>
     setUploaded((p) => [...p, ...Array.from(e.target.files || [])]);
 
-  const handleDriveUpload = (files: File[]) =>
-    setUploaded((p) => [...p, ...files]);
+  const handleDriveUpload = (files: File[]) => setUploaded((p) => [...p, ...files]);
 
-  const removeFile = (i: number) =>
-    setUploaded((p) => p.filter((_, idx) => idx !== i));
+  const removeFile = (i: number) => setUploaded((p) => p.filter((_, idx) => idx !== i));
 
   /* generate exam */
   const handleGenerate = async () => {
@@ -174,8 +159,7 @@ const GenerateExam: React.FC = () => {
     if (!htmlContent) return;
     try {
       setSaving(true);
-      const uid =
-        localStorage.getItem("userId") || "67f3bd679937c252dacacee4";
+      const uid = localStorage.getItem("userId") || "67f3bd679937c252dacacee4";
       await contentApi.createContent({
         userId: uid,
         content: htmlContent,
@@ -199,8 +183,7 @@ const GenerateExam: React.FC = () => {
         // auto-height after styles/scripts finish
         setTimeout(() => {
           if (iframeRef.current) {
-            iframeRef.current.style.height =
-              doc.body.scrollHeight + 30 + "px";
+            iframeRef.current.style.height = doc.body.scrollHeight + 30 + "px";
           }
         }, 120);
       }
@@ -208,8 +191,7 @@ const GenerateExam: React.FC = () => {
   }, [htmlContent]);
 
   /* loaders */
-  if (loading)
-    return <Loader msg="Generating exam… This may take a minute." />;
+  if (loading) return <Loader msg="Generating exam… This may take a minute." />;
   if (saving) return <Loader msg="Saving exam to your account…" />;
 
   /* ------------ rendered exam ------------ */
@@ -227,35 +209,21 @@ const GenerateExam: React.FC = () => {
           />
         )}
 
-        {error && (
-          <p style={{ color: "#b91c1c", margin: "12px 0" }}>{error}</p>
-        )}
+        {error && <p style={{ color: "#b91c1c", margin: "12px 0" }}>{error}</p>}
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
           {contentId && (
-            <button
-              onClick={() => setShowMeta(true)}
-              className={styles.primaryButton}
-              style={{ width: 200 }}
-            >
+            <button onClick={() => setShowMeta(true)} className={styles.primaryButton} style={{ width: 200 }}>
               {metaDone ? "Edit Exam Details" : "Set Exam Details"}
             </button>
           )}
 
-          <button
-            onClick={handleSave}
-            className={styles.primaryButton}
-            style={{ width: 160 }}
-          >
+          <button onClick={handleSave} className={styles.primaryButton} style={{ width: 160 }}>
             Save
           </button>
         </div>
 
-        <iframe
-          ref={iframeRef}
-          title="generated-exam"
-          style={{ width: "100%", border: "none", marginTop: 20 }}
-        />
+        <iframe ref={iframeRef} title="generated-exam" style={{ width: "100%", border: "none", marginTop: 20 }} />
       </>
     );
   }
@@ -268,9 +236,7 @@ const GenerateExam: React.FC = () => {
         <div className={styles.headerIcon}>📝</div>
         <div>
           <h2 className={styles.pageTitle}>Generate New Exam</h2>
-          <p className={styles.pageSubtitle}>
-            Upload material and create an exam in seconds
-          </p>
+          <p className={styles.pageSubtitle}>Upload material and create an exam in seconds</p>
         </div>
       </div>
 
@@ -320,6 +286,20 @@ const GenerateExam: React.FC = () => {
           <option value="Hard">Hard</option>
         </select>
 
+        {/* subject selector */}
+        <label className={styles.label} style={{ marginTop: 12 }}>
+          Subject
+        </label>
+        <select className={styles.input} value={subject} onChange={(e) => setSubject(e.target.value)}>
+          <option value="">Select subject…</option>
+          {subjects &&
+            subjects.map((s: any) => (
+              <option key={s._id} value={s.title}>
+                {s.title}
+              </option>
+            ))}
+        </select>
+
         {/* upload bloc */}
         <h3 className={styles.uploadSectionTitle}>Upload Files</h3>
 
@@ -329,25 +309,13 @@ const GenerateExam: React.FC = () => {
             <p>
               <strong>Click to upload</strong>
             </p>
-            <p style={{ fontSize: 13, color: "#64748b" }}>
-              PDF only, up to 10&nbsp;MB
-            </p>
-            <input
-              id="localFile"
-              type="file"
-              multiple
-              onChange={handleLocalUpload}
-              style={{ display: "none" }}
-            />
+            <p style={{ fontSize: 13, color: "#64748b" }}>PDF only, up to 10&nbsp;MB</p>
+            <input id="localFile" type="file" multiple onChange={handleLocalUpload} style={{ display: "none" }} />
           </label>
 
           <span className={styles.orText}>or</span>
 
-          <GoogleDrivePicker
-            className={styles.driveButton}
-            onFilesSelected={handleDriveUpload}
-            ref={hiddenDrivePicker}
-          />
+          <GoogleDrivePicker className={styles.driveButton} onFilesSelected={handleDriveUpload} ref={hiddenDrivePicker} />
         </div>
 
         {uploaded.length > 0 && (
@@ -355,13 +323,8 @@ const GenerateExam: React.FC = () => {
             {uploaded.map((f, i) => (
               <li key={i} className={styles.fileItem}>
                 <span className={styles.fileName}>{f.name}</span>
-                <span className={styles.fileInfo}>
-                  {(f.size / 1024).toFixed(1)} KB
-                </span>
-                <button
-                  className={styles.removeButton}
-                  onClick={() => removeFile(i)}
-                >
+                <span className={styles.fileInfo}>{(f.size / 1024).toFixed(1)} KB</span>
+                <button className={styles.removeButton} onClick={() => removeFile(i)}>
                   Remove
                 </button>
               </li>
@@ -369,11 +332,7 @@ const GenerateExam: React.FC = () => {
           </ul>
         )}
 
-        {error && (
-          <p style={{ color: "#b91c1c", marginTop: 12, fontWeight: 500 }}>
-            {error}
-          </p>
-        )}
+        {error && <p style={{ color: "#b91c1c", marginTop: 12, fontWeight: 500 }}>{error}</p>}
 
         <button onClick={handleGenerate} className={styles.primaryButton}>
           Generate Exam
