@@ -1,13 +1,18 @@
-import { useState } from "react";
-import { Plus, SaveIcon, Trash2 } from "lucide-react";
-import styles from './Notifications.module.css';
-
+import { useState, useEffect } from "react";
+import { Plus, Trash2 } from "lucide-react";
+import styles from "./Notifications.module.css";
+import {notificationService,Subject } from "../../hooks/useNotification";
+import useUser from"../../hooks/useUser";
 
 type Notification = {
-  id: number;
-  subject: string;
+  _id: string;
+  subjectId: string;
   day: string;
-  time: string;
+  time: {
+    hour: number;
+    minute: number;
+  };
+  userId: string;
 };
 
 const daysOfWeek = [
@@ -15,29 +20,57 @@ const daysOfWeek = [
 ];
 
 const NotificationsPage = () => {
-  const [notifications, setNotifications] = useState<Notification[]>([
-    { id: 1, subject: "Weekly summary", day: "Monday", time: "09:00" },
-    { id: 2, subject: "New content alert", day: "Wednesday", time: "14:30" },
-  ]);
-
+  const user = useUser();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [newNotification, setNewNotification] = useState<Partial<Notification>>({
-    subject: "",
+    subjectId: "",
     day: "Sunday",
-    time: "12:00",
+    time: {hour: 12, minute: 0 },
   });
+  const [subjects, setSubjects] = useState<Subject[]>([]);
 
-  const handleAdd = () => {
-    if (!newNotification.subject || !newNotification.time || !newNotification.day) return;
-    const newId = Date.now();
-    setNotifications([
-      ...notifications,
-      { id: newId, subject: newNotification.subject, day: newNotification.day, time: newNotification.time },
-    ]);
-    setNewNotification({ subject: "", day: "Sunday", time: "12:00" });
+  // טען מהשרת בעת טעינת הדף
+  useEffect(() => {
+    notificationService.getNotificationsByUserId(user.user?._id||"name")
+      .then((res) => setNotifications(res.data))
+      .catch((err) => console.error("שגיאה בטעינת התראות", err));
+
+    notificationService.getSubjectsByUserId(user.user?._id||"")
+      .then((res) => setSubjects(res.data))
+      .catch((err) => console.error("שגיאה בטעינת נושאים", err));
+  }, [user.user?._id]);
+
+  const handleAdd = async () => {
+    if (!newNotification.subjectId || !newNotification.time || !newNotification.day) return;
+    try {
+      const res = await notificationService.createNotification({
+        subjectId: newNotification.subjectId,
+        day: newNotification.day,
+        time: {
+          hour: newNotification.time?.hour!,
+          minute: newNotification.time?.minute!,
+        },
+        userId: user.user?._id||"",
+      } as Omit<Notification, "_id">);
+      setNotifications([...notifications, res.data]);
+      setNewNotification({ subjectId: "", day: "Sunday", time: {hour:12,minute:0} });
+    } catch (err) {
+      console.error("שגיאה ביצירת התראה", err);
+    }
   };
 
-  const handleDelete = (id: number) => {
-    setNotifications(notifications.filter(n => n.id !== id));
+  const handleDelete = async (id: string) => {
+    try {
+      await notificationService.deleteNotification(id);
+      setNotifications(notifications.filter(n => n._id !== id));
+    } catch (err) {
+      console.error("שגיאה במחיקת התראה", err);
+    }
+  };
+  const getSubjectTitle = (subjectId: string) => {  
+    const subject = subjects.find(s => s._id === subjectId);
+    console.log(subject);
+    return subject?.title || subjectId;
   };
 
   return (
@@ -48,13 +81,19 @@ const NotificationsPage = () => {
 
       <div className={styles.pageHeader}>
         <div className="grid grid-cols-4 items-center">
-          <input
-            type="text"
-            placeholder="Subject"
-            value={newNotification.subject}
-            onChange={(e) => setNewNotification({ ...newNotification, subject: e.target.value })}
+          <select
+            value={newNotification.subjectId}
+            onChange={(e) => setNewNotification({ ...newNotification, subjectId: e.target.value })}
             className="border p-2 col-span-1"
-          />
+          >
+            <option value="">Select Subject</option>
+            {subjects.map((subject) => (
+              <option key={subject._id} value={subject._id}>
+                {subject.title}
+              </option>
+            ))}
+          </select>
+
           <select
             value={newNotification.day}
             onChange={(e) => setNewNotification({ ...newNotification, day: e.target.value })}
@@ -66,27 +105,35 @@ const NotificationsPage = () => {
           </select>
           <input
             type="time"
-            value={newNotification.time}
-            onChange={(e) => setNewNotification({ ...newNotification, time: e.target.value })}
+            value={`${newNotification.time?.hour?.toString().padStart(2, "0") || "12"}:${newNotification.time?.minute?.toString().padStart(2, "0") || "00"}`}
+            onChange={(e) => {
+                      const [hour, minute] = e.target.value.split(":").map(Number);
+                      setNewNotification({
+                        ...newNotification,
+                        time: { hour, minute }
+                      });
+                    }}
             className="border p-2 col-span-1"
           />
         </div>
         <button
           onClick={handleAdd}
           className={styles.addButton}>
-            <Plus size={18} /> Add Notification
+          <Plus size={18} /> Add Notification
         </button>
       </div>
 
       <div className="mt-6 space-y-3">
         {notifications.map((notif) => (
-          <div key={notif.id} className={styles.notificationitem}>
+          <div key={notif._id} className={styles.notificationitem}>
             <div>
-              <h2 className="font-medium">{notif.subject}</h2>
-              <p className={styles.time}>{notif.day}, {notif.time}</p>
+              <h2 className="font-medium">{getSubjectTitle(notif.subjectId)}</h2>
+              <p className={styles.time}>
+                {notif.day}, {notif.time.hour.toString().padStart(2, '0')}:{notif.time.minute.toString().padStart(2, '0')}
+              </p>
             </div>
             <button
-              onClick={() => handleDelete(notif.id)}
+              onClick={() => handleDelete(notif._id)}
               className={styles.deleteButton}
             >
               <Trash2 size={18} />
