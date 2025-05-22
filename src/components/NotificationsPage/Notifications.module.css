@@ -1,0 +1,92 @@
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+/* מיישר את כותרת ההתראות עם שאר העמודים */
+h1 {
+   font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 7%;
+}
+
+h2 {
+  font-size: 20px;
+}
+.deleteButton {
+  background: #fee2e2;      /* red-100 */
+  color: #991b1b;           /* red-700 */
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.65rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.notificationitem {
+  position: relative;
+  background: #fff;
+  border: 1px solid #e5e7eb;  /* gray-200 */
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+  transition: box-shadow 0.2s ease;
+  margin-top: 1%;
+}
+
+/* מעגל כפתורים ושדות טקסט */
+button,
+input,
+select {
+  border-radius: 12px;
+  font-size: 14px;
+  padding: 8px 12px;
+}
+
+/* שינוי גודל פונט כללי */
+body,
+input,
+button,
+select,
+.notification-item {
+  font-size: 14x;
+}
+
+/* צבע טקסט של כפתור "Add Notification" */
+.addButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #0f172a;     /* slate-900 */
+  color: #fff;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s ease;
+  margin-left: 1rem;
+}
+
+.addButton:hover {
+  background-color: #1e293b;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+  margin-left: 25%;
+}
+
+.time {
+  font-size: 0.85rem;
+  color: #4b5563;           /* gray-600 */
+  margin-bottom: 0.75rem;
+}

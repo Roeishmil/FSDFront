@@ -5,6 +5,7 @@ import {
   FileText,
   Book,
   User,
+  Bell,
   LogOut,
   MenuSquare,
 } from "lucide-react";
@@ -70,6 +71,13 @@ const Sidenav: FC = () => {
         >
           <Book size={18} />
           Subjects
+        </Link>
+        <Link
+          to="/notifications"
+          className={`${styles.link} ${
+            pathname.startsWith("/notifications") ? styles.active : "" }`} >
+          <Bell size={18} />
+          Notifications
         </Link>
       </nav>
 
