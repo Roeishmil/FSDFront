@@ -157,7 +157,7 @@ export const contentApi = {
       throw error;
     }
   },
-  updateContent: async (contentId: string, data: { title?: string; subject?: string }) => {
+  updateContent: async (contentId: string, data: { title?: string; subject?: string; shared?: boolean }) => {
     try {
       const response = await api.put(`/content/${contentId}`, data);
       return response.data;

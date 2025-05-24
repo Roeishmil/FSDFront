@@ -160,3 +160,143 @@
 
 /* keyframes */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ───── Edit Modal ───── */
+.modalOverlayEdit {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalEdit {
+  background: white;
+  border-radius: 0.75rem;
+  width: 90%;
+  max-width: 420px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeaderEdit {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modalBodyEdit label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+.modalBodyEdit input[type="text"] {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+}
+
+.checkboxRowEdit {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+
+  input{
+    margin-right: 10px;
+  }
+}
+
+.modalFooterEdit {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.saveButtonEdit {
+  background: #0f172a;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+.saveButtonEdit:hover {
+  background: #1e293b;
+}
+
+.cancelButtonEdit {
+  background: #e5e7eb;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.closeButtonEdit {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  color: #6b7280;
+  cursor: pointer;
+}
+.closeButtonEdit:hover {
+  color: #111827;
+}
+
+.cardActionsEdit {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+
+.viewButton,
+.editButtonEdit
+ {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.65rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+
+.viewButton {
+  flex: 3;
+  background: #eff6ff;  /* blue-50 */
+  color: #1e40af;  /* blue-800 */
+}
+.viewButton:hover { background: #dbeafe;}
+
+
+
+.editButtonEdit {
+  flex:1;
+  background: #fef9c3;      /* yellow-100 */
+  color: #92400e;           /* amber-700 */
+}
+
+.editButtonEdit:hover { background: #fef08a; }
+
+.subjectInput{
+  height: 40px;
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+}

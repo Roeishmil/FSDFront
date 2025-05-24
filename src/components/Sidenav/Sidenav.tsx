@@ -55,16 +55,6 @@ const Sidenav: FC = () => {
           <FileText size={18} />
           Generated&nbsp;Content
         </Link>
-
-        <Link
-          to="/subjects"
-          className={`${styles.link} ${
-            pathname.startsWith("/subjects") ? styles.active : ""
-          }`}
-        >
-          <Book size={18} />
-          Subjects
-        </Link>
         <Link
           to="/shared-content"
           className={`${styles.link} ${

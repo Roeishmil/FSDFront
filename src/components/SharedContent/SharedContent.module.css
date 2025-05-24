@@ -1,87 +1,4 @@
-.sharedContent {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 2rem 1.25rem;
-  font-family: system-ui, sans-serif;
-}
 
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.25rem;
-}
-
-.card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: .85rem;
-  padding: 1.5rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-.cardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
-}
-
-.cardTitle {
-  display: flex;
-  flex-direction: column;
-}
-
-.cardDate {
-  font-size: 0.85rem;
-  color: #64748b;
-}
-
-.cardTags {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.tag {
-  background: #f1f5f9;
-  border-radius: 0.5rem;
-  padding: 0.25rem 0.75rem;
-  font-size: 0.85rem;
-  color: #334155;
-}
-
-.cardUser {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.userImage {
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  object-fit: cover;
-}
-
-.username {
-  font-size: 0.9rem;
-  color: #1e293b;
-  font-weight: 500;
-}
-
-.viewButton {
-  background: #0f172a;
-  color: white;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: .5rem;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-.viewButton:hover {
-  background: #1e293b;
-}
 
 .modalOverlay {
   position: fixed;
@@ -268,4 +185,157 @@
   font-weight: bold;
   cursor: pointer;
 }
+
+.sharedContent {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+  font-family: system-ui, sans-serif;
+  color: #0f172a;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1rem 0 2rem;
+  gap: 1rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tabs button {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.tabs button:hover {
+  background: #e2e8f0;
+}
+
+.active {
+  background: #1e40af;
+  font-weight: bold;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.85rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.cardTitle {
+  display: flex;
+  flex-direction: column;
+}
+
+.cardTitle strong {
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.cardDate {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.cardTags {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.tag {
+  background: #f1f5f9;
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.85rem;
+  color: #334155;
+}
+
+.cardUser {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.userImage {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.username {
+  font-size: 0.9rem;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.viewButton {
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.65rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  background: #eff6ff;
+  color: #1e40af;
+}
+
+.viewButton:hover {
+  background: #dbeafe;
+}
+
+.loading,
+.error,
+.noContent {
+  text-align: center;
+  font-size: 1rem;
+  margin-top: 2rem;
+  color: #475569;
+}
+
 

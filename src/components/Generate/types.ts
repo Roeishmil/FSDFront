@@ -6,4 +6,6 @@ export type ContentItem = {
   subject?: string;
   subjectTitle?: string;
   content?: string;
+  copyContent?: boolean;
+  shared?: boolean;
 };

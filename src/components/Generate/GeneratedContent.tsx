@@ -4,72 +4,8 @@ import styles from "./GeneratedContent.module.css";
 import { contentApi } from "../../api";
 import ContentModal from "./ContentModal";
 import { ContentItem } from "./types";
-import { Share2 } from "lucide-react";
-
-type ContentItem = {
-  id: string;
-  title: string;
-  date: string;
-  contentType: string;
-  subject?: string;
-  subjectId?: string;
-  content?: string;
-  copyContent?: boolean;
-};
-
-/* ───── Modal component (unchanged logic) ───── */
-const ContentModal: React.FC<{
-  item: ContentItem | null;
-  onClose: () => void;
-}> = ({ item, onClose }) => {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  useEffect(() => {
-    if (item?.content && iframeRef.current) {
-      const doc = iframeRef.current.contentDocument || iframeRef.current.contentWindow?.document;
-      if (doc) {
-        doc.open();
-        doc.write(item.content);
-        doc.close();
-      }
-    }
-  }, [item?.content]);
-
-  if (!item) return null;
-
-  return (
-    <div className={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className={styles.modalContent}>
-        <div className={styles.modalHeader}>
-          <h3>{item.title}</h3>
-          <button className={styles.closeButton} onClick={onClose}>
-            ×
-          </button>
-        </div>
-        <div className={styles.modalBody}>
-          {item.content ? (
-            <iframe
-              ref={iframeRef}
-              className={styles.contentIframe}
-              title={item.title}
-              sandbox="allow-same-origin allow-scripts"
-            />
-          ) : (
-            <p>No content available for this item.</p>
-          )}
-        </div>
-        <div className={styles.modalFooter}>
-          <span className={styles.itemMeta}>
-            {item.contentType} • {item.date}
-          </span>
-          <button className={styles.closeModalBtn} onClick={onClose}>
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
+import { Eye, Pencil, Share2, X } from "lucide-react";
+import EditContentModal from "./EditContentModal";
 
 const GeneratedContent: React.FC = () => {
   const [contentItems, setContentItems] = useState<ContentItem[]>([]);
@@ -78,18 +14,9 @@ const GeneratedContent: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<ContentItem | null>(null);
+  const [editingItem, setEditingItem] = useState<ContentItem | null>(null);
 
   const navigate = useNavigate();
-
-  const handleTestClick = () => {
-    // Navigate to the exam generate screen
-    navigate("/generate-test");
-  };
-
-  const handleSummaryClick = () => {
-    // Navigate to the summary generate screen
-    navigate("/generate-summary");
-  };
 
   useEffect(() => {
     (async () => {
@@ -106,6 +33,8 @@ const GeneratedContent: React.FC = () => {
           subject: i.subject,
           subjectTitle: i.subjectTitle,
           content: i.content,
+          copyContent: i.copyContent,
+          shared: i.shared ?? i.copyContent ?? false, // תמיכה לאחור
         }));
 
         setContentItems(normalized);
@@ -125,7 +54,31 @@ const GeneratedContent: React.FC = () => {
     return matchesType && matchesSearch;
   });
 
-  const handleGenerate = (type: "Summary" | "Exam") => console.log(`Generating ${type}`);
+  const handleSaveEdit = async (updated: ContentItem) => {
+    try {
+      await contentApi.updateContent(updated.id, {
+        title: updated.title,
+        subject: updated.subject,
+        shared: updated.shared ?? updated.copyContent ?? false,
+      });
+
+      setContentItems((prev) =>
+        prev.map((item) =>
+          item.id === updated.id
+            ? {
+                ...item,
+                title: updated.title,
+                subject: updated.subject,
+                shared: updated.shared ?? updated.copyContent ?? false,
+                copyContent: updated.shared ?? updated.copyContent ?? false,
+              }
+            : item
+        )
+      );
+    } catch (error) {
+      console.error("Failed to update content:", error);
+    }
+  };
 
   return (
     <div className={styles.generatedContent}>
@@ -149,8 +102,12 @@ const GeneratedContent: React.FC = () => {
             </button>
           ))}
         </div>
-        <input type="text" placeholder="Search content..." value={search} onChange={(e) => setSearch(e.target.value)} />
-        <input type="text" placeholder="Search content..." value={search} onChange={(e) => setSearch(e.target.value)} />
+        <input
+          type="text"
+          placeholder="Search content..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
       </div>
 
       {loading ? (
@@ -162,7 +119,7 @@ const GeneratedContent: React.FC = () => {
           {filteredContent.map((c) => (
             <div key={c.id} className={styles.card}>
               <div className={styles.cardHeader}>
-                {c.copyContent && <Share2 size={18} />}
+                {c.copyContent && <Share2 size={18} className={styles.shareIcon} />}
                 <strong>{c.title}</strong>
                 <span>{c.date}</span>
               </div>
@@ -170,10 +127,14 @@ const GeneratedContent: React.FC = () => {
                 {c.subjectTitle && <span className={styles.tag}>{c.subjectTitle}</span>}
                 <span className={styles.tag}>{c.contentType}</span>
               </div>
-              <button className={styles.viewButton} onClick={() => setSelectedItem(c)}>
-              <button className={styles.viewButton} onClick={() => setSelectedItem(c)}>
-                👁 View Content
-              </button>
+              <div className={styles.cardActionsEdit}>
+                <button className={styles.viewButton} onClick={() => setSelectedItem(c)}>
+                   <Eye size={14} /> View Content
+                </button>
+                <button className={styles.editButtonEdit} onClick={() => setEditingItem(c)}>
+                  <Pencil size={14} /> Edit
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -182,7 +143,9 @@ const GeneratedContent: React.FC = () => {
       )}
 
       {selectedItem && <ContentModal item={selectedItem} onClose={() => setSelectedItem(null)} />}
-      {selectedItem && <ContentModal item={selectedItem} onClose={() => setSelectedItem(null)} />}
+      {editingItem && (
+        <EditContentModal item={editingItem} onClose={() => setEditingItem(null)} onSave={handleSaveEdit} />
+      )}
     </div>
   );
 };
