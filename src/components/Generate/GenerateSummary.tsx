@@ -1,4 +1,3 @@
-/* src/components/generate/GenerateSummary.tsx */
 import React, { useState, useRef, useEffect } from "react";
 import { summaryApi, contentApi } from "../../api";
 import GoogleDrivePicker from "../googleDrive";
@@ -32,6 +31,7 @@ const ContentMetadata: React.FC<{
 }> = ({ contentId, initialTitle, onClose }) => {
   const [title, setTitle] = useState(initialTitle);
   const [subject, setSubject] = useState("");
+  const { subjects } = useSubject();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,12 +64,15 @@ const ContentMetadata: React.FC<{
         <label className={styles.label} style={{ marginTop: 12 }}>
           Subject
         </label>
-        <input
-          className={styles.input}
-          value={subject}
-          onChange={(e) => setSubject(e.target.value)}
-          placeholder="Enter subject name"
-        />
+        <select className={styles.input} value={subject} onChange={(e) => setSubject(e.target.value)}>
+          <option value="">Select subject…</option>
+          {subjects &&
+            subjects.map((s: any) => (
+              <option key={s._id} value={s._id}>
+                {s.title}
+              </option>
+            ))}
+        </select>
 
         <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
           <button onClick={onClose} className={styles.primaryButton} style={{ background: "#64748b", color: "#fff" }}>
@@ -129,6 +132,7 @@ const GenerateSummary: React.FC = () => {
 
       const fd = new FormData();
       fd.append("prompt", prompt);
+      fd.append("subjectId", subject);
       fd.append("file", uploaded[0]);
 
       const uid = localStorage.getItem("userId");
@@ -245,6 +249,21 @@ const GenerateSummary: React.FC = () => {
           placeholder="Add any specific requirements…"
         />
 
+        <>
+          <label className={styles.label} style={{ marginTop: 12 }}>
+            Subject
+          </label>
+          <select className={styles.input} value={subject} onChange={(e) => setSubject(e.target.value)}>
+            <option value="">Select subject…</option>
+            {subjects &&
+              subjects.map((s: any) => (
+                <option key={s._id} value={s._id}>
+                  {s.title}
+                </option>
+              ))}
+          </select>
+        </>
+
         <h3 className={styles.uploadSectionTitle}>Upload Files</h3>
 
         <div className={styles.uploadRow}>
@@ -281,21 +300,6 @@ const GenerateSummary: React.FC = () => {
         <button onClick={handleGenerate} className={styles.primaryButton}>
           Generate Summary
         </button>
-
-        <>
-          <label className={styles.label} style={{ marginTop: 12 }}>
-            Subject
-          </label>
-          <select className={styles.input} value={subject} onChange={(e) => setSubject(e.target.value)}>
-            <option value="">Select subject…</option>
-            {subjects &&
-              subjects.map((s: any) => (
-                <option key={s._id} value={s.title}>
-                  {s.title}
-                </option>
-              ))}
-          </select>
-        </>
       </div>
     </div>
   );

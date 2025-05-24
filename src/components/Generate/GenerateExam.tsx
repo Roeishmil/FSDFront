@@ -61,15 +61,20 @@ const ContentMetadata: React.FC<{
         <label className={styles.label}>Title</label>
         <input className={styles.input} value={title} onChange={(e) => setTitle(e.target.value)} />
 
-        <label className={styles.label} style={{ marginTop: 12 }}>
-          Subject
-        </label>
-        <input
-          className={styles.input}
-          value={subject}
-          onChange={(e) => setSubject(e.target.value)}
-          placeholder="Enter subject name"
-        />
+        <>
+          <label className={styles.label} style={{ marginTop: 12 }}>
+            Subject
+          </label>
+          <select className={styles.input} value={subject} onChange={(e) => setSubject(e.target.value)}>
+            <option value="">Select subject…</option>
+            {subjects &&
+              subjects.map((s: any) => (
+                <option key={s._id} value={s._id}>
+                  {s.title}
+                </option>
+              ))}
+          </select>
+        </>
 
         <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
           <button onClick={onClose} className={styles.primaryButton} style={{ background: "#64748b", color: "#fff" }}>
@@ -110,7 +115,6 @@ const GenerateExam: React.FC = () => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const hiddenDrivePicker = useRef<HTMLInputElement>(null);
   const { subjects } = useSubject();
-
   /* upload helpers */
   const handleLocalUpload = (e: React.ChangeEvent<HTMLInputElement>) =>
     setUploaded((p) => [...p, ...Array.from(e.target.files || [])]);
