@@ -1,6 +1,14 @@
 import { FC } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, FileText, Book, User, LogOut, MenuSquare } from "lucide-react";
+import {
+  Home,
+  FileText,
+  Book,
+  User,
+  LogOut,
+  Share2,
+  MenuSquare,
+} from "lucide-react";
 import styles from "./Sidenav.module.css";
 import useUser from "../../hooks/useUser";
 import Logo from "../../assets/Logo.png";
@@ -46,6 +54,25 @@ const Sidenav: FC = () => {
         <Link to="/generate" className={`${styles.link} ${pathname.startsWith("/generate") ? styles.active : ""}`}>
           <FileText size={18} />
           Generated&nbsp;Content
+        </Link>
+
+        <Link
+          to="/subjects"
+          className={`${styles.link} ${
+            pathname.startsWith("/subjects") ? styles.active : ""
+          }`}
+        >
+          <Book size={18} />
+          Subjects
+        </Link>
+        <Link
+          to="/shared-content"
+          className={`${styles.link} ${
+            pathname.startsWith("/shared-content") ? styles.active : ""
+          }`}
+        >
+          <Share2 size={18} />
+          Shared Content
         </Link>
       </nav>
 

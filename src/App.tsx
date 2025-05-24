@@ -16,6 +16,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import FileUpload from "./components/FileUpload/FileUpload";
 import SubjectsPage from "./components/SubjectsPage/SubjectsPage";
+import SharedContent from "./components/SharedContent/SharedContent";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -40,6 +41,7 @@ function App() {
                 <Route path="/profile" element={<UserProfile />} />
                 <Route path="/study" element={<StudyMetatrails />} />
                 <Route path="/generate" element={<Generate />} />
+                <Route path="/shared-content" element={<SharedContent />} />
                 {/* New generation screen routes */}
                 <Route path="/generate-test" element={<GenerateExam />} />
                 <Route path="/generate-summary" element={<GenerateSummary />} />
