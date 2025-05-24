@@ -6,6 +6,7 @@ import {
   Book,
   User,
   LogOut,
+  Share2,
   MenuSquare,
 } from "lucide-react";
 import styles from "./Sidenav.module.css";
@@ -70,6 +71,15 @@ const Sidenav: FC = () => {
         >
           <Book size={18} />
           Subjects
+        </Link>
+        <Link
+          to="/shared-content"
+          className={`${styles.link} ${
+            pathname.startsWith("/shared-content") ? styles.active : ""
+          }`}
+        >
+          <Share2 size={18} />
+          Shared Content
         </Link>
       </nav>
 

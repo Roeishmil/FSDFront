@@ -147,6 +147,15 @@ export const contentApi ={
       throw error;
     }
   },
+  fetchSharedContent: async () => {
+    try {
+      const response = await api.get(`/content/shared`);
+      return response.data;
+    } catch (error) {
+      console.error("Error in createContent:", error);
+      throw error;
+    }
+  },
   updateContent: async (contentId: string, data: { title?: string; subject?: string }) => {
     try {
       const response = await api.put(`/content/${contentId}`, data);
