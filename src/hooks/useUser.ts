@@ -9,7 +9,7 @@ export interface UserContextType {
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: import.meta.env.BASE_URL,
 });
 
 api.interceptors.request.use(

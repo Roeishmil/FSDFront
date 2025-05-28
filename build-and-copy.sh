@@ -10,7 +10,7 @@ set -e
 FRONTEND_DIR="./FSDFront"
 BACKEND_DIR="./FSDBackend"
 BUILD_DIR="$FRONTEND_DIR/dist" # change to build if using CRA
-TARGET_DIR="$BACKEND_DIR/public"
+TARGET_DIR="$BACKEND_DIR/front"
 
 # Step 1: Build frontend
 echo "Building frontend..."

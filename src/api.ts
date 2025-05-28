@@ -1,7 +1,7 @@
 import axios from "axios";
 import { IUser } from "./Interfaces";
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = import.meta.env.BASE_URL;
 // Cache for promises to prevent duplicate requests
 let examPromise: Promise<string> | null = null;
 let summaryPromise: Promise<string> | null = null;
