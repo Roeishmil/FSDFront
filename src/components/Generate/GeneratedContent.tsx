@@ -56,25 +56,28 @@ const GeneratedContent: React.FC = () => {
 
   const handleSaveEdit = async (updated: ContentItem) => {
     try {
-      await contentApi.updateContent(updated.id, {
-        title: updated.title,
-        subject: updated.subject,
-        shared: updated.shared ?? updated.copyContent ?? false,
-      });
-
-      setContentItems((prev) =>
-        prev.map((item) =>
-          item.id === updated.id
-            ? {
-                ...item,
-                title: updated.title,
-                subject: updated.subject,
-                shared: updated.shared ?? updated.copyContent ?? false,
-                copyContent: updated.shared ?? updated.copyContent ?? false,
-              }
-            : item
-        )
-      );
+      await contentApi
+        .updateContent(updated.id, {
+          title: updated.title,
+          subject: updated.subject,
+          shared: updated.shared,
+        })
+        .then((res) => {
+          setContentItems((prev) =>
+            prev.map((item) =>
+              item.id === updated.id
+                ? {
+                    ...item,
+                    title: res.title,
+                    subject: res.subject,
+                    subjectTitle: res.subjectTitle,
+                    shared: res.shared,
+                    copyContent: res.copyContent,
+                  }
+                : item
+            )
+          );
+        });
     } catch (error) {
       console.error("Failed to update content:", error);
     }
@@ -102,12 +105,7 @@ const GeneratedContent: React.FC = () => {
             </button>
           ))}
         </div>
-        <input
-          type="text"
-          placeholder="Search content..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <input type="text" placeholder="Search content..." value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
 
       {loading ? (
@@ -129,7 +127,7 @@ const GeneratedContent: React.FC = () => {
               </div>
               <div className={styles.cardActionsEdit}>
                 <button className={styles.viewButton} onClick={() => setSelectedItem(c)}>
-                   <Eye size={14} /> View Content
+                  <Eye size={14} /> View Content
                 </button>
                 <button className={styles.editButtonEdit} onClick={() => setEditingItem(c)}>
                   <Pencil size={14} /> Edit
