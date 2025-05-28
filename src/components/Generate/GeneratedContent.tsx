@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "./GeneratedContent.module.css";
 import { contentApi } from "../../api";
+import { Share2 } from "lucide-react";
 
 type ContentItem = {
   id: string;
@@ -82,6 +83,8 @@ const RestoreConfirmationModal: React.FC<{
       </div>
     </div>
   );
+
+
 };
 
 /* ───── Modal component (unchanged logic) ───── */
@@ -93,9 +96,7 @@ const ContentModal: React.FC<{
 
   useEffect(() => {
     if (item?.content && iframeRef.current) {
-      const doc =
-        iframeRef.current.contentDocument ||
-        iframeRef.current.contentWindow?.document;
+      const doc = iframeRef.current.contentDocument || iframeRef.current.contentWindow?.document;
       if (doc) {
         doc.open();
         doc.write(item.content);
@@ -107,10 +108,7 @@ const ContentModal: React.FC<{
   if (!item) return null;
 
   return (
-    <div
-      className={styles.modalOverlay}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
+    <div className={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className={styles.modalContent}>
         <div className={styles.modalHeader}>
           <h3>{item.title}</h3>
@@ -325,24 +323,20 @@ const GeneratedContent: React.FC = () => {
       return sortOrder === "desc" ? -comparison : comparison;
     });
 
+
     return filtered;
   }, [contentItems, deletedContentItems, viewMode, filter, search, sortBy, sortOrder]);
+
 
   return (
     <div className={styles.generatedContent}>
       <div className={styles.header}>
         <h2>Generated Content for {subjectId}</h2>
         <div className={styles.actions}>
-          <button
-            className={styles.blackButton}
-            onClick={() => handleSummaryClick()}
-          >
+          <button className={styles.blackButton} onClick={() => handleSummaryClick()}>
             Create Summary
           </button>
-          <button
-            className={styles.blackButton}
-            onClick={() => handleTestClick()}
-          >
+          <button className={styles.blackButton} onClick={() => handleTestClick()}>
             Create Exam
           </button>
         </div>
@@ -366,15 +360,12 @@ const GeneratedContent: React.FC = () => {
       <div className={styles.filters}>
         <div className={styles.tabs}>
           {(["All", "Summary", "Exam"] as const).map((t) => (
-            <button
-              key={t}
-              className={filter === t ? styles.active : ""}
-              onClick={() => setFilter(t)}
-            >
+            <button key={t} className={filter === t ? styles.active : ""} onClick={() => setFilter(t)}>
               {t === "All" ? "All Content" : `${t}s`}
             </button>
           ))}
         </div>
+
         <div className={styles.searchAndSort}>
           <input
             type="text"
@@ -399,6 +390,7 @@ const GeneratedContent: React.FC = () => {
             <option value="type-desc">Type Z-A</option>
           </select>
         </div>
+
       </div>
 
       {loading ? (
@@ -410,6 +402,7 @@ const GeneratedContent: React.FC = () => {
           {filteredAndSortedContent.map((c) => (
             <div key={c.id} className={`${styles.card} ${viewMode === "deleted" ? styles.deletedCard : ""}`}>
               <div className={styles.cardHeader}>
+                {c.copyContent && <Share2 size={18} />}
                 <strong>{c.title}</strong>
                 <span>{c.date}</span>
               </div>
@@ -447,10 +440,12 @@ const GeneratedContent: React.FC = () => {
                   </button>
                 )}
               </div>
+
             </div>
           ))}
         </div>
       ) : (
+
         <div className={styles.noContent}>
           {viewMode === "active" 
             ? "No active content found for this subject." 
@@ -477,6 +472,7 @@ const GeneratedContent: React.FC = () => {
           onCancel={handleRestoreCancel}
         />
       )}
+
     </div>
   );
 };
