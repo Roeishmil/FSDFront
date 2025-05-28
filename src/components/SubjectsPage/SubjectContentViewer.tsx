@@ -57,6 +57,7 @@ const SubjectContentViewer: FC<{
   const [error, setError] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<ContentItem | null>(null);
   const { user } = useUser();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -108,13 +109,6 @@ const SubjectContentViewer: FC<{
     setSelectedItem(null);
   };
 
-  // Function to generate a new content item
-  const handleGenerateContent = (contentType: "Summary" | "Exam") => {
-    // Implementation placeholder for generating content
-    console.log(`Generating new ${contentType} for subject ${subject.title}`);
-    // This would call your API to create a new summary or Exam
-  };
-
   return (
     <div className={SubjectsPageStyle.subjectContentViewer}>
       <div className={SubjectsPageStyle.contentViewerHeader}>
@@ -125,11 +119,11 @@ const SubjectContentViewer: FC<{
       </div>
 
       <div className={SubjectsPageStyle.contentActions}>
-        <button className={SubjectsPageStyle.generateButton} onClick={() => handleGenerateContent("Summary")}>
+        <button className={SubjectsPageStyle.generateButton} onClick={() => navigate("/generate-summary")}>
           <Sparkles size={16} />
           Generate Summary
         </button>
-        <button className={SubjectsPageStyle.generateButton} onClick={() => handleGenerateContent("Exam")}>
+        <button className={SubjectsPageStyle.generateButton} onClick={() => navigate("/generate-test")}>
           <FileText size={16} />
           Create Exam
         </button>
