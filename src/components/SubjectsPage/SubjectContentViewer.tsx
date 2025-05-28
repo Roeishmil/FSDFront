@@ -104,6 +104,14 @@ const SubjectContentViewer: FC<{
     setSelectedItem(item);
   };
 
+  const handleClickGenerateSummary = () => {
+    navigate(`/generate-summary?id=${subject._id}`);
+  };
+
+  const handleClickGenerateExam = () => {
+    navigate(`/generate-test?id=${subject._id}`);
+  };
+
   // Function to close the modal
   const closeContentModal = () => {
     setSelectedItem(null);
@@ -119,11 +127,11 @@ const SubjectContentViewer: FC<{
       </div>
 
       <div className={SubjectsPageStyle.contentActions}>
-        <button className={SubjectsPageStyle.generateButton} onClick={() => navigate("/generate-summary")}>
+        <button className={SubjectsPageStyle.generateButton} onClick={() => handleClickGenerateSummary()}>
           <Sparkles size={16} />
           Generate Summary
         </button>
-        <button className={SubjectsPageStyle.generateButton} onClick={() => navigate("/generate-test")}>
+        <button className={SubjectsPageStyle.generateButton} onClick={() => handleClickGenerateExam()}>
           <FileText size={16} />
           Create Exam
         </button>

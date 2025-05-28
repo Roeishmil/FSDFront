@@ -4,6 +4,7 @@ import { examApi, contentApi } from "../../api";
 import GoogleDrivePicker from "../googleDrive";
 import { useSubject } from "../../hooks/useSubject";
 import styles from "./Generate.module.css";
+import { useLocation } from "react-router-dom";
 
 /* ─── loader ─── */
 const Loader: React.FC<{ msg: string }> = ({ msg }) => (
@@ -175,6 +176,16 @@ const GenerateExam: React.FC = () => {
       setSaving(false);
     }
   };
+
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const id = params.get("id");
+    const type = params.get("subjectTitle");
+
+    setSubject(id || "");
+  }, [location.search]);
 
   /* write HTML into sandboxed <iframe> */
   useEffect(() => {
