@@ -6,6 +6,8 @@ import ContentModal from "./ContentModal";
 import { ContentItem } from "./types";
 import { Eye, Pencil, Share2, X } from "lucide-react";
 import EditContentModal from "./EditContentModal";
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
+import RestoreConfirmationModal from "./RestoreConfirmationModal";
 
 const GeneratedContent: React.FC = () => {
   const [contentItems, setContentItems] = useState<ContentItem[]>([]);
@@ -44,14 +46,17 @@ const GeneratedContent: React.FC = () => {
 
   const handleDeleteConfirm = async () => {
     if (!itemToDelete) return;
-    
+
     try {
       setDeleting(true);
       await contentApi.deleteContent(itemToDelete.id);
-      
+
       // Remove the deleted item from active content and add to deleted content
-      setContentItems(prev => prev.filter(item => item.id !== itemToDelete.id));
-      setDeletedContentItems(prev => [...prev, { ...itemToDelete, deleted: true, deletedAt: new Date().toISOString() }]);
+      setContentItems((prev) => prev.filter((item) => item.id !== itemToDelete.id));
+      setDeletedContentItems((prev) => [
+        ...prev,
+        { ...itemToDelete, deleted: true, deletedAt: new Date().toISOString() },
+      ]);
       setItemToDelete(null);
       setError(null);
     } catch (err) {
@@ -63,14 +68,14 @@ const GeneratedContent: React.FC = () => {
 
   const handleRestoreConfirm = async () => {
     if (!itemToRestore) return;
-    
+
     try {
       setRestoring(true);
       await contentApi.restoreContent(itemToRestore.id);
-      
+
       // Remove from deleted content and add back to active content
-      setDeletedContentItems(prev => prev.filter(item => item.id !== itemToRestore.id));
-      setContentItems(prev => [...prev, { ...itemToRestore, deleted: false, deletedAt: undefined }]);
+      setDeletedContentItems((prev) => prev.filter((item) => item.id !== itemToRestore.id));
+      setContentItems((prev) => [...prev, { ...itemToRestore, deleted: false, deletedAt: undefined }]);
       setItemToRestore(null);
       setError(null);
     } catch (err) {
@@ -92,20 +97,19 @@ const GeneratedContent: React.FC = () => {
     try {
       const stored = JSON.parse(localStorage.getItem("user") || "{}");
       const userContent = await contentApi.fetchContent(stored._id);
+      console.log("Fetched user content:", userContent);
       const normalized = userContent.map((i: any) => ({
         ...i,
         id: i._id,
         date: i.creationDate || new Date(i.createdAt).toLocaleDateString(),
-        contentType:
-          i.contentType === "summary"
-            ? "Summary"
-            : i.contentType === "Exam"
-            ? "Exam"
-            : i.contentType,
-        createdAt: i.createdAt || i.creationDate
+        contentType: i.contentType === "summary" ? "Summary" : i.contentType === "Exam" ? "Exam" : i.contentType,
+        createdAt: i.createdAt || i.creationDate,
+        copyContent: i.copyContent,
+        shared: i.shared,
       }));
-      return normalized.filter((c: any) => c.subjectId === subjectId);
+      return normalized;
     } catch (error) {
+      console.log("Error fetching active content:", error);
       throw new Error("Failed to fetch active content");
     }
   };
@@ -118,15 +122,12 @@ const GeneratedContent: React.FC = () => {
         ...i,
         id: i._id,
         date: i.creationDate || new Date(i.createdAt).toLocaleDateString(),
-        contentType:
-          i.contentType === "summary"
-            ? "Summary"
-            : i.contentType === "Exam"
-            ? "Exam"
-            : i.contentType,
-        createdAt: i.createdAt || i.creationDate
+        contentType: i.contentType === "summary" ? "Summary" : i.contentType === "Exam" ? "Exam" : i.contentType,
+        createdAt: i.createdAt || i.creationDate,
+        copyContent: i.copyContent,
+        shared: i.shared,
       }));
-      return normalized.filter((c: any) => c.subjectId === subjectId);
+      return normalized;
     } catch (error) {
       throw new Error("Failed to fetch deleted content");
     }
@@ -136,11 +137,7 @@ const GeneratedContent: React.FC = () => {
     (async () => {
       try {
         setLoading(true);
-        const [activeContent, deletedContent] = await Promise.all([
-          fetchActiveContent(),
-          fetchDeletedContent()
-        ]);
-        
+        const [activeContent, deletedContent] = await Promise.all([fetchActiveContent(), fetchDeletedContent()]);
         setContentItems(activeContent);
         setDeletedContentItems(deletedContent);
         setError(null);
@@ -151,17 +148,6 @@ const GeneratedContent: React.FC = () => {
       }
     })();
   }, []);
-
-  // Real-time filtered and sorted content using useMemo
-  const filteredAndSortedContent = useMemo(() => {
-    const currentItems = viewMode === "active" ? contentItems : deletedContentItems;
-    
-    // Filter content
-    let filtered = currentItems.filter((i) => {
-      const matchesType = filter === "All" || i.contentType === filter;
-      const matchesSearch = i.title.toLowerCase().includes(search.toLowerCase());
-      return matchesType && matchesSearch;
-    });
 
   const handleSaveEdit = async (updated: ContentItem) => {
     try {
@@ -191,10 +177,22 @@ const GeneratedContent: React.FC = () => {
       console.error("Failed to update content:", error);
     }
   };
+
+  // Real-time filtered and sorted content using useMemo
+  const filteredAndSortedContent = useMemo(() => {
+    const currentItems = viewMode === "active" ? contentItems : deletedContentItems;
+
+    // Filter content
+    let filtered = currentItems.filter((i) => {
+      const matchesType = filter === "All" || i.contentType === filter;
+      const matchesSearch = i.title.toLowerCase().includes(search.toLowerCase());
+      return matchesType && matchesSearch;
+    });
+
     // Sort content
     filtered.sort((a, b) => {
       let comparison = 0;
-      
+
       switch (sortBy) {
         case "date":
           const dateA = new Date(a.createdAt || a.date).getTime();
@@ -210,14 +208,12 @@ const GeneratedContent: React.FC = () => {
         default:
           comparison = 0;
       }
-      
+
       return sortOrder === "desc" ? -comparison : comparison;
     });
 
-
     return filtered;
   }, [contentItems, deletedContentItems, viewMode, filter, search, sortBy, sortOrder]);
-
 
   return (
     <div className={styles.generatedContent}>
@@ -234,16 +230,10 @@ const GeneratedContent: React.FC = () => {
       </div>
 
       <div className={styles.viewModeToggle}>
-        <button
-          className={viewMode === "active" ? styles.active : ""}
-          onClick={() => setViewMode("active")}
-        >
+        <button className={viewMode === "active" ? styles.active : ""} onClick={() => setViewMode("active")}>
           Active Content ({contentItems.length})
         </button>
-        <button
-          className={viewMode === "deleted" ? styles.active : ""}
-          onClick={() => setViewMode("deleted")}
-        >
+        <button className={viewMode === "deleted" ? styles.active : ""} onClick={() => setViewMode("deleted")}>
           Deleted Content ({deletedContentItems.length})
         </button>
       </div>
@@ -258,16 +248,11 @@ const GeneratedContent: React.FC = () => {
         </div>
 
         <div className={styles.searchAndSort}>
-          <input
-            type="text"
-            placeholder="Search content..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <select 
-            value={`${sortBy}-${sortOrder}`} 
+          <input type="text" placeholder="Search content..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          <select
+            value={`${sortBy}-${sortOrder}`}
             onChange={(e) => {
-              const [newSortBy, newSortOrder] = e.target.value.split('-') as [typeof sortBy, typeof sortOrder];
+              const [newSortBy, newSortOrder] = e.target.value.split("-") as [typeof sortBy, typeof sortOrder];
               setSortBy(newSortBy);
               setSortOrder(newSortOrder);
             }}
@@ -281,7 +266,6 @@ const GeneratedContent: React.FC = () => {
             <option value="type-desc">Type Z-A</option>
           </select>
         </div>
-
       </div>
 
       {loading ? (
@@ -301,72 +285,47 @@ const GeneratedContent: React.FC = () => {
                 {c.subjectTitle && <span className={styles.tag}>{c.subjectTitle}</span>}
                 <span className={styles.tag}>{c.contentType}</span>
                 {viewMode === "deleted" && c.deletedAt && (
-                  <span className={styles.deletedTag}>
-                    Deleted: {new Date(c.deletedAt).toLocaleDateString()}
-                  </span>
+                  <span className={styles.deletedTag}>Deleted: {new Date(c.deletedAt).toLocaleDateString()}</span>
                 )}
               </div>
               <div className={styles.cardActionsEdit}>
                 <div className={styles.cardActions}>
-                <button
-                  className={styles.viewButton}
-                  onClick={() => setSelectedItem(c)}
-                >
+                  <button className={styles.viewButton} onClick={() => setSelectedItem(c)}>
                     <Eye size={14} /> View Content
-                </button>
-                <button className={styles.editButtonEdit} onClick={() => setEditingItem(c)}>
-                  <Pencil size={14} /> Edit
                   </button>
-              </div>
+                  <button className={styles.editButtonEdit} onClick={() => setEditingItem(c)}>
+                    <Pencil size={14} /> Edit
+                  </button>
+                </div>
                 {viewMode === "active" ? (
-                  <button
-                    className={styles.deleteButton}
-                    onClick={() => handleDeleteClick(c)}
-                    disabled={deleting}
-                  >
+                  <button className={styles.deleteButton} onClick={() => handleDeleteClick(c)} disabled={deleting}>
                     🗑 Delete
                   </button>
                 ) : (
-                  <button
-                    className={styles.restoreButton}
-                    onClick={() => handleRestoreClick(c)}
-                    disabled={restoring}
-                  >
+                  <button className={styles.restoreButton} onClick={() => handleRestoreClick(c)} disabled={restoring}>
                     🔄 Restore
                   </button>
                 )}
               </div>
-
             </div>
           ))}
         </div>
       ) : (
-
         <div className={styles.noContent}>
-          {viewMode === "active" 
-            ? "No active content found for this subject." 
+          {viewMode === "active"
+            ? "No active content found for this subject."
             : "No deleted content found for this subject."}
         </div>
       )}
 
-      {selectedItem && (
-        <ContentModal item={selectedItem} onClose={() => setSelectedItem(null)} />
-      )}
+      {selectedItem && <ContentModal item={selectedItem} onClose={() => setSelectedItem(null)} />}
 
       {itemToDelete && (
-        <DeleteConfirmationModal
-          item={itemToDelete}
-          onConfirm={handleDeleteConfirm}
-          onCancel={handleDeleteCancel}
-        />
+        <DeleteConfirmationModal item={itemToDelete} onConfirm={handleDeleteConfirm} onCancel={handleDeleteCancel} />
       )}
 
       {itemToRestore && (
-        <RestoreConfirmationModal
-          item={itemToRestore}
-          onConfirm={handleRestoreConfirm}
-          onCancel={handleRestoreCancel}
-        />
+        <RestoreConfirmationModal item={itemToRestore} onConfirm={handleRestoreConfirm} onCancel={handleRestoreCancel} />
       )}
 
       {editingItem && (
