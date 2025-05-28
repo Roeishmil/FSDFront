@@ -2,150 +2,12 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "./GeneratedContent.module.css";
 import { contentApi } from "../../api";
-import { Share2 } from "lucide-react";
-
-type ContentItem = {
-  id: string;
-  title: string;
-  date: string;
-  contentType: string;
-  subject?: string;
-  subjectId?: string;
-  content?: string;
-  deleted?: boolean;
-  deletedAt?: string;
-  createdAt?: string;
-};
-
-/* ───── Delete Confirmation Modal ───── */
-const DeleteConfirmationModal: React.FC<{
-  item: ContentItem | null;
-  onConfirm: () => void;
-  onCancel: () => void;
-}> = ({ item, onConfirm, onCancel }) => {
-  if (!item) return null;
-
-  return (
-    <div
-      className={styles.modalOverlay}
-      onClick={(e) => e.target === e.currentTarget && onCancel()}
-    >
-      <div className={styles.deleteModal}>
-        <div className={styles.deleteModalHeader}>
-          <h3>Delete Content</h3>
-        </div>
-        <div className={styles.deleteModalBody}>
-          <p>Are you sure you want to delete <strong>"{item.title}"</strong>?</p>
-          <p className={styles.deleteWarning}>This content will be moved to trash and can be restored later.</p>
-        </div>
-        <div className={styles.deleteModalFooter}>
-          <button className={styles.cancelButton} onClick={onCancel}>
-            Cancel
-          </button>
-          <button className={styles.deleteButton} onClick={onConfirm}>
-            Move to Trash
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-/* ───── Restore Confirmation Modal ───── */
-const RestoreConfirmationModal: React.FC<{
-  item: ContentItem | null;
-  onConfirm: () => void;
-  onCancel: () => void;
-}> = ({ item, onConfirm, onCancel }) => {
-  if (!item) return null;
-
-  return (
-    <div
-      className={styles.modalOverlay}
-      onClick={(e) => e.target === e.currentTarget && onCancel()}
-    >
-      <div className={styles.deleteModal}>
-        <div className={styles.deleteModalHeader}>
-          <h3>Restore Content</h3>
-        </div>
-        <div className={styles.deleteModalBody}>
-          <p>Are you sure you want to restore <strong>"{item.title}"</strong>?</p>
-          <p>This content will be moved back to your active content.</p>
-        </div>
-        <div className={styles.deleteModalFooter}>
-          <button className={styles.cancelButton} onClick={onCancel}>
-            Cancel
-          </button>
-          <button className={styles.restoreButton} onClick={onConfirm}>
-            Restore
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-
-
-};
-
-/* ───── Modal component (unchanged logic) ───── */
-const ContentModal: React.FC<{
-  item: ContentItem | null;
-  onClose: () => void;
-}> = ({ item, onClose }) => {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  useEffect(() => {
-    if (item?.content && iframeRef.current) {
-      const doc = iframeRef.current.contentDocument || iframeRef.current.contentWindow?.document;
-      if (doc) {
-        doc.open();
-        doc.write(item.content);
-        doc.close();
-      }
-    }
-  }, [item?.content]);
-
-  if (!item) return null;
-
-  return (
-    <div className={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className={styles.modalContent}>
-        <div className={styles.modalHeader}>
-          <h3>{item.title}</h3>
-          <button className={styles.closeButton} onClick={onClose}>
-            ×
-          </button>
-        </div>
-        <div className={styles.modalBody}>
-          {item.content ? (
-            <iframe
-              ref={iframeRef}
-              className={styles.contentIframe}
-              title={item.title}
-              sandbox="allow-same-origin allow-scripts"
-            />
-          ) : (
-            <p>No content available for this item.</p>
-          )}
-        </div>
-        <div className={styles.modalFooter}>
-          <span className={styles.itemMeta}>
-            {item.contentType} • {item.date}
-            {item.deleted && item.deletedAt && (
-              <> • Deleted: {new Date(item.deletedAt).toLocaleDateString()}</>
-            )}
-          </span>
-          <button className={styles.closeModalBtn} onClick={onClose}>
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
+import ContentModal from "./ContentModal";
+import { ContentItem } from "./types";
+import { Eye, Pencil, Share2, X } from "lucide-react";
+import EditContentModal from "./EditContentModal";
 
 const GeneratedContent: React.FC = () => {
-  const { subjectId } = useParams();
   const [contentItems, setContentItems] = useState<ContentItem[]>([]);
   const [deletedContentItems, setDeletedContentItems] = useState<ContentItem[]>([]);
   const [filter, setFilter] = useState<"All" | "Exam" | "Summary">("All");
@@ -156,6 +18,7 @@ const GeneratedContent: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<ContentItem | null>(null);
+  const [editingItem, setEditingItem] = useState<ContentItem | null>(null);
   const [itemToDelete, setItemToDelete] = useState<ContentItem | null>(null);
   const [itemToRestore, setItemToRestore] = useState<ContentItem | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -287,7 +150,7 @@ const GeneratedContent: React.FC = () => {
         setLoading(false);
       }
     })();
-  }, [subjectId]);
+  }, []);
 
   // Real-time filtered and sorted content using useMemo
   const filteredAndSortedContent = useMemo(() => {
@@ -300,6 +163,34 @@ const GeneratedContent: React.FC = () => {
       return matchesType && matchesSearch;
     });
 
+  const handleSaveEdit = async (updated: ContentItem) => {
+    try {
+      await contentApi
+        .updateContent(updated.id, {
+          title: updated.title,
+          subject: updated.subject,
+          shared: updated.shared,
+        })
+        .then((res) => {
+          setContentItems((prev) =>
+            prev.map((item) =>
+              item.id === updated.id
+                ? {
+                    ...item,
+                    title: res.title,
+                    subject: res.subject,
+                    subjectTitle: res.subjectTitle,
+                    shared: res.shared,
+                    copyContent: res.copyContent,
+                  }
+                : item
+            )
+          );
+        });
+    } catch (error) {
+      console.error("Failed to update content:", error);
+    }
+  };
     // Sort content
     filtered.sort((a, b) => {
       let comparison = 0;
@@ -331,12 +222,12 @@ const GeneratedContent: React.FC = () => {
   return (
     <div className={styles.generatedContent}>
       <div className={styles.header}>
-        <h2>Generated Content for {subjectId}</h2>
+        <h2>All Generated Content</h2>
         <div className={styles.actions}>
-          <button className={styles.blackButton} onClick={() => handleSummaryClick()}>
+          <button className={styles.blackButton} onClick={() => navigate("/generate-summary")}>
             Create Summary
           </button>
-          <button className={styles.blackButton} onClick={() => handleTestClick()}>
+          <button className={styles.blackButton} onClick={() => navigate("/generate-test")}>
             Create Exam
           </button>
         </div>
@@ -359,8 +250,8 @@ const GeneratedContent: React.FC = () => {
 
       <div className={styles.filters}>
         <div className={styles.tabs}>
-          {(["All", "Summary", "Exam"] as const).map((t) => (
-            <button key={t} className={filter === t ? styles.active : ""} onClick={() => setFilter(t)}>
+          {["All", "Summary", "Exam"].map((t) => (
+            <button key={t} className={filter === t ? styles.active : ""} onClick={() => setFilter(t as any)}>
               {t === "All" ? "All Content" : `${t}s`}
             </button>
           ))}
@@ -402,12 +293,12 @@ const GeneratedContent: React.FC = () => {
           {filteredAndSortedContent.map((c) => (
             <div key={c.id} className={`${styles.card} ${viewMode === "deleted" ? styles.deletedCard : ""}`}>
               <div className={styles.cardHeader}>
-                {c.copyContent && <Share2 size={18} />}
+                {c.copyContent && <Share2 size={18} className={styles.shareIcon} />}
                 <strong>{c.title}</strong>
                 <span>{c.date}</span>
               </div>
               <div className={styles.cardTags}>
-                {c.subject && <span className={styles.tag}>{c.subject}</span>}
+                {c.subjectTitle && <span className={styles.tag}>{c.subjectTitle}</span>}
                 <span className={styles.tag}>{c.contentType}</span>
                 {viewMode === "deleted" && c.deletedAt && (
                   <span className={styles.deletedTag}>
@@ -415,13 +306,18 @@ const GeneratedContent: React.FC = () => {
                   </span>
                 )}
               </div>
-              <div className={styles.cardActions}>
+              <div className={styles.cardActionsEdit}>
+                <div className={styles.cardActions}>
                 <button
                   className={styles.viewButton}
                   onClick={() => setSelectedItem(c)}
                 >
-                  👁 View Content
+                    <Eye size={14} /> View Content
                 </button>
+                <button className={styles.editButtonEdit} onClick={() => setEditingItem(c)}>
+                  <Pencil size={14} /> Edit
+                  </button>
+              </div>
                 {viewMode === "active" ? (
                   <button
                     className={styles.deleteButton}
@@ -473,6 +369,9 @@ const GeneratedContent: React.FC = () => {
         />
       )}
 
+      {editingItem && (
+        <EditContentModal item={editingItem} onClose={() => setEditingItem(null)} onSave={handleSaveEdit} />
+      )}
     </div>
   );
 };

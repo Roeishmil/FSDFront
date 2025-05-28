@@ -66,11 +66,11 @@ export const fileApi = {
   // FIXED: Update to use PUT instead of POST since we're updating a user
   uploadFile: (formData: FormData, userId: string) => {
     // Debug log the file being uploaded
-    const file = formData.get('file') as File;
+    const file = formData.get("file") as File;
     if (file) {
       console.log(`Uploading file: ${file.name}, type: ${file.type}, size: ${file.size}bytes`);
     }
-    
+
     // We need to use PUT since we're updating the user record
     // According to usersRoute.js, PUT route is /users/:id
     return api.put(`/users/${userId}`, formData, {
@@ -96,7 +96,7 @@ export const examApi = {
           "Content-Type": "multipart/form-data",
         },
       });
-      
+
       return response.data;
     } catch (error) {
       console.error("Error in creatExam:", error);
@@ -128,7 +128,7 @@ export const summaryApi = {
   },
 };
 
-export const contentApi ={
+export const contentApi = {
   createContent: async (formData: any) => {
     try {
       const response = await api.post("/content", formData);
@@ -138,12 +138,13 @@ export const contentApi ={
       throw error;
     }
   },
-  fetchContent: async (userId: any) => {
+  fetchContent: async (userId: string, subjectId?: string) => {
     try {
-      const response = await api.get(`/content/user/${userId}`);
+      const params = subjectId ? { subjectId } : {};
+      const response = await api.get(`/content/user/${userId}`, { params });
       return response.data;
     } catch (error) {
-      console.error("Error in createContent:", error);
+      console.error("Error in fetchContent:", error);
       throw error;
     }
   },
@@ -156,7 +157,7 @@ export const contentApi ={
       throw error;
     }
   },
-  updateContent: async (contentId: string, data: { title?: string; subject?: string }) => {
+  updateContent: async (contentId: string, data: { title?: string; subject?: string; shared?: boolean }) => {
     try {
       const response = await api.put(`/content/${contentId}`, data);
       return response.data;

@@ -38,7 +38,7 @@ function App() {
           <Routes>
             {isAuthenticated ? (
               <>
-                <Route path="/" element={<UserProfile />} />
+                <Route path="/profile" element={<UserProfile />} />
                 <Route path="/study" element={<StudyMetatrails />} />
                 <Route path="/generate" element={<Generate />} />
                 <Route path="/shared-content" element={<SharedContent />} />
@@ -48,7 +48,7 @@ function App() {
                 {/* You can keep the legacy routes if needed, or remove them */}
                 <Route path="/test" element={<ViewExam />} />
                 <Route path="/summary" element={<ViewSummary />} />
-                <Route path="/subjects" element={<SubjectsPage />} />
+                <Route path="/" element={<SubjectsPage />} />
                 <Route path="/upload" element={<FileUpload />} />
               </>
             ) : (

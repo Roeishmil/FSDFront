@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./SharedContent.module.css";
-import SharedContentModal from "./SharedContentModal"
+import SharedContentModal from "./SharedContentModal";
 import { contentApi } from "../../api";
+import { Eye } from "lucide-react";
 
 type SharedContentItem = {
   id: string;
@@ -9,11 +10,12 @@ type SharedContentItem = {
   date: string;
   contentType: string;
   subject?: string;
+  subjectTitle?: string;
   content?: string;
   user: {
     username: string;
     fullName: string;
-    imageUrl?: string;
+    imgUrl?: string;
   };
 };
 
@@ -22,6 +24,8 @@ const SharedContent: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<SharedContentItem | null>(null);
+  const [filter, setFilter] = useState<"All" | "Summary" | "Exam">("All");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -30,7 +34,7 @@ const SharedContent: React.FC = () => {
         const shared = await contentApi.fetchSharedContent();
         const normalized = shared.map((i: any) => ({
           ...i,
-          contentType: i.contentType === "summary" ? "Summary" : i.contentType,
+          contentType: i.contentType === "summary" ? "Summary" : i.contentType === "Exam" ? "Exam" : i.contentType,
         }));
         setContentItems(normalized);
         setError(null);
@@ -42,16 +46,40 @@ const SharedContent: React.FC = () => {
     })();
   }, []);
 
+  const filteredContent = contentItems.filter((item) => {
+    const matchesType = filter === "All" || item.contentType === filter;
+    const matchesSearch = item.title.toLowerCase().includes(search.toLowerCase());
+    return matchesType && matchesSearch;
+  });
+
   return (
     <div className={styles.sharedContent}>
       <h2>Shared Content</h2>
+
+      <div className={styles.filters}>
+        <div className={styles.tabs}>
+          {["All", "Summary", "Exam"].map((t) => (
+            <button key={t} className={filter === t ? styles.active : ""} onClick={() => setFilter(t as any)}>
+              {t === "All" ? "All Content" : `${t}s`}
+            </button>
+          ))}
+        </div>
+        <input
+          type="text"
+          placeholder="Search shared content..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className={styles.searchInput}
+        />
+      </div>
+
       {loading ? (
         <div className={styles.loading}>Loading content...</div>
       ) : error ? (
         <div className={styles.error}>{error}</div>
-      ) : contentItems.length ? (
+      ) : filteredContent.length ? (
         <div className={styles.cards}>
-          {contentItems.map((c) => (
+          {filteredContent.map((c) => (
             <div key={c.id} className={styles.card}>
               <div className={styles.cardHeader}>
                 <div className={styles.cardTitle}>
@@ -59,16 +87,17 @@ const SharedContent: React.FC = () => {
                   <span className={styles.cardDate}>{c.date}</span>
                 </div>
                 <div className={styles.cardUser}>
-                  {c.user.imageUrl && <img src={c.user.imageUrl} alt="User" className={styles.userImage} />}
+                  {c.user.imgUrl && <img src={c.user.imgUrl} alt="User" className={styles.userImage} />}
                   <span className={styles.username}>{c.user.fullName}</span>
                 </div>
               </div>
               <div className={styles.cardTags}>
-                {c.subject && <span className={styles.tag}>{c.subject}</span>}
+                {c.subjectTitle && <span className={styles.tag}>{c.subjectTitle}</span>}
                 <span className={styles.tag}>{c.contentType}</span>
               </div>
               <button className={styles.viewButton} onClick={() => setSelectedItem(c)}>
-                👁 View Content
+                <Eye size={14} />
+                View Content
               </button>
             </div>
           ))}
