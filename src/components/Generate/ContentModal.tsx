@@ -47,6 +47,7 @@ const ContentModal: React.FC<Props> = ({ item, onClose }) => {
         <div className={styles.modalFooter}>
           <span className={styles.itemMeta}>
             {item.contentType} • {item.date}
+            {item.deleted && item.deletedAt && <> • Deleted: {new Date(item.deletedAt).toLocaleDateString()}</>}
           </span>
           <button className={styles.closeModalBtn} onClick={onClose}>
             Close

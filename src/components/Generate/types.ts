@@ -8,4 +8,7 @@ export type ContentItem = {
   content?: string;
   copyContent?: boolean;
   shared?: boolean;
+  deleted?: boolean;
+  deletedAt?: string;
+  createdAt?: string;
 };
