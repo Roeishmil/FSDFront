@@ -166,7 +166,47 @@ export const contentApi = {
       throw error;
     }
   },
-};
+    // New method for soft deleting content
+    deleteContent: async (contentId: string) => {
+      try {
+        const response = await api.delete(`/content/${contentId}`);
+        return response.data;
+      } catch (error) {
+        console.error("Error in deleteContent:", error);
+        throw error;
+      }
+    },
+    // New method for restoring deleted content
+    restoreContent: async (contentId: string) => {
+      try {
+        const response = await api.put(`/content/${contentId}/restore`);
+        return response.data;
+      } catch (error) {
+        console.error("Error in restoreContent:", error);
+        throw error;
+      }
+    },
+    // New method for fetching deleted content
+    fetchDeletedContent: async (userId: any) => {
+      try {
+        const response = await api.get(`/content/user/${userId}/deleted`);
+        return response.data;
+      } catch (error) {
+        console.error("Error in fetchDeletedContent:", error);
+        throw error;
+      }
+    },
+    // New method for permanent deletion (admin use)
+    permanentlyDeleteContent: async (contentId: string) => {
+      try {
+        const response = await api.delete(`/content/${contentId}/permanent`);
+        return response.data;
+      } catch (error) {
+        console.error("Error in permanentlyDeleteContent:", error);
+        throw error;
+      }
+    },
+}
 
 export const subjectsApi = {
   fetchSubjects: async (userId: any) => {
