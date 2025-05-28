@@ -135,6 +135,7 @@ const GenerateExam: React.FC = () => {
 
       const fd = new FormData();
       fd.append("prompt", prompt);
+      fd.append("subject", subject);
       fd.append("numAmerican", numAmerican.toString());
       fd.append("numOpen", numOpen.toString());
       fd.append("difficulty", difficulty);

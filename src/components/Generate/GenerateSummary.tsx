@@ -132,7 +132,7 @@ const GenerateSummary: React.FC = () => {
 
       const fd = new FormData();
       fd.append("prompt", prompt);
-      fd.append("subjectId", subject);
+      fd.append("subject", subject);
       fd.append("file", uploaded[0]);
 
       const uid = localStorage.getItem("userId");
