@@ -605,3 +605,30 @@ deleteModal {
     min-width: auto;
   }
 }
+
+.searchAndSort {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* רווח בין השדה ל-dropdown */
+}
+.sortSelect {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db; /* גבול אפור בהיר */
+  border-radius: 0.75rem;    /* פינות מעוגלות */
+  background-color: white;
+  color: #111827;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+  margin-left: 0.5rem;
+  appearance: none; /* מסיר עיצוב דיפולטי של ברירת מחדל */
+  background-image: url("data:image/svg+xml,%3Csvg fill='black' viewBox='0 0 24 24' width='16' height='16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem; /* כדי שלא יחתוך את החץ */
+}
+
+.sortSelect:focus {
+  border-color: #6366f1; /* סגול בולט בזמן פוקוס */
+}
