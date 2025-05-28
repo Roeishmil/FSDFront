@@ -29,10 +29,12 @@ const Loader: React.FC<{ msg: string }> = ({ msg }) => (
 const ContentMetadata: React.FC<{
   contentId: string;
   initialTitle: string;
+  perSubject?: string;
   onClose: () => void;
-}> = ({ contentId, initialTitle, onClose }) => {
+}> = ({ contentId, initialTitle, perSubject, onClose }) => {
   const [title, setTitle] = useState(initialTitle);
-  const [subject, setSubject] = useState("");
+  const [subject, setSubject] = useState(perSubject || "");
+  const { subjects } = useSubject();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -160,32 +162,15 @@ const GenerateExam: React.FC = () => {
     }
   };
 
-  /* save exam */
-  const handleSave = async () => {
-    if (!htmlContent) return;
-    try {
-      setSaving(true);
-      const uid = localStorage.getItem("userId") || "67f3bd679937c252dacacee4";
-      await contentApi.createContent({
-        userId: uid,
-        content: htmlContent,
-        title: "Generated Exam",
-        contentType: "Exam",
-      });
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const location = useLocation();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const id = params.get("id");
-    const type = params.get("subjectTitle");
 
     setSubject(id || "");
-  }, [location.search]);
+    console.log("Subject ID from URL:", id);
+  }, []);
 
   /* write HTML into sandboxed <iframe> */
   useEffect(() => {
@@ -218,6 +203,7 @@ const GenerateExam: React.FC = () => {
           <ContentMetadata
             contentId={contentId}
             initialTitle={`Exam - ${difficulty}`}
+            perSubject={subject}
             onClose={() => {
               setShowMeta(false);
               setMetaDone(true);
@@ -233,10 +219,6 @@ const GenerateExam: React.FC = () => {
               {metaDone ? "Edit Exam Details" : "Set Exam Details"}
             </button>
           )}
-
-          <button onClick={handleSave} className={styles.primaryButton} style={{ width: 160 }}>
-            Save
-          </button>
         </div>
 
         <iframe ref={iframeRef} title="generated-exam" style={{ width: "100%", border: "none", marginTop: 20 }} />
@@ -310,7 +292,7 @@ const GenerateExam: React.FC = () => {
           <option value="">Select subject…</option>
           {subjects &&
             subjects.map((s: any) => (
-              <option key={s._id} value={s.title}>
+              <option key={s._id} value={s._id}>
                 {s.title}
               </option>
             ))}

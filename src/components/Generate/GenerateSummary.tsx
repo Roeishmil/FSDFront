@@ -28,10 +28,11 @@ const Loader: React.FC<{ msg: string }> = ({ msg }) => (
 const ContentMetadata: React.FC<{
   contentId: string;
   initialTitle: string;
+  perSubject?: string;
   onClose: () => void;
-}> = ({ contentId, initialTitle, onClose }) => {
+}> = ({ contentId, initialTitle,perSubject, onClose }) => {
   const [title, setTitle] = useState(initialTitle);
-  const [subject, setSubject] = useState("");
+  const [subject, setSubject] = useState(perSubject || "");
   const { subjects } = useSubject();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -154,22 +155,6 @@ const GenerateSummary: React.FC = () => {
     }
   };
 
-  /* save summary */
-  const handleSave = async () => {
-    if (!htmlContent) return;
-    try {
-      setSaving(true);
-      const uid = localStorage.getItem("userId") || "67f3bd679937c252dacacee4";
-      await contentApi.createContent({
-        userId: uid,
-        content: htmlContent,
-        title: "Generated Summary",
-        contentType: "Summary",
-      });
-    } finally {
-      setSaving(false);
-    }
-  };
   const location = useLocation();
 
   useEffect(() => {
@@ -210,6 +195,7 @@ const GenerateSummary: React.FC = () => {
         {showMeta && contentId && (
           <ContentMetadata
             contentId={contentId}
+            perSubject={subject}
             initialTitle="Summary"
             onClose={() => {
               setShowMeta(false);
@@ -226,10 +212,6 @@ const GenerateSummary: React.FC = () => {
               {metaDone ? "Edit Summary Details" : "Set Summary Details"}
             </button>
           )}
-
-          <button onClick={handleSave} className={styles.primaryButton} style={{ width: 160, height: 40 }}>
-            Save
-          </button>
         </div>
 
         <iframe ref={iframeRef} title="generated-summary" style={{ width: "100%", border: "none" }} />
