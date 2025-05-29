@@ -16,6 +16,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import FileUpload from "./components/FileUpload/FileUpload";
 import SubjectsPage from "./components/SubjectsPage/SubjectsPage";
+import SharedContent from "./components/SharedContent/SharedContent";
 import NotificationsPage from "./components/NotificationsPage/Notifications"
 
 function App() {
@@ -38,16 +39,17 @@ function App() {
           <Routes>
             {isAuthenticated ? (
               <>
-                <Route path="/" element={<UserProfile />} />
+                <Route path="/profile" element={<UserProfile />} />
                 <Route path="/study" element={<StudyMetatrails />} />
                 <Route path="/generate" element={<Generate />} />
+                <Route path="/shared-content" element={<SharedContent />} />
                 {/* New generation screen routes */}
                 <Route path="/generate-test" element={<GenerateExam />} />
                 <Route path="/generate-summary" element={<GenerateSummary />} />
                 {/* You can keep the legacy routes if needed, or remove them */}
                 <Route path="/test" element={<ViewExam />} />
                 <Route path="/summary" element={<ViewSummary />} />
-                <Route path="/subjects" element={<SubjectsPage />} />
+                <Route path="/" element={<SubjectsPage />} />
                 <Route path="/upload" element={<FileUpload />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
               </>

@@ -160,3 +160,475 @@
 
 /* keyframes */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ───── Edit Modal ───── */
+.modalOverlayEdit {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalEdit {
+  background: white;
+  border-radius: 0.75rem;
+  width: 90%;
+  max-width: 420px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeaderEdit {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modalBodyEdit label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+.modalBodyEdit input[type="text"] {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+}
+
+.checkboxRowEdit {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+
+  input{
+    margin-right: 10px;
+  }
+}
+
+.modalFooterEdit {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.saveButtonEdit {
+  background: #0f172a;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+.saveButtonEdit:hover {
+  background: #1e293b;
+}
+
+.cancelButtonEdit {
+  background: #e5e7eb;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.closeButtonEdit {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  color: #6b7280;
+  cursor: pointer;
+}
+.closeButtonEdit:hover {
+  color: #111827;
+}
+
+.cardActionsEdit {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+
+.viewButton,
+.editButtonEdit
+ {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.65rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+
+.viewButton {
+  flex: 3;
+  background: #eff6ff;  /* blue-50 */
+  color: #1e40af;  /* blue-800 */
+}
+.viewButton:hover { background: #dbeafe;}
+
+
+
+.editButtonEdit {
+  flex:1;
+  background: #fef9c3;      /* yellow-100 */
+  color: #92400e;           /* amber-700 */
+}
+
+.editButtonEdit:hover { background: #fef08a; }
+
+.subjectInput{
+  height: 40px;
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+}
+
+deleteModal {
+  background: #fff;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 480px;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
+  animation: modalSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.deleteModalHeader {
+  padding: 1.5rem 1.5rem 1rem;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border-bottom: 1px solid #fca5a5;
+}
+
+.deleteModalHeader h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #991b1b;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.deleteModalHeader h3::before {
+  content: "⚠️";
+  font-size: 1.1rem;
+}
+
+.deleteModalBody {
+  padding: 1.5rem;
+  background: #fff;
+}
+
+.deleteModalBody p {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.deleteModalBody p:last-child {
+  margin-bottom: 0;
+}
+
+.deleteWarning {
+  background: #fef3cd;
+  border: 1px solid #fbbf24;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  color: #92400e;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.deleteWarning::before {
+  content: "ℹ️";
+  flex-shrink: 0;
+}
+
+.deleteModalFooter {
+  padding: 1rem 1.5rem 1.5rem;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* Enhanced Button Styles */
+.cancelButton {
+  background: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+  padding: 0.625rem 1.25rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 80px;
+}
+
+.cancelButton:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+  color: #374151;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 0.1);
+}
+
+.deleteButton {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
+  border: none;
+  padding: 0.625rem 1.25rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 120px;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgb(220 38 38 / 0.2);
+}
+
+.deleteButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgb(220 38 38 / 0.3);
+}
+
+.deleteButton:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+.restoreButton {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  color: white;
+  border: none;
+  padding: 0.625rem 1.25rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 120px;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgb(5 150 105 / 0.2);
+}
+
+.restoreButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgb(5 150 105 / 0.3);
+}
+
+.restoreButton:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+/* Restore Modal Header - Different Color Scheme */
+.deleteModal:has(.restoreButton) .deleteModalHeader {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-bottom-color: #6ee7b7;
+}
+
+.deleteModal:has(.restoreButton) .deleteModalHeader h3 {
+  color: #065f46;
+}
+
+.deleteModal:has(.restoreButton) .deleteModalHeader h3::before {
+  content: "🔄";
+}
+
+/* Card Action Buttons Enhancement */
+.cardActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto;
+  flex-wrap: wrap;
+}
+
+.cardActions .deleteButton,
+.cardActions .restoreButton {
+  padding: 0.5rem 0.875rem;
+  font-size: 0.8rem;
+  min-width: auto;
+  flex: 1;
+  min-width: 100px;
+}
+
+/* Deleted Card Styling */
+.deletedCard {
+  opacity: 0.8;
+  border-color: #fca5a5;
+  background: linear-gradient(135deg, #fef2f2 0%, #fff 100%);
+}
+
+.deletedTag {
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+  font-size: 0.65rem;
+  padding: 0.25rem 0.45rem;
+  border-radius: 0.375rem;
+}
+
+/* View Mode Toggle Enhancement */
+.viewModeToggle {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  background: #f3f4f6;
+  padding: 0.25rem;
+  border-radius: 8px;
+  width: fit-content;
+}
+
+.viewModeToggle button {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #6b7280;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.viewModeToggle button:hover {
+  color: #374151;
+}
+
+.viewModeToggle button.active {
+  background: #fff;
+  color: #0f172a;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+  font-weight: 600;
+}
+
+/* Loading States */
+.deleteButton:disabled::after,
+.restoreButton:disabled::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 0.25rem;
+}
+
+/* Animations */
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Focus States for Accessibility */
+.deleteButton:focus,
+.restoreButton:focus,
+.cancelButton:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .deleteModal {
+    width: 95%;
+    margin: 1rem;
+  }
+
+  .deleteModalFooter {
+    flex-direction: column-reverse;
+  }
+
+  .deleteModalFooter button {
+    width: 100%;
+  }
+
+  .cardActions {
+    flex-direction: column;
+  }
+
+  .cardActions .deleteButton,
+  .cardActions .restoreButton {
+    min-width: auto;
+  }
+}
+
+.searchAndSort {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* רווח בין השדה ל-dropdown */
+}
+.sortSelect {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db; /* גבול אפור בהיר */
+  border-radius: 0.75rem;    /* פינות מעוגלות */
+  background-color: white;
+  color: #111827;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+  margin-left: 0.5rem;
+  appearance: none; /* מסיר עיצוב דיפולטי של ברירת מחדל */
+  background-image: url("data:image/svg+xml,%3Csvg fill='black' viewBox='0 0 24 24' width='16' height='16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem; /* כדי שלא יחתוך את החץ */
+}
+
+.sortSelect:focus {
+  border-color: #6366f1; /* סגול בולט בזמן פוקוס */
+}

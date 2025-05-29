@@ -1,7 +1,7 @@
 import axios from "axios";
 import { IUser } from "./Interfaces";
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = import.meta.env.BASE_URL;
 // Cache for promises to prevent duplicate requests
 let examPromise: Promise<string> | null = null;
 let summaryPromise: Promise<string> | null = null;
@@ -66,11 +66,11 @@ export const fileApi = {
   // FIXED: Update to use PUT instead of POST since we're updating a user
   uploadFile: (formData: FormData, userId: string) => {
     // Debug log the file being uploaded
-    const file = formData.get('file') as File;
+    const file = formData.get("file") as File;
     if (file) {
       console.log(`Uploading file: ${file.name}, type: ${file.type}, size: ${file.size}bytes`);
     }
-    
+
     // We need to use PUT since we're updating the user record
     // According to usersRoute.js, PUT route is /users/:id
     return api.put(`/users/${userId}`, formData, {
@@ -96,7 +96,7 @@ export const examApi = {
           "Content-Type": "multipart/form-data",
         },
       });
-      
+
       return response.data;
     } catch (error) {
       console.error("Error in creatExam:", error);
@@ -128,7 +128,7 @@ export const summaryApi = {
   },
 };
 
-export const contentApi ={
+export const contentApi = {
   createContent: async (formData: any) => {
     try {
       const response = await api.post("/content", formData);
@@ -138,16 +138,26 @@ export const contentApi ={
       throw error;
     }
   },
-  fetchContent: async (userId: any) => {
+  fetchContent: async (userId: string, subjectId?: string) => {
     try {
-      const response = await api.get(`/content/user/${userId}`);
+      const params = subjectId ? { subjectId } : {};
+      const response = await api.get(`/content/user/${userId}`, { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error in fetchContent:", error);
+      throw error;
+    }
+  },
+  fetchSharedContent: async () => {
+    try {
+      const response = await api.get(`/content/shared`);
       return response.data;
     } catch (error) {
       console.error("Error in createContent:", error);
       throw error;
     }
   },
-  updateContent: async (contentId: string, data: { title?: string; subject?: string }) => {
+  updateContent: async (contentId: string, data: { title?: string; subject?: string; shared?: boolean }) => {
     try {
       const response = await api.put(`/content/${contentId}`, data);
       return response.data;
@@ -156,6 +166,46 @@ export const contentApi ={
       throw error;
     }
   },
+    // New method for soft deleting content
+    deleteContent: async (contentId: string) => {
+      try {
+        const response = await api.delete(`/content/${contentId}`);
+        return response.data;
+      } catch (error) {
+        console.error("Error in deleteContent:", error);
+        throw error;
+      }
+    },
+    // New method for restoring deleted content
+    restoreContent: async (contentId: string) => {
+      try {
+        const response = await api.put(`/content/${contentId}/restore`);
+        return response.data;
+      } catch (error) {
+        console.error("Error in restoreContent:", error);
+        throw error;
+      }
+    },
+    // New method for fetching deleted content
+    fetchDeletedContent: async (userId: any) => {
+      try {
+        const response = await api.get(`/content/user/${userId}/deleted`);
+        return response.data;
+      } catch (error) {
+        console.error("Error in fetchDeletedContent:", error);
+        throw error;
+      }
+    },
+    // New method for permanent deletion (admin use)
+    permanentlyDeleteContent: async (contentId: string) => {
+      try {
+        const response = await api.delete(`/content/${contentId}/permanent`);
+        return response.data;
+      } catch (error) {
+        console.error("Error in permanentlyDeleteContent:", error);
+        throw error;
+      }
+    },
 }
 
 export const subjectsApi = {
