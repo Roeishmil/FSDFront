@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import styles from "./Notifications.module.css";
-import {notificationService,Subject } from "../../hooks/useNotification";
+import {notificationApi} from "../../api";
+import {ISubject} from "../../Interfaces"
 import useUser from"../../hooks/useUser";
 
 type Notification = {
@@ -27,23 +28,23 @@ const NotificationsPage = () => {
     day: "Sunday",
     time: {hour: 12, minute: 0 },
   });
-  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [subjects, setSubjects] = useState<ISubject[]>([]);
 
   // טען מהשרת בעת טעינת הדף
   useEffect(() => {
-    notificationService.getNotificationsByUserId(user.user?._id||"name")
-      .then((res) => setNotifications(res.data))
+    notificationApi.getNotificationsByUserId(user.user?._id||"name")
+      .then((res) => setNotifications(res))
       .catch((err) => console.error("שגיאה בטעינת התראות", err));
 
-    notificationService.getSubjectsByUserId(user.user?._id||"")
-      .then((res) => setSubjects(res.data))
+    notificationApi.getSubjectsByUserId(user.user?._id||"")
+      .then((res) => setSubjects(res))
       .catch((err) => console.error("שגיאה בטעינת נושאים", err));
   }, [user.user?._id]);
 
   const handleAdd = async () => {
     if (!newNotification.subjectId || !newNotification.time || !newNotification.day) return;
     try {
-      const res = await notificationService.createNotification({
+      const res = await notificationApi.createNotification({
         subjectId: newNotification.subjectId,
         day: newNotification.day,
         time: {
@@ -52,7 +53,7 @@ const NotificationsPage = () => {
         },
         userId: user.user?._id||"",
       } as Omit<Notification, "_id">);
-      setNotifications([...notifications, res.data]);
+      setNotifications([...notifications, res]);
       setNewNotification({ subjectId: "", day: "Sunday", time: {hour:12,minute:0} });
     } catch (err) {
       console.error("שגיאה ביצירת התראה", err);
@@ -61,7 +62,7 @@ const NotificationsPage = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      await notificationService.deleteNotification(id);
+      await notificationApi.deleteNotification(id);
       setNotifications(notifications.filter(n => n._id !== id));
     } catch (err) {
       console.error("שגיאה במחיקת התראה", err);

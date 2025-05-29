@@ -15,7 +15,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const api = axios.create({
-  baseURL: import.meta.env.BASE_URL,
+  baseURL: import.meta.env.VITE_BASE_URL,
 });
 
 const LoginPage: FC = () => {

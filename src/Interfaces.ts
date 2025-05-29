@@ -67,3 +67,21 @@ export const INTINAL_DATA_COMMENT: IComments = {
   senderId: "",
   imgUrl: "",
 };
+export type INotification = {
+  _id: string;
+  subjectId: string;
+  day: string;
+  time: {
+    hour: number;
+    minute: number;
+  };
+  userId: string;
+};
+
+export type ISubject = {
+  _id: string;
+  title: string;
+  description?: string;
+  userId: string;
+  resultsId: string[];
+};
