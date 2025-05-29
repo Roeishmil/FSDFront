@@ -17,6 +17,7 @@ import "react-toastify/dist/ReactToastify.css";
 import FileUpload from "./components/FileUpload/FileUpload";
 import SubjectsPage from "./components/SubjectsPage/SubjectsPage";
 import SharedContent from "./components/SharedContent/SharedContent";
+import NotificationsPage from "./components/NotificationsPage/Notifications"
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -50,6 +51,7 @@ function App() {
                 <Route path="/summary" element={<ViewSummary />} />
                 <Route path="/" element={<SubjectsPage />} />
                 <Route path="/upload" element={<FileUpload />} />
+                <Route path="/notifications" element={<NotificationsPage />} />
               </>
             ) : (
               <>

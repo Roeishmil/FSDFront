@@ -8,4 +8,3 @@ export default defineConfig({
     allowedHosts: ['whynot100.cs.colman.ac.il'],
   },
 })
-

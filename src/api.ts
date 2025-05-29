@@ -1,7 +1,7 @@
 import axios from "axios";
-import { IUser } from "./Interfaces";
+import { IUser,ISubject,INotification } from "./Interfaces";
 
-const BASE_URL = import.meta.env.BASE_URL;
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 // Cache for promises to prevent duplicate requests
 let examPromise: Promise<string> | null = null;
 let summaryPromise: Promise<string> | null = null;
@@ -234,6 +234,33 @@ export const userApi = {
   },
 };
 
+export const notificationApi = {
+  getNotificationsByUserId: async (userId: string): Promise<INotification[]> => {
+    const response = await api.get(`/notifications/user/${userId}`);
+    return response.data;
+  },
+
+  createNotification: async (data: Omit<INotification, "_id">): Promise<INotification> => {
+    const response = await api.post(`/notifications`, data);
+    return response.data;
+  },
+
+  deleteNotification: async (notificationId: string): Promise<void> => {
+    await api.delete(`/notifications/${notificationId}`);
+  },
+
+  getSubjectsByUserId: async (userId: string): Promise<ISubject[]> => {
+    const response = await api.get(`/subjects/user/${userId}`);
+    return response.data;
+  },
+
+  getSubjectById: async (subjectId: string): Promise<ISubject> => {
+    const response = await api.get(`/subjects/${subjectId}`);
+    return response.data;
+  },
+};
+
+
 export default {
   api,
   examApi,
@@ -242,4 +269,5 @@ export default {
   userService,
   fileApi,
   subjectsApi,
+  notificationApi
 };

@@ -5,6 +5,7 @@ import {
   FileText,
   Book,
   User,
+  Bell,
   LogOut,
   Share2,
   MenuSquare,
@@ -63,6 +64,13 @@ const Sidenav: FC = () => {
         >
           <Share2 size={18} />
           Shared Content
+        </Link>
+        <Link
+          to="/notifications"
+          className={`${styles.link} ${
+            pathname.startsWith("/notifications") ? styles.active : "" }`} >
+          <Bell size={18} />
+          Notifications
         </Link>
       </nav>
 
