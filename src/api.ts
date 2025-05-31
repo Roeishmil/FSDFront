@@ -2,6 +2,7 @@ import axios from "axios";
 import { IUser,ISubject,INotification } from "./Interfaces";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
+console.log('url', BASE_URL);
 // Cache for promises to prevent duplicate requests
 let examPromise: Promise<string> | null = null;
 let summaryPromise: Promise<string> | null = null;
@@ -63,19 +64,29 @@ export const userService = {
 };
 
 export const fileApi = {
-  // FIXED: Update to use PUT instead of POST since we're updating a user
-  uploadFile: (formData: FormData, userId: string) => {
-    // Debug log the file being uploaded
+  // Convert file to base64 and send as JSON
+  uploadFile: async (formData: FormData, userId: string) => {
     const file = formData.get("file") as File;
-    if (file) {
-      console.log(`Uploading file: ${file.name}, type: ${file.type}, size: ${file.size}bytes`);
+    if (!file) {
+      throw new Error('No file selected');
     }
 
-    // We need to use PUT since we're updating the user record
-    // According to usersRoute.js, PUT route is /users/:id
-    return api.put(`/users/${userId}`, formData, {
+    console.log(`Processing file: ${file.name}, type: ${file.type}, size: ${file.size}bytes`);
+
+    // Convert file to base64
+    const base64 = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    // Send as regular JSON instead of FormData
+    return api.put(`/users/${userId}`, {
+      imgUrl: base64
+    }, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Content-Type": "application/json",
       },
     });
   },
