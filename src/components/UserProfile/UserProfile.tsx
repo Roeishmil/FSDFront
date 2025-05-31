@@ -25,6 +25,7 @@ const UserProfile: FC = () => {
     isLoading: userLoading,
     error: userError,
     updateUser,
+    refetchUser,
   } = useUser();
 
   /* local state */
@@ -32,7 +33,6 @@ const UserProfile: FC = () => {
   const [userData, setUserData] = useState<IUser>(
     fetchedUser || INTINAL_DATA_USER
   );
-  const [refreshTrigger, setRefreshTrigger] = useState(false);
   const [errorFile, setErrorFile] = useState<string | null>(null);
   const [isLoadingFile, setIsLoadingFile] = useState(false);
 
@@ -71,12 +71,19 @@ const UserProfile: FC = () => {
 
     const validTypes = [
       "image/jpeg",
-      "image/png",
+      "image/png", 
       "image/gif",
       "image/webp",
     ];
     if (!validTypes.includes(selectedFile.type)) {
-      alert("Invalid file type! Please choose JPEG, PNG, GIF, or WebP.");
+      setErrorFile("Invalid file type! Please choose JPEG, PNG, GIF, or WebP.");
+      return;
+    }
+
+    // Check file size (limit to 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (selectedFile.size > maxSize) {
+      setErrorFile("File too large! Please choose a file smaller than 5MB.");
       return;
     }
 
@@ -86,56 +93,66 @@ const UserProfile: FC = () => {
       return;
     }
 
-    // Create a FormData with just the file
-    // According to usersController.js, the update method expects JSON
-    // So we'll need to convert the file to base64 and update user manually
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      try {
-        setIsLoadingFile(true);
-        setErrorFile(null);
+    try {
+      setIsLoadingFile(true);
+      setErrorFile(null);
 
-        // Convert image to base64 string
-        const base64Image = e.target?.result as string;
-
-        // Update user with the image URL
-        const updatedUser = {
-          ...userData,
-          imgUrl: base64Image,
-        };
-
-        // Use updateUser from useUser hook to update profile
-        if (updateUser) {
-          const updated = await updateUser(updatedUser);
-          if (updated) {
-            setUserData(updated);
-            setRefreshTrigger((p) => !p);
-          }
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      
+      // Use the fileApi.uploadFile method
+      const response = await fileApi.uploadFile(formData, userData._id);
+      
+      // The response should contain the updated user data
+      if (response.data) {
+        // Update local state immediately
+        setUserData(response.data);
+        
+        // Force refetch from server to ensure consistency
+        if (refetchUser) {
+          await refetchUser();
         }
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        setErrorFile(msg);
-        console.error("Upload error:", err);
-      } finally {
-        setIsLoadingFile(false);
       }
-    };
-
-    reader.onerror = () => {
-      setErrorFile("Error reading file");
+    } catch (err: any) {
+      console.error("Upload error:", err);
+      
+      // Handle specific error cases
+      if (err.response?.status === 404) {
+        setErrorFile("User not found. Please try refreshing the page.");
+      } else if (err.response?.status === 413) {
+        setErrorFile("File too large! Please choose a smaller image.");
+      } else if (err.response?.status === 400) {
+        const message = err.response?.data?.message || "Invalid file format.";
+        setErrorFile(message);
+      } else {
+        const msg = err.response?.data?.message || err.message || "Upload failed";
+        setErrorFile(msg);
+      }
+    } finally {
       setIsLoadingFile(false);
-    };
-
-    // Read file as data URL (base64)
-    reader.readAsDataURL(selectedFile);
+      // Clear the file input so the same file can be selected again if needed
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   const handleSave = async (data: FormData) => {
-    const updated = await updateUser({ ...userData, ...data });
-    if (updated) {
-      setUserData(updated);
-      setEditMode(false);
-      setRefreshTrigger((p) => !p);
+    try {
+      const updated = await updateUser({ ...userData, ...data });
+      if (updated) {
+        setUserData(updated);
+        setEditMode(false);
+        
+        // Force refetch to ensure consistency
+        if (refetchUser) {
+          await refetchUser();
+        }
+      }
+    } catch (err: any) {
+      console.error("Update user error:", err);
+      // Handle error appropriately
     }
   };
 
@@ -150,6 +167,11 @@ const UserProfile: FC = () => {
               src={userData.imgUrl || Avatar}
               alt="profile"
               className={UserProfileStyle.profilePic}
+              onError={(e) => {
+                // Fallback to default avatar if image fails to load
+                const target = e.target as HTMLImageElement;
+                target.src = Avatar;
+              }}
             />
             <input
               type="file"
@@ -157,11 +179,14 @@ const UserProfile: FC = () => {
               accept="image/*"
               className={UserProfileStyle.uploadPicInput}
               onChange={handleFileChange}
+              disabled={isLoadingFile}
             />
             <FontAwesomeIcon
               icon={faImage}
-              className={UserProfileStyle.uploadPicIcon}
-              onClick={() => fileInputRef.current?.click()}
+              className={`${UserProfileStyle.uploadPicIcon} ${
+                isLoadingFile ? UserProfileStyle.disabled : ''
+              }`}
+              onClick={() => !isLoadingFile && fileInputRef.current?.click()}
             />
           </div>
           {isLoadingFile && <Loader />}
