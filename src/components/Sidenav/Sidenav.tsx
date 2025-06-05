@@ -9,6 +9,8 @@ import {
   LogOut,
   Share2,
   MenuSquare,
+  SquarePen,
+   TextSelect
 } from "lucide-react";
 import styles from "./Sidenav.module.css";
 import useUser from "../../hooks/useUser";
@@ -52,9 +54,17 @@ const Sidenav: FC = () => {
           <Book size={18} />
           Subjects
         </Link>
-        <Link to="/generate" className={`${styles.link} ${pathname.startsWith("/generate") ? styles.active : ""}`}>
+        <Link to="/generate" className={`${styles.link} ${pathname.endsWith("/generate") ? styles.active : ""}`}>
           <FileText size={18} />
           Generated&nbsp;Content
+        </Link>
+        <Link to="/generate-test" className={`${styles.link} ${pathname.startsWith("/generate-test") ? styles.active : ""}`}>
+          <SquarePen size={16} />
+          Create Test
+        </Link>
+        <Link to="/generate-summary" className={`${styles.link} ${pathname.startsWith("/generate-summary") ? styles.active : ""}`}>
+          <TextSelect size={16} />
+          Create Summary
         </Link>
         <Link
           to="/shared-content"
