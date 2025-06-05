@@ -32,8 +32,8 @@ interface Subject {
   userId: string;
   testCount?: number;
   summaryCount?: number;
-  tests?: any[];
-  summaries?: any[];
+  tests?: number;
+  summaries?: number;
 }
 
 type ContentItem = {
@@ -135,13 +135,13 @@ const SubjectsPage: FC = () => {
         <p className={SubjectsPageStyle.error}>{error}</p>
       ) : (
         <ul className={SubjectsPageStyle.subjectList}>
-          {subjects.length === 0 ? (
+          {subjects?.length === 0 ? (
             <p>No subjects found.</p>
           ) : (
-            subjects.map((subject) => {
+            subjects?.map((subject) => {
               /* front-end only numbers (fallback to 0) */
-              const tests = (subject as any).testCount ?? (subject as any).tests?.length ?? 0;
-              const summaries = (subject as any).summaryCount ?? (subject as any).summaries?.length ?? 0;
+              const tests = (subject as any).testCount ?? (subject as any).tests ?? 0;
+              const summaries = (subject as any).summaryCount ?? (subject as any).summaries ?? 0;
 
               return (
                 <li key={subject._id} className={SubjectsPageStyle.subjectItem}>
