@@ -9,10 +9,28 @@ import useUser from "../../hooks/useUser";
 import { userApi } from "../../api";
 
 const schema = z.object({
-  email: z.string().email("Invalid email").min(1, "Email is required"),
-  fullName: z.string().min(1, "Full Name is required"),
-  username: z.string().min(1, "User Name is required"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  email: z.string().email("Invalid email"),
+  fullName: z.string()
+    .min(1, "Full Name is required")
+    .regex(/^[a-zA-Z\u0590-\u05FF\s]+$/, "Full Name should contain only letters and spaces")
+    .refine(name => name.trim().includes(' '), "Full Name should contain at least one space"),
+  username: z.string()
+    .min(1, "User Name is required")
+    .regex(/^[a-zA-Z0-9_]+$/, "Username should contain only letters, numbers and underscores"),
+   password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .refine(password => {
+      // At least one uppercase letter
+      const hasUpperCase = /[A-Z]/.test(password);
+      // At least one lowercase letter
+      const hasLowerCase = /[a-z]/.test(password);
+      // At least one digit
+      const hasDigit = /\d/.test(password);
+      // At least one special character
+      const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+      
+      return hasUpperCase && hasLowerCase && hasDigit && hasSpecialChar;
+    }, "Password too weak")
 });
 
 type FormData = z.infer<typeof schema>;
