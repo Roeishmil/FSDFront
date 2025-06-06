@@ -183,8 +183,12 @@ const GenerateExam: React.FC = () => {
 
         // auto-height after styles/scripts finish
         setTimeout(() => {
-          if (iframeRef.current) {
-            iframeRef.current.style.height = doc.body.scrollHeight + 30 + "px";
+          const iframe = iframeRef.current;
+          const doc = iframe?.contentDocument;
+          const body = doc?.body;
+
+          if (iframe && body) {
+            iframe.style.height = `${body.scrollHeight + 30}px`;
           }
         }, 120);
       }
