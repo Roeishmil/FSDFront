@@ -56,7 +56,7 @@ const forceLogout = () => {
   failedQueue = [];
   
   // Redirect to login page
-  window.location.href = '/login';
+  window.location.href = '/';
 };
 
 // Check if we should attempt token refresh
