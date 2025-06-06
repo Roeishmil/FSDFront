@@ -118,7 +118,8 @@ const GenerateSummary: React.FC = () => {
   const handleLocalUpload = (e: React.ChangeEvent<HTMLInputElement>) =>
     setUploaded((p) => [...p, ...Array.from(e.target.files || [])]);
 
-  const handleDriveUpload = (files: File[]) => setUploaded((p) => [...p, ...files]);
+  // FIXED: Changed to handle single file from Google Drive
+  const handleDriveUpload = (file: File) => setUploaded((p) => [...p, file]);
 
   const removeFile = (i: number) => setUploaded((p) => p.filter((_, idx) => idx !== i));
 
@@ -270,7 +271,8 @@ const GenerateSummary: React.FC = () => {
 
           <span className={styles.orText}>or</span>
 
-          <GoogleDrivePicker className={styles.driveButton} onFilesSelected={handleDriveUpload} ref={hiddenDrivePicker} />
+          {/* FIXED: Changed prop name from onFilesSelected to onFileSelected */}
+          <GoogleDrivePicker className={styles.driveButton} onFileSelected={handleDriveUpload} ref={hiddenDrivePicker} />
         </div>
 
         {uploaded.length > 0 && (
