@@ -38,7 +38,7 @@ const EditContentModal = ({
         <div className={styles.modalBodyEdit}>
           <label>
             Title:
-            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+            <input type="text" value={title} maxLength={30} onChange={(e) => setTitle(e.target.value)} />
           </label>
           <label>Subject:</label>
           <select className={styles.subjectInput} value={subject} onChange={(e) => setSubject(e.target.value)}>

@@ -215,14 +215,12 @@
 }
   
 .contentViewerHeader {
-  display: flex;
+    display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid #e5e7eb;  /* gray-200 */
-  border-radius: 0.75rem;
   width: 100%;
-  max-width: 460px;
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .contentViewerHeader h2 {
