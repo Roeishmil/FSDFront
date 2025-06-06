@@ -7,7 +7,7 @@ interface GoogleDrivePickerProps {
 
 // Google API configuration
 const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY
-const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
+const CLIENT_ID = import.meta.env.VITE_GOOGLE_DRIVE_CLIENT_ID
 const SCOPES = 'https://www.googleapis.com/auth/drive.readonly';
 
 // Global variable to track script loading

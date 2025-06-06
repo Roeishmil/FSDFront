@@ -18,7 +18,15 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
 });
 
-const LoginPage: FC = () => {
+interface LoginPageProps {
+  showLogoutMessage?: boolean;
+  onDismissLogoutMessage?: () => void;
+}
+
+const LoginPage: FC<LoginPageProps> = ({ 
+  showLogoutMessage = false, 
+  onDismissLogoutMessage 
+}) => {
   const { register, handleSubmit, formState } = useForm<FormData>({ resolver: zodResolver(schema) });
   const navigate = useNavigate();
   const { setUser } = useUser();
@@ -38,6 +46,10 @@ const LoginPage: FC = () => {
       localStorage.setItem("refreshToken", response.data.refreshToken);
       localStorage.setItem("user", JSON.stringify(response.data.user));
       localStorage.setItem("userId", response.data.user._id);
+      
+      // Clear the logout message flag on successful login
+      localStorage.removeItem('idleLogoutMessage');
+      
       setUser(response.data.user);
       navigate("/");
     } catch (error: any) {
@@ -82,6 +94,9 @@ const LoginPage: FC = () => {
       localStorage.setItem("user", JSON.stringify(response.data.user));
       localStorage.setItem("userId", response.data.user._id);
 
+      // Clear the logout message flag on successful login
+      localStorage.removeItem('idleLogoutMessage');
+
       setUser(response.data.user);
       navigate("/");
     } catch (error: any) {
@@ -105,6 +120,73 @@ const LoginPage: FC = () => {
 
   return (
     <div className={LoginPageStyle.Container}>
+      {/* Logout message displayed at the top of login page */}
+      {showLogoutMessage && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          backgroundColor: '#ff6b6b',
+          color: 'white',
+          padding: '15px 25px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
+          zIndex: 10001,
+          textAlign: 'center',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          animation: 'slideInFromTop 0.3s ease-out',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '15px',
+          maxWidth: '90vw'
+        }}>
+          <style>
+            {`
+              @keyframes slideInFromTop {
+                0% { 
+                  transform: translateX(-50%) translateY(-100%);
+                  opacity: 0;
+                }
+                100% { 
+                  transform: translateX(-50%) translateY(0);
+                  opacity: 1;
+                }
+              }
+            `}
+          </style>
+          <span>🔒 You have been signed out due to inactivity</span>
+          <button
+            onClick={onDismissLogoutMessage}
+            style={{
+              background: 'rgba(255, 255, 255, 0.2)',
+              border: 'none',
+              color: 'white',
+              borderRadius: '50%',
+              width: '24px',
+              height: '24px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              transition: 'background-color 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+            }}
+            title="Dismiss"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       <div className={LoginPageStyle.Box}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <h2>Login</h2>
