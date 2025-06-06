@@ -42,7 +42,11 @@ const NotificationsPage = () => {
   }, [user.user?._id]);
 
   const handleAdd = async () => {
-    if (!newNotification.subjectId || !newNotification.time || !newNotification.day) return;
+    if (!newNotification.subjectId) {
+      alert("Please Select Subject");
+      return;
+    }
+    if (!newNotification.time || !newNotification.day) return;
     try {
       const res = await notificationApi.createNotification({
         subjectId: newNotification.subjectId,

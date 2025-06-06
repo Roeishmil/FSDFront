@@ -74,6 +74,9 @@
   box-shadow: 0 1px 3px rgb(0 0 0 / .06);
   transition: box-shadow .2s ease;
 }
+.cardSpacer {
+  flex-grow: 1;
+}
 .card:hover {
   box-shadow: 0 4px 6px rgb(0 0 0 / .1);
 }
@@ -255,7 +258,8 @@
 .cardActionsEdit {
   display: flex;
   gap: 0.5rem;
-  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+
 }
 
 

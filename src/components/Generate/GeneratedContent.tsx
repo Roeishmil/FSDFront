@@ -288,6 +288,7 @@ const GeneratedContent: React.FC = () => {
                   <span className={styles.deletedTag}>Deleted: {new Date(c.deletedAt).toLocaleDateString()}</span>
                 )}
               </div>
+              <div className={styles.cardSpacer} />
               <div className={styles.cardActionsEdit}>
                 <div className={styles.cardActions}>
                   <button className={styles.viewButton} onClick={() => setSelectedItem(c)}>

@@ -12,11 +12,9 @@ interface Subject {
   summaries?: number;
 }
 
-let cachedSubject: Subject[] | null = null;
-
 export function useSubject() {
-  const [subjects, setSubjects] = useState<Subject[] | null>(cachedSubject);
-  const [loading, setLoading] = useState(!cachedSubject);
+  const [subjects, setSubjects] = useState<Subject[] | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<null | string>(null);
   const { user } = useUser();
 
@@ -26,8 +24,6 @@ export function useSubject() {
       setError(null);
       const data = await subjectsApi.fetchSubjects(user?._id);
       console.log(data);
-      
-      cachedSubject = data;
       setSubjects(data);
     } catch (err) {
       setError((err as Error).message);
@@ -37,8 +33,9 @@ export function useSubject() {
   }, [user?._id]);
 
   useEffect(() => {
-    if (cachedSubject) return;
-    reloadSubject();
+    if (user?._id) {
+      reloadSubject();
+    }
   }, [reloadSubject]);
 
   return { subjects, setSubjects, loading, error, reloadSubject };
