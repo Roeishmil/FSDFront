@@ -53,6 +53,7 @@ api.interceptors.response.use(
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("user");
         localStorage.removeItem("userId");
+        localStorage.clear();
         // Optionally redirect to login
         window.location.href = "/login";
         return Promise.reject(refreshError);
