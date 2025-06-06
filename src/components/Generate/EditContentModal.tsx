@@ -50,10 +50,12 @@ const EditContentModal = ({
                 </option>
               ))}
           </select>
-          <label className={styles.checkboxRowEdit}>
-            <input type="checkbox" checked={shared} onChange={(e) => setShared(e.target.checked)} />
-            <span>Shared</span>
-          </label>
+          {!item.deleted && (
+            <label className={styles.checkboxRowEdit}>
+              <input type="checkbox" checked={shared} onChange={(e) => setShared(e.target.checked)} />
+              <span>Shared</span>
+            </label>
+          )}
         </div>
         <div className={styles.modalFooterEdit}>
           <button className={styles.saveButtonEdit} onClick={handleSubmit}>
