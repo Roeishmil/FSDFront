@@ -10,6 +10,7 @@ type SharedContentItem = {
   subject?: string;
   content?: string;
   user: {
+    _id: string;
     username: string;
     fullName: string;
     imageUrl?: string;
@@ -24,6 +25,16 @@ const SharedContentModal: React.FC<{
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [titleInput, setTitleInput] = useState("");
   const [subjectInput, setSubjectInput] = useState("");
+  const [currentUserId, setCurrentUserId] = useState("");
+
+  useEffect(() => {
+    // Get current user ID from localStorage when component mounts
+    const uid = localStorage.getItem("userId") || "";
+    setCurrentUserId(uid);
+  }, []);
+
+  // Check if the content belongs to the current user
+  const isOwnContent = currentUserId && item?.user._id === currentUserId;
 
   useEffect(() => {
     if (item?.content && iframeRef.current) {
@@ -37,9 +48,10 @@ const SharedContentModal: React.FC<{
   }, [item]);
 
   const handleConfirmSave = async () => {
-    const uid = localStorage.getItem("userId") || "67f3bd679937c252dacacee4";
+    if (isOwnContent) return; // Just in case as we'll disable the button
+
     await contentApi.createContent({
-      userId: uid,
+      userId: currentUserId,
       content: item?.content,
       title: titleInput,
       contentType: item?.contentType,
@@ -83,9 +95,11 @@ const SharedContentModal: React.FC<{
               <span className={styles.username}>{item.user.fullName}</span>
             </div>
             <div>
-              <button className={styles.saveModalBtn} onClick={() => setIsSaveModalOpen(true)}>
-                Save
-              </button>
+              {!isOwnContent && (
+                <button className={styles.saveModalBtn} onClick={() => setIsSaveModalOpen(true)}>
+                  Save
+                </button>
+              )}
               <button className={styles.closeModalBtn} onClick={onClose}>
                 Close
               </button>
@@ -104,7 +118,11 @@ const SharedContentModal: React.FC<{
               <input id="title" type="text" value={titleInput} onChange={(e) => setTitleInput(e.target.value)} />
             </div>
             <div className={styles.modalActions}>
-              <button className={styles.saveButton} onClick={handleConfirmSave}>
+              <button
+                className={styles.saveButton}
+                onClick={handleConfirmSave}
+                disabled={isOwnContent} // Disable if it's their own content
+              >
                 Confirm Save
               </button>
               <button className={styles.cancelButton} onClick={() => setIsSaveModalOpen(false)}>
