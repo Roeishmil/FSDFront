@@ -1,11 +1,69 @@
 import axios from "axios";
-import { IUser,ISubject,INotification } from "./Interfaces";
+import { IUser, ISubject, INotification } from "./Interfaces";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 console.log('url', BASE_URL);
+
 // Cache for promises to prevent duplicate requests
 let examPromise: Promise<string> | null = null;
 let summaryPromise: Promise<string> | null = null;
+
+// Flag to prevent multiple simultaneous refresh attempts
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value: any) => void;
+  reject: (error: any) => void;
+}> = [];
+
+// Process queued requests after refresh
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error);
+    } else {
+      resolve(token);
+    }
+  });
+  
+  failedQueue = [];
+};
+
+// Utility function to check if token is expired
+const isTokenExpired = (token: string): boolean => {
+  if (!token) return true;
+  
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const currentTime = Date.now() / 1000;
+    // Add 30 second buffer to account for clock skew
+    return payload.exp < (currentTime + 30);
+  } catch (error) {
+    console.error('Error parsing token:', error);
+    return true;
+  }
+};
+
+// Force logout function
+const forceLogout = () => {
+  // Clear all stored tokens and user data
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+  localStorage.removeItem("user");
+  localStorage.removeItem("userId");
+  
+  // Reset refresh state
+  isRefreshing = false;
+  failedQueue = [];
+  
+  // Redirect to login page
+  window.location.href = '/login';
+};
+
+// Check if we should attempt token refresh
+const shouldAttemptRefresh = (): boolean => {
+  const refreshToken = localStorage.getItem("refreshToken");
+  return refreshToken && !isTokenExpired(refreshToken);
+};
 
 export const api = axios.create({
   baseURL: BASE_URL,
@@ -16,17 +74,27 @@ export const api = axios.create({
   timeout: 300000,
 });
 
+// Request interceptor - add token to requests
 api.interceptors.request.use(
   async (config) => {
     const accessToken = localStorage.getItem("accessToken");
+    
     if (accessToken) {
-      config.headers.Authorization = `JWT ${accessToken}`;
+      // Check if access token is expired before making request
+      if (isTokenExpired(accessToken)) {
+        // Don't add expired token, let response interceptor handle refresh
+        console.log('Access token expired, will refresh on response');
+      } else {
+        config.headers.Authorization = `JWT ${accessToken}`;
+      }
     }
+    
     return config;
   },
   (error) => Promise.reject(error)
 );
 
+// Response interceptor - handle token refresh
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -36,23 +104,98 @@ api.interceptors.response.use(
     }
 
     const originalRequest = error.config;
+    
+    // Handle 401 Unauthorized responses
     if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      try {
-        const refreshToken = localStorage.getItem("refreshToken");
-        const response = await api.post("/refresh", { token: refreshToken });
-        const newAccessToken = response.data.accessToken;
-        localStorage.setItem("accessToken", newAccessToken);
-        api.defaults.headers.common["Authorization"] = `JWT ${newAccessToken}`;
-        return api(originalRequest);
-      } catch (refreshError) {
-        // If refresh token fails, reject with the original error
+      // Check if we should attempt refresh
+      if (!shouldAttemptRefresh()) {
+        console.log('Refresh token expired or missing, forcing logout');
+        forceLogout();
         return Promise.reject(error);
       }
+
+      // If already refreshing, queue this request
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(token => {
+          originalRequest.headers.Authorization = `JWT ${token}`;
+          return api(originalRequest);
+        }).catch(err => {
+          return Promise.reject(err);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const refreshToken = localStorage.getItem("refreshToken");
+        console.log('Attempting token refresh...');
+        
+        const response = await api.post("/refresh", { token: refreshToken });
+        const newAccessToken = response.data.accessToken;
+        const newRefreshToken = response.data.refreshToken;
+        
+        // Update stored tokens
+        localStorage.setItem("accessToken", newAccessToken);
+        if (newRefreshToken) {
+          localStorage.setItem("refreshToken", newRefreshToken);
+        }
+        
+        // Update default authorization header
+        api.defaults.headers.common["Authorization"] = `JWT ${newAccessToken}`;
+        
+        // Process queued requests
+        processQueue(null, newAccessToken);
+        
+        console.log('Token refresh successful');
+        
+        // Retry original request with new token
+        originalRequest.headers.Authorization = `JWT ${newAccessToken}`;
+        return api(originalRequest);
+        
+      } catch (refreshError) {
+        console.error('Token refresh failed:', refreshError);
+        
+        // Process queued requests with error
+        processQueue(refreshError, null);
+        
+        // Force logout on refresh failure
+        forceLogout();
+        
+        return Promise.reject(error);
+      } finally {
+        isRefreshing = false;
+      }
     }
+    
     return Promise.reject(error);
   }
 );
+
+// Add periodic token validation (runs every 5 minutes)
+const startTokenValidation = () => {
+  setInterval(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    const refreshToken = localStorage.getItem("refreshToken");
+    
+    // If no tokens, user is not logged in
+    if (!accessToken && !refreshToken) {
+      return;
+    }
+    
+    // If both tokens are expired, force logout
+    if ((!accessToken || isTokenExpired(accessToken)) && 
+        (!refreshToken || isTokenExpired(refreshToken))) {
+      console.log('Both tokens expired, forcing logout');
+      forceLogout();
+    }
+  }, 5 * 60 * 1000); // Check every 5 minutes
+};
+
+// Start token validation when module loads
+startTokenValidation();
 
 export const userService = {
   updateUser: (userData: IUser) => {
@@ -177,46 +320,46 @@ export const contentApi = {
       throw error;
     }
   },
-    // New method for soft deleting content
-    deleteContent: async (contentId: string) => {
-      try {
-        const response = await api.delete(`/content/${contentId}`);
-        return response.data;
-      } catch (error) {
-        console.error("Error in deleteContent:", error);
-        throw error;
-      }
-    },
-    // New method for restoring deleted content
-    restoreContent: async (contentId: string) => {
-      try {
-        const response = await api.put(`/content/${contentId}/restore`);
-        return response.data;
-      } catch (error) {
-        console.error("Error in restoreContent:", error);
-        throw error;
-      }
-    },
-    // New method for fetching deleted content
-    fetchDeletedContent: async (userId: any) => {
-      try {
-        const response = await api.get(`/content/user/${userId}/deleted`);
-        return response.data;
-      } catch (error) {
-        console.error("Error in fetchDeletedContent:", error);
-        throw error;
-      }
-    },
-    // New method for permanent deletion (admin use)
-    permanentlyDeleteContent: async (contentId: string) => {
-      try {
-        const response = await api.delete(`/content/${contentId}/permanent`);
-        return response.data;
-      } catch (error) {
-        console.error("Error in permanentlyDeleteContent:", error);
-        throw error;
-      }
-    },
+  // New method for soft deleting content
+  deleteContent: async (contentId: string) => {
+    try {
+      const response = await api.delete(`/content/${contentId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error in deleteContent:", error);
+      throw error;
+    }
+  },
+  // New method for restoring deleted content
+  restoreContent: async (contentId: string) => {
+    try {
+      const response = await api.put(`/content/${contentId}/restore`);
+      return response.data;
+    } catch (error) {
+      console.error("Error in restoreContent:", error);
+      throw error;
+    }
+  },
+  // New method for fetching deleted content
+  fetchDeletedContent: async (userId: any) => {
+    try {
+      const response = await api.get(`/content/user/${userId}/deleted`);
+      return response.data;
+    } catch (error) {
+      console.error("Error in fetchDeletedContent:", error);
+      throw error;
+    }
+  },
+  // New method for permanent deletion (admin use)
+  permanentlyDeleteContent: async (contentId: string) => {
+    try {
+      const response = await api.delete(`/content/${contentId}/permanent`);
+      return response.data;
+    } catch (error) {
+      console.error("Error in permanentlyDeleteContent:", error);
+      throw error;
+    }
+  },
 }
 
 export const subjectsApi = {
@@ -271,6 +414,12 @@ export const notificationApi = {
   },
 };
 
+// Export utility functions for external use
+export const tokenUtils = {
+  isTokenExpired,
+  forceLogout,
+  shouldAttemptRefresh,
+};
 
 export default {
   api,
@@ -280,5 +429,6 @@ export default {
   userService,
   fileApi,
   subjectsApi,
-  notificationApi
+  notificationApi,
+  tokenUtils
 };
