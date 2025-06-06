@@ -22,7 +22,7 @@ const LoginPage: FC = () => {
   const { register, handleSubmit, formState } = useForm<FormData>({ resolver: zodResolver(schema) });
   const navigate = useNavigate();
   const { setUser } = useUser();
-  
+
   // Add state for error messages
   const [loginError, setLoginError] = useState<string>("");
   const [googleError, setGoogleError] = useState<string>("");
@@ -31,7 +31,7 @@ const LoginPage: FC = () => {
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     setLoginError(""); // Clear previous errors
-    
+
     try {
       const response = await api.post("/auth/login", data);
       localStorage.setItem("accessToken", response.data.accessToken);
@@ -42,13 +42,13 @@ const LoginPage: FC = () => {
       navigate("/");
     } catch (error: any) {
       console.error("Login failed", error);
-      
+
       // Handle different types of errors
       if (error.response) {
         // Server responded with error status
         const status = error.response.status;
         const message = error.response.data?.message || error.response.data?.error;
-        
+
         if (status === 401) {
           setLoginError("Invalid email/username or password. Please try again.");
         } else if (status === 404) {
@@ -74,7 +74,7 @@ const LoginPage: FC = () => {
 
   const googleResponseMessage = async (credentialResponse: CredentialResponse) => {
     setGoogleError(""); // Clear previous errors
-    
+
     try {
       const response = await api.post("/auth/googleSignin", { credential: credentialResponse });
       localStorage.setItem("accessToken", response.data.accessToken);
@@ -86,7 +86,7 @@ const LoginPage: FC = () => {
       navigate("/");
     } catch (error: any) {
       console.error("Google login failed", error);
-      
+
       if (error.response) {
         const message = error.response.data?.message || error.response.data?.error;
         setGoogleError(message || "Google login failed. Please try again.");
@@ -108,35 +108,35 @@ const LoginPage: FC = () => {
       <div className={LoginPageStyle.Box}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <h2>Login</h2>
-          
+
           {/* Display general login error */}
           {loginError && (
-            <div className="alert alert-danger" style={{ 
-              backgroundColor: '#f8d7da', 
-              color: '#721c24', 
-              padding: '10px', 
-              borderRadius: '5px', 
+            <div className="alert alert-danger" style={{
+              backgroundColor: '#f8d7da',
+              color: '#721c24',
+              padding: '10px',
+              borderRadius: '5px',
               marginBottom: '15px',
               border: '1px solid #f5c6cb'
             }}>
               {loginError}
             </div>
           )}
-          
+
           {/* Display Google login error */}
           {googleError && (
-            <div className="alert alert-danger" style={{ 
-              backgroundColor: '#f8d7da', 
-              color: '#721c24', 
-              padding: '10px', 
-              borderRadius: '5px', 
+            <div className="alert alert-danger" style={{
+              backgroundColor: '#f8d7da',
+              color: '#721c24',
+              padding: '10px',
+              borderRadius: '5px',
               marginBottom: '15px',
               border: '1px solid #f5c6cb'
             }}>
               {googleError}
             </div>
           )}
-          
+
           <div className={LoginPageStyle.error}>
             {formState.errors.emailOrusername && (
               <div className="text-danger">{formState.errors.emailOrusername.message}</div>
@@ -168,7 +168,19 @@ const LoginPage: FC = () => {
           <button type="submit" className={LoginPageStyle.Button} disabled={isLoading}>
             {isLoading ? "Logging in..." : "Login"}
           </button>
-          <GoogleLogin onSuccess={googleResponseMessage} onError={googleErrorMessage} />
+          <div style={{
+            width: '100%',
+            margin: '10px 0',
+            display: 'flex',
+            justifyContent: 'center'
+          }}>
+            <GoogleLogin
+              onSuccess={googleResponseMessage}
+              onError={googleErrorMessage}
+              width="350px" // Set this to match your form width
+              size="large"
+            />
+          </div>
         </form>
         <div onClick={() => navigate("/SignUp")} className={LoginPageStyle.herf}>
           SignUp
