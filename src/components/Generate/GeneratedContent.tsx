@@ -294,9 +294,12 @@ const GeneratedContent: React.FC = () => {
                   <button className={styles.viewButton} onClick={() => setSelectedItem(c)}>
                     <Eye size={14} /> View Content
                   </button>
-                  <button className={styles.editButtonEdit} onClick={() => setEditingItem(c)}>
-                    <Pencil size={14} /> Edit
-                  </button>
+                  {/* Only show edit button for active content */}
+                  {viewMode === "active" && (
+                    <button className={styles.editButtonEdit} onClick={() => setEditingItem(c)}>
+                      <Pencil size={14} /> Edit
+                    </button>
+                  )}
                 </div>
                 {viewMode === "active" ? (
                   <button className={styles.deleteButton} onClick={() => handleDeleteClick(c)} disabled={deleting}>
@@ -329,7 +332,8 @@ const GeneratedContent: React.FC = () => {
         <RestoreConfirmationModal item={itemToRestore} onConfirm={handleRestoreConfirm} onCancel={handleRestoreCancel} />
       )}
 
-      {editingItem && (
+      {/* Only show EditContentModal for active content */}
+      {editingItem && viewMode === "active" && (
         <EditContentModal item={editingItem} onClose={() => setEditingItem(null)} onSave={handleSaveEdit} />
       )}
     </div>

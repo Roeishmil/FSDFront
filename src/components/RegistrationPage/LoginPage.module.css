@@ -1,85 +1,555 @@
+/* Global reset for full screen background */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Enhanced Login/Signup Page Styles */
 .Container {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 60px;
+  min-height: 100vh;
+  width: 100vw;
+  background: #ffffff;
+  padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
+}
+
+.Container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(102,126,234,0.02)"/><circle cx="75" cy="75" r="1.5" fill="rgba(102,126,234,0.015)"/><circle cx="50" cy="10" r="0.5" fill="rgba(102,126,234,0.01)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  pointer-events: none;
 }
 
 .Box {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: white;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-  width: 500px;
+  background: rgba(248, 247, 255, 0.8);
+  backdrop-filter: blur(20px);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 
+    0 25px 50px rgba(102, 126, 234, 0.08),
+    0 0 0 1px rgba(102, 126, 234, 0.1);
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.Box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
+  border-radius: 20px 20px 0 0;
 }
 
 h2 {
-  margin-bottom: 20px;
-}
-
-.inputField {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.Button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.Button:hover {
-  background-color: #0056b3;
-}
-
-.herf{
-  color: #007bff;
-  margin-top: 25px;
-  text-decoration: underline;
-}
-.herf:hover {
-  color: #0056b3;
+  margin-bottom: 30px;
+  color: #2d3748;
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .formGroup {
   position: relative;
-  display: flex;
-  align-items: center;
-  margin-bottom: 2px;
   width: 100%;
-  z-index: 2;
+  margin-bottom: 24px; /* Reduced from 30px for better spacing */
 }
 
 .formGroup label {
-  width: 100px;
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #4a5568;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.inputField {
+  width: 100%;
+  padding: 16px 20px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.8);
+  box-sizing: border-box;
+}
+
+.inputField:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-2px);
+}
+
+.inputField::placeholder {
+  color: #a0aec0;
+  font-style: italic;
+}
+
+.Button {
+  width: 100%;
+  padding: 18px;
+  margin: 20px 0 15px 0; /* Reduced top margin */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.Button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.Button:hover::before {
+  left: 100%;
+}
+
+.Button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+}
+
+.Button:active {
+  transform: translateY(0);
+}
+
+.Button:disabled {
+  background: #cbd5e0;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.Button:disabled::before {
+  display: none;
+}
+
+.herf {
+  color: #667eea;
+  margin-top: 25px; /* Reduced from 30px */
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 15px 24px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  position: relative;
+  text-align: center;
+}
+
+.herf:hover {
+  background: rgba(102, 126, 234, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Improved error message positioning */
+.error {
+  position: absolute;
+  right: 0;
+  top: -22px; /* Reduced from -30px to bring closer to input */
+  color: #e53e3e;
+  font-size: 13px;
+  font-weight: 500;
+  background: rgba(229, 62, 62, 0.1);
+  padding: 6px 12px; /* Reduced padding for more compact look */
+  border-radius: 8px;
+  border: 1px solid rgba(229, 62, 62, 0.2);
+  z-index: 10;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(229, 62, 62, 0.1);
+  max-width: calc(100% - 20px); /* Ensure it doesn't overflow */
+}
+
+.alertError {
+  background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
+  color: #742a2a;
+  padding: 18px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  border: 1px solid #fed7d7;
+  font-weight: 500;
+  position: relative;
+  animation: shake 0.5s ease-in-out;
+  line-height: 1.5;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.alertSuccess {
+  background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+  color: #22543d;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  border: 1px solid #c6f6d5;
+  text-align: center;
+  animation: fadeInScale 0.5s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.successTitle {
+  color: #22543d !important;
+  margin-bottom: 15px !important;
+  font-size: 24px !important;
+}
+
+/* Improved Google Login Button Styling */
+.googleLoginWrapper {
+  width: 100%;
+  margin: 30px 0 25px 0; /* Increased top margin to separate from OR divider */
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.googleLoginWrapper::before {
+  content: 'OR';
+  position: absolute;
+  top: -25px; /* Moved further up to avoid overlap */
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(248, 247, 255, 0.9);
+  padding: 0 20px;
+  color: #718096;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  z-index: 2;
+}
+
+.googleLoginWrapper::after {
+  content: '';
+  position: absolute;
+  top: -19px; /* Adjusted to align with OR text */
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+  z-index: 1;
+}
+
+/* Style the Google Login button container to match other buttons */
+.googleLoginWrapper > div {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+/* Override Google button styles for consistency */
+.googleLoginWrapper iframe {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 56px !important; /* Match button height */
+  border-radius: 12px !important;
+}
+
+/* Custom Google button wrapper for better control */
+.googleLoginWrapper .google-signin-button {
+  width: 100%;
+  height: 56px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.googleLoginWrapper .google-signin-button:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.logoutMessage {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  color: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+  z-index: 10001;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  animation: slideInFromTop 0.5s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  max-width: 90vw;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.logoutMessage .dismissBtn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
   font-weight: bold;
+  transition: all 0.2s ease;
 }
 
-.formGroup input {
-  flex: 1;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.logoutMessage .dismissBtn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
 }
 
+@keyframes slideInFromTop {
+  0% { 
+    transform: translateX(-50%) translateY(-100%);
+    opacity: 0;
+  }
+  100% { 
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
 
-.error{
-  justify-content: end;
-    display: flex;
-    position: fixed;
-    margin-left: 105px;
-    padding-top: 50px;
-    z-index: 0;
+/* Loading state styles */
+.Button.loading {
+  position: relative;
+}
+
+.Button.loading::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+  margin-left: -10px;
+  margin-top: -10px;
+  border: 2px solid transparent;
+  border-top: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Add spacing utility classes */
+.spacingTop {
+  margin-top: 20px;
+}
+
+.spacingBottom {
+  margin-bottom: 20px;
+}
+
+/* Improved form error message spacing */
+.formGroup.hasError {
+  margin-bottom: 30px; /* Reduced from 35px */
+}
+
+.formGroup.hasError .inputField {
+  border-color: #e53e3e;
+  box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.1);
+}
+
+.formGroup.hasError .inputField:focus {
+  border-color: #e53e3e;
+  box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.2);
+}
+
+/* Password strength indicator spacing */
+.passwordStrengthIndicator {
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 768px) {
+  .Container {
+    padding: 16px;
+  }
+  
+  .Box {
+    padding: 30px 20px;
+    margin: 20px 0;
+  }
+  
+  h2 {
+    font-size: 24px;
+    margin-bottom: 25px;
+  }
+  
+  .inputField {
+    padding: 14px 16px;
+  }
+  
+  .Button {
+    padding: 14px;
+    font-size: 15px;
+  }
+  
+  .formGroup {
+    margin-bottom: 20px;
+  }
+  
+  .formGroup.hasError {
+    margin-bottom: 30px;
+  }
+  
+  .error {
+    position: static; /* Stack on mobile for better readability */
+    margin-top: 8px;
+    margin-bottom: 0;
+    max-width: 100%;
+    right: auto;
+    top: auto;
+  }
+  
+  .googleLoginWrapper {
+    margin: 25px 0 20px 0;
+  }
+  
+  .googleLoginWrapper iframe {
+    height: 48px !important; /* Slightly smaller on mobile */
+  }
+}
+
+/* Tablet responsive improvements */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .Box {
+    max-width: 420px;
+    padding: 35px;
+  }
+}
+
+/* Focus styles for accessibility */
+.Button:focus-visible,
+.herf:focus-visible {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .Container {
+    background: #000;
+  }
+  
+  .Box {
+    background: #fff;
+    border: 2px solid #000;
+  }
+  
+  .Button {
+    background: #000;
+    border: 2px solid #000;
+  }
+  
+  .error {
+    background: #fff;
+    border: 2px solid #e53e3e;
+  }
+}
+
+/* Smooth transitions for better UX */
+.formGroup {
+  transition: margin-bottom 0.3s ease;
+}
+
+.googleLoginWrapper {
+  transition: margin 0.3s ease;
+}
+
+/* Improved visual hierarchy */
+.Box form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Better button alignment */
+.Button,
+.googleLoginWrapper,
+.herf {
+  align-self: stretch;
 }

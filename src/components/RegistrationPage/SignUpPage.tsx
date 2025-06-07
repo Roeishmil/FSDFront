@@ -30,13 +30,13 @@ const schema = z.object({
       const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
       
       return hasUpperCase && hasLowerCase && hasDigit && hasSpecialChar;
-    }, "Password too weak")
+    }, "Password must contain uppercase, lowercase, number and special character")
 });
 
 type FormData = z.infer<typeof schema>;
 
 const SignUpPage: FC = () => {
-  const { register, handleSubmit, formState, reset } = useForm<FormData>({ resolver: zodResolver(schema) });
+  const { register, handleSubmit, formState, reset, watch } = useForm<FormData>({ resolver: zodResolver(schema) });
   const navigate = useNavigate();
   const { setUser } = useUser();
   
@@ -45,6 +45,32 @@ const SignUpPage: FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string>("");
+
+  // Watch password for strength indicator
+  const watchedPassword = watch("password", "");
+
+  // Password strength checker
+  const getPasswordStrength = (password: string) => {
+    if (!password) return { strength: 0, label: "", color: "#e2e8f0" };
+    
+    let score = 0;
+    const checks = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /\d/.test(password),
+      special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+    };
+    
+    score = Object.values(checks).filter(Boolean).length;
+    
+    if (score <= 2) return { strength: score, label: "Weak", color: "#e53e3e" };
+    if (score <= 3) return { strength: score, label: "Fair", color: "#dd6b20" };
+    if (score <= 4) return { strength: score, label: "Good", color: "#38a169" };
+    return { strength: score, label: "Strong", color: "#22543d" };
+  };
+
+  const passwordStrength = getPasswordStrength(watchedPassword);
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
@@ -131,17 +157,30 @@ const SignUpPage: FC = () => {
         {showSuccess ? (
           // Success confirmation screen
           <div style={{ textAlign: 'center' }}>
-            <div style={{
-              backgroundColor: '#d4edda',
-              color: '#155724',
-              padding: '20px',
-              borderRadius: '10px',
-              marginBottom: '20px',
-              border: '1px solid #c3e6cb'
-            }}>
-              <h2 style={{ color: '#155724', marginBottom: '15px' }}>🎉 Registration Successful!</h2>
-              <p style={{ margin: '10px 0', fontSize: '16px' }}>{successMessage}</p>
-              <p style={{ margin: '10px 0', fontSize: '14px' }}>You will be automatically logged in shortly...</p>
+            <div className={LoginPageStyle.alertSuccess}>
+              <h2 className={LoginPageStyle.successTitle}>🎉 Welcome Aboard!</h2>
+              <p style={{ margin: '10px 0', fontSize: '16px', lineHeight: '1.5' }}>
+                {successMessage}
+              </p>
+              <p style={{ margin: '15px 0 0 0', fontSize: '14px', opacity: 0.8 }}>
+                Redirecting you to your dashboard...
+              </p>
+              <div style={{ 
+                width: '100%', 
+                height: '4px', 
+                background: 'rgba(34, 84, 61, 0.2)', 
+                borderRadius: '2px', 
+                margin: '15px 0',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  width: '100%',
+                  height: '100%',
+                  background: '#22543d',
+                  borderRadius: '2px',
+                  animation: 'progressBar 2s ease-in-out'
+                }}></div>
+              </div>
             </div>
             <button 
               onClick={handleContinue}
@@ -150,87 +189,135 @@ const SignUpPage: FC = () => {
             >
               Continue Now
             </button>
+            <style>
+              {`
+                @keyframes progressBar {
+                  from { width: 0%; }
+                  to { width: 100%; }
+                }
+              `}
+            </style>
           </div>
         ) : (
           // Registration form
           <form onSubmit={handleSubmit(onSubmit)}>
-            <h2>SignUp</h2>
+            <h2>Create Account</h2>
             
             {/* Display signup error */}
             {signupError && (
-              <div style={{ 
-                backgroundColor: '#f8d7da', 
-                color: '#721c24', 
-                padding: '10px', 
-                borderRadius: '5px', 
-                marginBottom: '15px',
-                border: '1px solid #f5c6cb'
-              }}>
-                {signupError}
+              <div className={LoginPageStyle.alertError}>
+                <strong>⚠️ Registration Failed:</strong> {signupError}
               </div>
             )}
             
-            <div className={LoginPageStyle.error}>
-              {formState.errors.username && <div className="text-danger">{formState.errors.username.message}</div>}
-            </div>
-            <div className={LoginPageStyle.formGroup}>
-              <label>User Name:</label>
+            <div className={`${LoginPageStyle.formGroup} ${formState.errors.username ? LoginPageStyle.hasError : ''}`}>
+              <label htmlFor="username">Username</label>
               <input
                 id="username"
                 type="text"
-                placeholder="User Name"
+                placeholder="Choose a unique username"
                 {...register("username")}
                 className={LoginPageStyle.inputField}
               />
+              {formState.errors.username && (
+                <div className={LoginPageStyle.error}>
+                  {formState.errors.username.message}
+                </div>
+              )}
             </div>
-            <div className={LoginPageStyle.error}>
-              {formState.errors.fullName && <div className="text-danger">{formState.errors.fullName.message}</div>}
-            </div>
-            <div className={LoginPageStyle.formGroup}>
-              <label>Full Name:</label>
+
+            <div className={`${LoginPageStyle.formGroup} ${formState.errors.fullName ? LoginPageStyle.hasError : ''}`}>
+              <label htmlFor="fullName">Full Name</label>
               <input
                 id="fullName"
                 type="text"
-                placeholder="Full Name"
+                placeholder="Enter your full name"
                 {...register("fullName")}
                 className={LoginPageStyle.inputField}
               />
+              {formState.errors.fullName && (
+                <div className={LoginPageStyle.error}>
+                  {formState.errors.fullName.message}
+                </div>
+              )}
             </div>
-            <div className={LoginPageStyle.error}>
-              {formState.errors.email && <div className="text-danger">{formState.errors.email.message}</div>}
-            </div>
-            <div className={LoginPageStyle.formGroup}>
-              <label>Email:</label>
+
+            <div className={`${LoginPageStyle.formGroup} ${formState.errors.email ? LoginPageStyle.hasError : ''}`}>
+              <label htmlFor="email">Email Address</label>
               <input
                 id="email"
-                type="text"
-                placeholder="Email"
+                type="email"
+                placeholder="Enter your email address"
                 {...register("email")}
                 className={LoginPageStyle.inputField}
               />
+              {formState.errors.email && (
+                <div className={LoginPageStyle.error}>
+                  {formState.errors.email.message}
+                </div>
+              )}
             </div>
-            <div className={LoginPageStyle.error}>
-              {formState.errors.password && <div className="text-danger">{formState.errors.password.message}</div>}
-            </div>
-            <div className={LoginPageStyle.formGroup}>
-              <label>Password:</label>
+
+            <div className={`${LoginPageStyle.formGroup} ${formState.errors.password ? LoginPageStyle.hasError : ''}`}>
+              <label htmlFor="password">Password</label>
               <input
                 id="password"
                 type="password"
-                placeholder="Password"
+                placeholder="Create a strong password"
                 {...register("password")}
                 className={LoginPageStyle.inputField}
               />
+              {watchedPassword && (
+                <div style={{
+                  marginTop: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px'
+                }}>
+                  <div style={{
+                    flex: 1,
+                    height: '4px',
+                    background: '#e2e8f0',
+                    borderRadius: '2px',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{
+                      width: `${(passwordStrength.strength / 5) * 100}%`,
+                      height: '100%',
+                      background: passwordStrength.color,
+                      transition: 'all 0.3s ease',
+                      borderRadius: '2px'
+                    }}></div>
+                  </div>
+                  <span style={{
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    color: passwordStrength.color
+                  }}>
+                    {passwordStrength.label}
+                  </span>
+                </div>
+              )}
+              {formState.errors.password && (
+                <div className={LoginPageStyle.error}>
+                  {formState.errors.password.message}
+                </div>
+              )}
             </div>
-            <button type="submit" className={LoginPageStyle.Button} disabled={isLoading}>
-              {isLoading ? "Creating Account..." : "SignUp"}
+
+            <button 
+              type="submit" 
+              className={`${LoginPageStyle.Button} ${isLoading ? LoginPageStyle.loading : ''}`} 
+              disabled={isLoading}
+            >
+              {isLoading ? "Creating Account..." : "Create Account"}
             </button>
           </form>
         )}
         
         {!showSuccess && (
           <div onClick={() => navigate("/login")} className={LoginPageStyle.herf}>
-            Login
+            Already have an account? Sign In
           </div>
         )}
       </div>

@@ -120,66 +120,13 @@ const LoginPage: FC<LoginPageProps> = ({
 
   return (
     <div className={LoginPageStyle.Container}>
-      {/* Logout message displayed at the top of login page */}
+      {/* Enhanced Logout message */}
       {showLogoutMessage && (
-        <div style={{
-          position: 'fixed',
-          top: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          backgroundColor: '#ff6b6b',
-          color: 'white',
-          padding: '15px 25px',
-          borderRadius: '8px',
-          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
-          zIndex: 10001,
-          textAlign: 'center',
-          fontSize: '16px',
-          fontWeight: 'bold',
-          animation: 'slideInFromTop 0.3s ease-out',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '15px',
-          maxWidth: '90vw'
-        }}>
-          <style>
-            {`
-              @keyframes slideInFromTop {
-                0% { 
-                  transform: translateX(-50%) translateY(-100%);
-                  opacity: 0;
-                }
-                100% { 
-                  transform: translateX(-50%) translateY(0);
-                  opacity: 1;
-                }
-              }
-            `}
-          </style>
+        <div className={LoginPageStyle.logoutMessage}>
           <span>🔒 You have been signed out due to inactivity</span>
           <button
             onClick={onDismissLogoutMessage}
-            style={{
-              background: 'rgba(255, 255, 255, 0.2)',
-              border: 'none',
-              color: 'white',
-              borderRadius: '50%',
-              width: '24px',
-              height: '24px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '14px',
-              fontWeight: 'bold',
-              transition: 'background-color 0.2s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-            }}
+            className={LoginPageStyle.dismissBtn}
             title="Dismiss"
           >
             ×
@@ -189,83 +136,76 @@ const LoginPage: FC<LoginPageProps> = ({
 
       <div className={LoginPageStyle.Box}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <h2>Login</h2>
+          <h2>Welcome Back</h2>
 
           {/* Display general login error */}
           {loginError && (
-            <div className="alert alert-danger" style={{
-              backgroundColor: '#f8d7da',
-              color: '#721c24',
-              padding: '10px',
-              borderRadius: '5px',
-              marginBottom: '15px',
-              border: '1px solid #f5c6cb'
-            }}>
-              {loginError}
+            <div className={LoginPageStyle.alertError}>
+              <strong>⚠️ Login Failed:</strong> {loginError}
             </div>
           )}
 
           {/* Display Google login error */}
           {googleError && (
-            <div className="alert alert-danger" style={{
-              backgroundColor: '#f8d7da',
-              color: '#721c24',
-              padding: '10px',
-              borderRadius: '5px',
-              marginBottom: '15px',
-              border: '1px solid #f5c6cb'
-            }}>
-              {googleError}
+            <div className={LoginPageStyle.alertError}>
+              <strong>⚠️ Google Login Failed:</strong> {googleError}
             </div>
           )}
 
-          <div className={LoginPageStyle.error}>
-            {formState.errors.emailOrusername && (
-              <div className="text-danger">{formState.errors.emailOrusername.message}</div>
-            )}
-          </div>
-          <div className={LoginPageStyle.formGroup}>
-            <label>Email:</label>
+          <div className={`${LoginPageStyle.formGroup} ${formState.errors.emailOrusername ? LoginPageStyle.hasError : ''}`}>
+            <label htmlFor="emailOrusername">Email or Username</label>
             <input
               id="emailOrusername"
               type="text"
-              placeholder="email / username"
+              placeholder="Enter your email or username"
               {...register("emailOrusername")}
               className={LoginPageStyle.inputField}
             />
+            {formState.errors.emailOrusername && (
+              <div className={LoginPageStyle.error}>
+                {formState.errors.emailOrusername.message}
+              </div>
+            )}
           </div>
-          <div className={LoginPageStyle.error}>
-            {formState.errors.password && <div className="text-danger">{formState.errors.password.message}</div>}
-          </div>
-          <div className={LoginPageStyle.formGroup}>
-            <label>Password:</label>
+
+          <div className={`${LoginPageStyle.formGroup} ${formState.errors.password ? LoginPageStyle.hasError : ''}`}>
+            <label htmlFor="password">Password</label>
             <input
               id="password"
               type="password"
-              placeholder="Password"
+              placeholder="Enter your password"
               {...register("password")}
               className={LoginPageStyle.inputField}
             />
+            {formState.errors.password && (
+              <div className={LoginPageStyle.error}>
+                {formState.errors.password.message}
+              </div>
+            )}
           </div>
-          <button type="submit" className={LoginPageStyle.Button} disabled={isLoading}>
-            {isLoading ? "Logging in..." : "Login"}
+
+          <button 
+            type="submit" 
+            className={`${LoginPageStyle.Button} ${isLoading ? LoginPageStyle.loading : ''}`} 
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing In..." : "Sign In"}
           </button>
-          <div style={{
-            width: '100%',
-            margin: '10px 0',
-            display: 'flex',
-            justifyContent: 'center'
-          }}>
+
+          <div className={LoginPageStyle.googleLoginWrapper}>
             <GoogleLogin
               onSuccess={googleResponseMessage}
               onError={googleErrorMessage}
-              width="350px" // Set this to match your form width
+              width="100%"
               size="large"
+              shape="rectangular"
+              theme="outline"
             />
           </div>
         </form>
+        
         <div onClick={() => navigate("/SignUp")} className={LoginPageStyle.herf}>
-          SignUp
+          Don't have an account? Sign Up
         </div>
       </div>
     </div>
