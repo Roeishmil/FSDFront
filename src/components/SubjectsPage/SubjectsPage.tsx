@@ -72,14 +72,15 @@ const SubjectsPage: FC = () => {
     setIsEditMode(false);
     setCurrentSubject(null);
     setIsModalOpen(true);
-    reset();
+    // Reset form with empty values to clear any previous data
+    reset({ title: "", description: "" });
   };
 
   const handleEdit = (subject: Subject) => {
     setIsEditMode(true);
     setCurrentSubject(subject);
     setIsModalOpen(true);
-    reset({ title: subject.title, description: subject.description });
+    reset({ title: subject.title, description: subject.description || "" });
   };
 
   const handleDelete = async (id: string) => {
@@ -96,6 +97,14 @@ const SubjectsPage: FC = () => {
     setViewingContent(subject);
   };
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    // Clear form state when closing modal
+    reset({ title: "", description: "" });
+    setCurrentSubject(null);
+    setIsEditMode(false);
+  };
+
   const onSubmit = async (data: FormData) => {
     try {
       if (isEditMode && currentSubject) {
@@ -105,9 +114,8 @@ const SubjectsPage: FC = () => {
         const created = await subjectsApi.createSubject({ ...data, userId: user?._id });
         setSubjects((prev) => [...prev, created]);
       }
-      setIsModalOpen(false);
+      handleCloseModal();
       reloadSubject();
-      reset();
     } catch (err: any) {
       alert(err.message ?? "Save failed");
     }
@@ -197,7 +205,7 @@ const SubjectsPage: FC = () => {
         <div
           className={SubjectsPageStyle.modalOverlay}
           onClick={(e) => {
-            if (e.target === e.currentTarget) setIsModalOpen(false);
+            if (e.target === e.currentTarget) handleCloseModal();
           }}
         >
           <div className={SubjectsPageStyle.modalContentSubject}>
@@ -221,7 +229,7 @@ const SubjectsPage: FC = () => {
                 <button type="submit" className={SubjectsPageStyle.saveButton}>
                   Save
                 </button>
-                <button type="button" className={SubjectsPageStyle.cancelButton} onClick={() => setIsModalOpen(false)}>
+                <button type="button" className={SubjectsPageStyle.cancelButton} onClick={handleCloseModal}>
                   Cancel
                 </button>
               </div>
