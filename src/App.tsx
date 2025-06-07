@@ -27,14 +27,20 @@ function App() {
 
   useEffect(() => {
     setIsAuthenticated(!!user);
-  }, [user]);
+    
+    // Auto-dismiss logout message when user successfully logs in
+    if (user && showLogoutMessage) {
+      setShowLogoutMessage(false);
+      localStorage.removeItem('idleLogoutMessage');
+    }
+  }, [user, showLogoutMessage]);
 
   // Check for logout message flag on mount
   useEffect(() => {
     const logoutFlag = localStorage.getItem('idleLogoutMessage');
     if (logoutFlag === 'true') {
       setShowLogoutMessage(true);
-      // Don't remove the flag here - let user dismiss it manually
+      // Don't remove the flag here - let user dismiss it manually or auto-dismiss on login
     }
   }, []);
 
