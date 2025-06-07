@@ -12,7 +12,12 @@ h1 {
 }
 
 h2 {
-  font-size: 20px;
+  display: flex;
+  font-size: 21px;
+  justify-content: start;
+  background-color: #111827;
+  color: #111827;
+  -webkit-text-fill-color:#111827;
 }
 .deleteButton {
   background: #fee2e2;      /* red-100 */
