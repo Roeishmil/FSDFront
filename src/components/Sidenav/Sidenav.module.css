@@ -90,3 +90,37 @@
   background: rgba(220, 38, 38, 0.08);
   transform: translateY(-1px);
 }
+.generateGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.submenu {
+  padding-left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.2rem;
+}
+
+.sublink {
+  font-size: 0.875rem;
+  color: #444;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.sublink:hover {
+  background-color: #f0f0f0;
+}
+
+.subactive {
+  background-color: #e0e7ff;
+  color: #3730a3;
+  font-weight: 500;
+}

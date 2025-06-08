@@ -1,17 +1,6 @@
 import { FC } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import {
-  Home,
-  FileText,
-  Book,
-  User,
-  Bell,
-  LogOut,
-  Share2,
-  MenuSquare,
-  SquarePen,
-   TextSelect
-} from "lucide-react";
+import { FileText, Book, User, Bell, LogOut, Share2, SquarePen, TextSelect } from "lucide-react";
 import styles from "./Sidenav.module.css";
 import useUser from "../../hooks/useUser";
 import Logo from "../../assets/Logo.png";
@@ -27,6 +16,8 @@ const Sidenav: FC = () => {
     setUser(undefined);
     navigate("/login");
   };
+
+  const isGenerateSection = pathname.startsWith("/generate");
 
   return (
     <aside className={styles.sidebar}>
@@ -50,35 +41,51 @@ const Sidenav: FC = () => {
           <User size={18} />
           Profile
         </Link>
+
         <Link to="/" className={`${styles.link} ${pathname === "/" ? styles.active : ""}`}>
           <Book size={18} />
           Subjects
         </Link>
-        <Link to="/generate" className={`${styles.link} ${pathname.endsWith("/generate") ? styles.active : ""}`}>
-          <FileText size={18} />
-          Generated&nbsp;Content
-        </Link>
-        <Link to="/generate-test" className={`${styles.link} ${pathname.startsWith("/generate-test") ? styles.active : ""}`}>
-          <SquarePen size={16} />
-          Create Test
-        </Link>
-        <Link to="/generate-summary" className={`${styles.link} ${pathname.startsWith("/generate-summary") ? styles.active : ""}`}>
-          <TextSelect size={16} />
-          Create Summary
-        </Link>
+
+        {/* ─── Generated Content with Submenu ─── */}
+        <div className={styles.generateGroup}>
+          <Link to="/generate" className={`${styles.link} ${isGenerateSection ? styles.active : ""}`}>
+            <FileText size={18} />
+            Generated&nbsp;Content
+          </Link>
+
+          {isGenerateSection && (
+            <div className={styles.submenu}>
+              <Link
+                to="/generate-test"
+                className={`${styles.sublink} ${pathname.startsWith("/generate-test") ? styles.subactive : ""}`}
+              >
+                <SquarePen size={16} />
+                Create Test
+              </Link>
+              <Link
+                to="/generate-summary"
+                className={`${styles.sublink} ${pathname.startsWith("/generate-summary") ? styles.subactive : ""}`}
+              >
+                <TextSelect size={16} />
+                Create Summary
+              </Link>
+            </div>
+          )}
+        </div>
+
         <Link
           to="/shared-content"
-          className={`${styles.link} ${
-            pathname.startsWith("/shared-content") ? styles.active : ""
-          }`}
+          className={`${styles.link} ${pathname.startsWith("/shared-content") ? styles.active : ""}`}
         >
           <Share2 size={18} />
           Shared Content
         </Link>
+
         <Link
           to="/notifications"
-          className={`${styles.link} ${
-            pathname.startsWith("/notifications") ? styles.active : "" }`} >
+          className={`${styles.link} ${pathname.startsWith("/notifications") ? styles.active : ""}`}
+        >
           <Bell size={18} />
           Notifications
         </Link>
