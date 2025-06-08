@@ -27,18 +27,18 @@ function App() {
 
   useEffect(() => {
     setIsAuthenticated(!!user);
-    
+
     // Auto-dismiss logout message when user successfully logs in
     if (user && showLogoutMessage) {
       setShowLogoutMessage(false);
-      localStorage.removeItem('idleLogoutMessage');
+      localStorage.removeItem("idleLogoutMessage");
     }
   }, [user, showLogoutMessage]);
 
   // Check for logout message flag on mount
   useEffect(() => {
-    const logoutFlag = localStorage.getItem('idleLogoutMessage');
-    if (logoutFlag === 'true') {
+    const logoutFlag = localStorage.getItem("idleLogoutMessage");
+    if (logoutFlag === "true") {
       setShowLogoutMessage(true);
       // Don't remove the flag here - let user dismiss it manually or auto-dismiss on login
     }
@@ -47,25 +47,28 @@ function App() {
   // Handle idle logout callback
   const handleIdleLogout = () => {
     // Set flag in localStorage so it persists across re-renders
-    localStorage.setItem('idleLogoutMessage', 'true');
+    localStorage.setItem("idleLogoutMessage", "true");
     setShowLogoutMessage(true);
   };
 
   // Handle dismissing the logout message
   const dismissLogoutMessage = () => {
     setShowLogoutMessage(false);
-    localStorage.removeItem('idleLogoutMessage');
+    localStorage.removeItem("idleLogoutMessage");
   };
 
   // Show loading state while checking authentication
   if (isLoading) {
     return (
-      <div className={AppStyle.container} style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh' 
-      }}>
+      <div
+        className={AppStyle.container}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
         <div>Loading...</div>
       </div>
     );
@@ -76,26 +79,28 @@ function App() {
       <div className={AppStyle.container}>
         {/* Logout Notification - Persists across authentication states */}
         {showLogoutMessage && (
-          <div style={{
-            position: 'fixed',
-            top: '20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            backgroundColor: '#ff6b6b',
-            color: 'white',
-            padding: '15px 25px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
-            zIndex: 10001,
-            textAlign: 'center',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            animation: 'slideInFromTop 0.3s ease-out',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '15px',
-            maxWidth: '90vw'
-          }}>
+          <div
+            style={{
+              position: "fixed",
+              top: "20px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              backgroundColor: "#ff6b6b",
+              color: "white",
+              padding: "15px 25px",
+              borderRadius: "8px",
+              boxShadow: "0 4px 15px rgba(0, 0, 0, 0.2)",
+              zIndex: 10001,
+              textAlign: "center",
+              fontSize: "16px",
+              fontWeight: "bold",
+              animation: "slideInFromTop 0.3s ease-out",
+              display: "flex",
+              alignItems: "center",
+              gap: "15px",
+              maxWidth: "90vw",
+            }}
+          >
             <style>
               {`
                 @keyframes slideInFromTop {
@@ -114,25 +119,25 @@ function App() {
             <button
               onClick={dismissLogoutMessage}
               style={{
-                background: 'rgba(255, 255, 255, 0.2)',
-                border: 'none',
-                color: 'white',
-                borderRadius: '50%',
-                width: '24px',
-                height: '24px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '14px',
-                fontWeight: 'bold',
-                transition: 'background-color 0.2s ease'
+                background: "rgba(255, 255, 255, 0.2)",
+                border: "none",
+                color: "white",
+                borderRadius: "50%",
+                width: "24px",
+                height: "24px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "14px",
+                fontWeight: "bold",
+                transition: "background-color 0.2s ease",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.3)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
               }}
               title="Dismiss"
             >
@@ -142,12 +147,7 @@ function App() {
         )}
 
         {isAuthenticated ? (
-          <IdleTimeoutProvider 
-            timeoutMinutes={2} 
-            showWarning={true} 
-            warningMinutes={0.5}
-            onIdle={handleIdleLogout}
-          >
+          <IdleTimeoutProvider timeoutMinutes={2} showWarning={true} warningMinutes={0.5} onIdle={handleIdleLogout}>
             <div className={AppStyle.sidenav}>
               <Sidenav />
             </div>
@@ -156,6 +156,7 @@ function App() {
                 <Route path="/profile" element={<UserProfile />} />
                 <Route path="/study" element={<StudyMetatrails />} />
                 <Route path="/generate" element={<Generate />} />
+                <Route path="/generated-content" element={<Generate />} />
                 <Route path="/shared-content" element={<SharedContent />} />
                 <Route path="/generate-test" element={<GenerateExam />} />
                 <Route path="/generate-summary" element={<GenerateSummary />} />
@@ -170,13 +171,17 @@ function App() {
         ) : (
           <div className={AppStyle.unauthenticatedMain}>
             <Routes>
-              <Route 
-                path="/" 
-                element={<LoginPage showLogoutMessage={showLogoutMessage} onDismissLogoutMessage={dismissLogoutMessage} />} 
+              <Route
+                path="/"
+                element={
+                  <LoginPage showLogoutMessage={showLogoutMessage} onDismissLogoutMessage={dismissLogoutMessage} />
+                }
               />
-              <Route 
-                path="/login" 
-                element={<LoginPage showLogoutMessage={showLogoutMessage} onDismissLogoutMessage={dismissLogoutMessage} />} 
+              <Route
+                path="/login"
+                element={
+                  <LoginPage showLogoutMessage={showLogoutMessage} onDismissLogoutMessage={dismissLogoutMessage} />
+                }
               />
               <Route path="/SignUp" element={<SignUpPage />} />
             </Routes>
