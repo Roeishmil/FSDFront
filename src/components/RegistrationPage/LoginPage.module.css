@@ -1,555 +1,99 @@
-/* Global reset for full screen background */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* ─────────  GLOBAL RESET  ───────── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html,body{height:100%;width:100%;font-family:"Inter",system-ui,sans-serif}
+
+/* ─────────  OUTER WRAPPER  ───────── */
+.Container{
+  display:flex;justify-content:center;align-items:center;
+  min-height:100vh;padding:20px;background:#f9fafb;overflow:auto;position:relative;
+}
+/* subtle grain */
+.Container::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="g" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(102,126,234,.03)"/><circle cx="75" cy="75" r="1.5" fill="rgba(102,126,234,.02)"/></pattern></defs><rect width="100" height="100" fill="url(%23g)"/></svg>');
 }
 
-html, body {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
+/* ─────────  CARD  ───────── */
+.Box{
+  position:relative;width:100%;max-width:440px;
+  background:rgba(250,250,255,.86);backdrop-filter:blur(20px);
+  padding:32px 36px 40px;border-radius:18px;border:1px solid rgba(102,126,234,.12);
+  box-shadow:0 22px 50px rgba(102,126,234,.06),0 0 0 1px rgba(102,126,234,.08);
+  animation:slideUp .6s ease-out;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+
+/* top accent line */
+.Box::before{
+  content:"";position:absolute;inset:0 0 auto 0;height:3px;border-radius:18px 18px 0 0;
+  background:linear-gradient(90deg,#3b82f6 0%,#6366f1 45%,#c084fc 75%,#f87171 100%);
+  z-index:-1;          /* ⬅ ensures it’s behind the heading */
 }
 
-/* Enhanced Login/Signup Page Styles */
-.Container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  width: 100vw;
-  background: #ffffff;
-  padding: 20px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow: auto;
+/* ─────────  HEADINGS  ───────── */
+h2{
+  font-size:26px;font-weight:700;text-align:center;margin:2px 0 24px;
+  background:linear-gradient(90deg,#4f46e5 0%,#8b5cf6 40%,#ec4899 70%,#fb7185 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
 }
 
-.Container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(102,126,234,0.02)"/><circle cx="75" cy="75" r="1.5" fill="rgba(102,126,234,0.015)"/><circle cx="50" cy="10" r="0.5" fill="rgba(102,126,234,0.01)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-  pointer-events: none;
+/* ─────────  FORM FIELDS  ───────── */
+.formGroup{margin-bottom:16px}
+.formGroup label{
+  display:block;margin-bottom:6px;font-size:13px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.3px;color:#475569
 }
+.inputField{
+  width:100%;padding:13px 18px;font-size:15px;border:2px solid #e2e8f0;border-radius:10px;
+  background:rgba(255,255,255,.9);transition:border-color .25s,box-shadow .25s
+}
+.inputField:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.18);background:#fff}
+.formGroup.hasError .inputField{border-color:#e53e3e;box-shadow:0 0 0 3px rgba(229,62,62,.18)}
 
-.Box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: rgba(248, 247, 255, 0.8);
-  backdrop-filter: blur(20px);
-  padding: 40px;
-  border-radius: 20px;
-  box-shadow: 
-    0 25px 50px rgba(102, 126, 234, 0.08),
-    0 0 0 1px rgba(102, 126, 234, 0.1);
-  width: 100%;
-  max-width: 480px;
-  position: relative;
-  border: 1px solid rgba(102, 126, 234, 0.1);
-  animation: slideUp 0.6s ease-out;
+/* error message */
+.error{
+  margin-top:4px;padding:6px 10px;font-size:12.5px;font-weight:500;line-height:1.35;
+  color:#e53e3e;background:rgba(229,62,62,.08);border:1px solid rgba(229,62,62,.16);border-radius:6px
 }
+.fieldGap{height:10px}
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* ─────────  BUTTON  ───────── */
+.Button{
+  width:100%;padding:15px;margin:14px 0 18px;font-size:15.5px;font-weight:600;
+  border:none;border-radius:10px;color:#fff;cursor:pointer;
+  background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#ec4899 100%);
+  transition:opacity .2s,transform .2s;position:relative
 }
+.Button:disabled{opacity:.6;cursor:not-allowed}
+.Button:hover:not(:disabled){opacity:.9;transform:translateY(-1px)}
+.Button.loading::after{
+  content:"";position:absolute;inset:0;width:18px;height:18px;margin:auto;
+  border:2px solid transparent;border-top:2px solid #fff;border-radius:50%;animation:spin 1s linear infinite
+}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-.Box::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
-  border-radius: 20px 20px 0 0;
+/* ─────────  SWITCH LINK  ───────── */
+.herf{
+  margin-top:6px;text-align:center;font-size:14px;color:#4f46e5;cursor:pointer;user-select:none
 }
+.herf:hover{text-decoration:underline}
 
-h2 {
-  margin-bottom: 30px;
-  color: #2d3748;
-  font-size: 28px;
-  font-weight: 700;
-  text-align: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+/* ─────────  GOOGLE  ───────── */
+.googleLoginWrapper>div{width:100%!important}
 
-.formGroup {
-  position: relative;
-  width: 100%;
-  margin-bottom: 24px; /* Reduced from 30px for better spacing */
-}
+/* alerts (unchanged) */
+.alertError,.alertSuccess{font-size:14px;padding:10px 14px;margin-bottom:16px;border-radius:8px}
+.alertError{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca}
+.alertSuccess{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}
+.successTitle{margin:0 0 6px;font-size:22px}
 
-.formGroup label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: #4a5568;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.inputField {
-  width: 100%;
-  padding: 16px 20px;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  font-size: 16px;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.8);
-  box-sizing: border-box;
-}
-
-.inputField:focus {
-  outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-  background: rgba(255, 255, 255, 1);
-  transform: translateY(-2px);
-}
-
-.inputField::placeholder {
-  color: #a0aec0;
-  font-style: italic;
-}
-
-.Button {
-  width: 100%;
-  padding: 18px;
-  margin: 20px 0 15px 0; /* Reduced top margin */
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.Button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s ease;
-}
-
-.Button:hover::before {
-  left: 100%;
-}
-
-.Button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-}
-
-.Button:active {
-  transform: translateY(0);
-}
-
-.Button:disabled {
-  background: #cbd5e0;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.Button:disabled::before {
-  display: none;
-}
-
-.herf {
-  color: #667eea;
-  margin-top: 25px; /* Reduced from 30px */
-  text-decoration: none;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 15px 24px;
-  border-radius: 10px;
-  transition: all 0.3s ease;
-  position: relative;
-  text-align: center;
-}
-
-.herf:hover {
-  background: rgba(102, 126, 234, 0.1);
-  transform: translateY(-1px);
-}
-
-/* Improved error message positioning */
-.error {
-  position: absolute;
-  right: 0;
-  top: -22px; /* Reduced from -30px to bring closer to input */
-  color: #e53e3e;
-  font-size: 13px;
-  font-weight: 500;
-  background: rgba(229, 62, 62, 0.1);
-  padding: 6px 12px; /* Reduced padding for more compact look */
-  border-radius: 8px;
-  border: 1px solid rgba(229, 62, 62, 0.2);
-  z-index: 10;
-  white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(229, 62, 62, 0.1);
-  max-width: calc(100% - 20px); /* Ensure it doesn't overflow */
-}
-
-.alertError {
-  background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
-  color: #742a2a;
-  padding: 18px;
-  border-radius: 12px;
-  margin-bottom: 25px;
-  border: 1px solid #fed7d7;
-  font-weight: 500;
-  position: relative;
-  animation: shake 0.5s ease-in-out;
-  line-height: 1.5;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
-}
-
-.alertSuccess {
-  background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
-  color: #22543d;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  border: 1px solid #c6f6d5;
-  text-align: center;
-  animation: fadeInScale 0.5s ease-out;
-}
-
-@keyframes fadeInScale {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.successTitle {
-  color: #22543d !important;
-  margin-bottom: 15px !important;
-  font-size: 24px !important;
-}
-
-/* Improved Google Login Button Styling */
-.googleLoginWrapper {
-  width: 100%;
-  margin: 30px 0 25px 0; /* Increased top margin to separate from OR divider */
-  display: flex;
-  justify-content: center;
-  position: relative;
-}
-
-.googleLoginWrapper::before {
-  content: 'OR';
-  position: absolute;
-  top: -25px; /* Moved further up to avoid overlap */
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(248, 247, 255, 0.9);
-  padding: 0 20px;
-  color: #718096;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  z-index: 2;
-}
-
-.googleLoginWrapper::after {
-  content: '';
-  position: absolute;
-  top: -19px; /* Adjusted to align with OR text */
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
-  z-index: 1;
-}
-
-/* Style the Google Login button container to match other buttons */
-.googleLoginWrapper > div {
-  width: 100% !important;
-  display: flex !important;
-  justify-content: center !important;
-}
-
-/* Override Google button styles for consistency */
-.googleLoginWrapper iframe {
-  width: 100% !important;
-  max-width: 100% !important;
-  height: 56px !important; /* Match button height */
-  border-radius: 12px !important;
-}
-
-/* Custom Google button wrapper for better control */
-.googleLoginWrapper .google-signin-button {
-  width: 100%;
-  height: 56px;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.googleLoginWrapper .google-signin-button:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  transform: translateY(-1px);
-}
-
-.logoutMessage {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-  color: white;
-  padding: 16px 24px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
-  z-index: 10001;
-  text-align: center;
-  font-size: 16px;
-  font-weight: 600;
-  animation: slideInFromTop 0.5s ease-out;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  max-width: 90vw;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.logoutMessage .dismissBtn {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  color: white;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: bold;
-  transition: all 0.2s ease;
-}
-
-.logoutMessage .dismissBtn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.1);
-}
-
-@keyframes slideInFromTop {
-  0% { 
-    transform: translateX(-50%) translateY(-100%);
-    opacity: 0;
-  }
-  100% { 
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-  }
-}
-
-/* Loading state styles */
-.Button.loading {
-  position: relative;
-}
-
-.Button.loading::after {
-  content: '';
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  top: 50%;
-  left: 50%;
-  margin-left: -10px;
-  margin-top: -10px;
-  border: 2px solid transparent;
-  border-top: 2px solid rgba(255, 255, 255, 0.8);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Add spacing utility classes */
-.spacingTop {
-  margin-top: 20px;
-}
-
-.spacingBottom {
-  margin-bottom: 20px;
-}
-
-/* Improved form error message spacing */
-.formGroup.hasError {
-  margin-bottom: 30px; /* Reduced from 35px */
-}
-
-.formGroup.hasError .inputField {
-  border-color: #e53e3e;
-  box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.1);
-}
-
-.formGroup.hasError .inputField:focus {
-  border-color: #e53e3e;
-  box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.2);
-}
-
-/* Password strength indicator spacing */
-.passwordStrengthIndicator {
-  margin-top: 10px;
-  margin-bottom: 5px;
-}
-
-/* Mobile responsive improvements */
-@media (max-width: 768px) {
-  .Container {
-    padding: 16px;
-  }
-  
-  .Box {
-    padding: 30px 20px;
-    margin: 20px 0;
-  }
-  
-  h2 {
-    font-size: 24px;
-    margin-bottom: 25px;
-  }
-  
-  .inputField {
-    padding: 14px 16px;
-  }
-  
-  .Button {
-    padding: 14px;
-    font-size: 15px;
-  }
-  
-  .formGroup {
-    margin-bottom: 20px;
-  }
-  
-  .formGroup.hasError {
-    margin-bottom: 30px;
-  }
-  
-  .error {
-    position: static; /* Stack on mobile for better readability */
-    margin-top: 8px;
-    margin-bottom: 0;
-    max-width: 100%;
-    right: auto;
-    top: auto;
-  }
-  
-  .googleLoginWrapper {
-    margin: 25px 0 20px 0;
-  }
-  
-  .googleLoginWrapper iframe {
-    height: 48px !important; /* Slightly smaller on mobile */
-  }
-}
-
-/* Tablet responsive improvements */
-@media (max-width: 1024px) and (min-width: 769px) {
-  .Box {
-    max-width: 420px;
-    padding: 35px;
-  }
-}
-
-/* Focus styles for accessibility */
-.Button:focus-visible,
-.herf:focus-visible {
-  outline: 2px solid #667eea;
-  outline-offset: 2px;
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .Container {
-    background: #000;
-  }
-  
-  .Box {
-    background: #fff;
-    border: 2px solid #000;
-  }
-  
-  .Button {
-    background: #000;
-    border: 2px solid #000;
-  }
-  
-  .error {
-    background: #fff;
-    border: 2px solid #e53e3e;
-  }
-}
-
-/* Smooth transitions for better UX */
-.formGroup {
-  transition: margin-bottom 0.3s ease;
-}
-
-.googleLoginWrapper {
-  transition: margin 0.3s ease;
-}
-
-/* Improved visual hierarchy */
-.Box form {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-/* Better button alignment */
-.Button,
-.googleLoginWrapper,
-.herf {
-  align-self: stretch;
-}
+/* ─────────  PASSWORD STRENGTH  ───────── */
+.passwordRules{margin:8px 0 6px}
+.rule{font-size:12px;display:flex;gap:6px;align-items:center;color:#64748b}
+.rule.pass{color:#16a34a}
+.barWrap{height:5px;width:100%;background:#e2e8f0;border-radius:3px;overflow:hidden;margin-top:6px}
+.barFill{height:100%;width:0;background:#e53e3e;transition:width .3s,background .3s}
+.barFill.fair{background:#f97316}
+.barFill.good{background:#38a169}
+.barFill.strong{background:#22543d}
+.strengthLabel{font-size:12px;font-weight:600;margin-top:3px;text-align:right;color:#475569}

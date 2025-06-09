@@ -7,12 +7,21 @@ import { useLocation } from "react-router-dom";
 
 /* ─── loader ─── */
 const Loader: React.FC<{ msg: string }> = ({ msg }) => (
-  <div style={{ padding: "48px 0", textAlign: "center" }}>
+  <div
+    style={{
+      minHeight: "70vh",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      textAlign: "center",
+    }}
+  >
     <div
       style={{
-        width: 42,
-        height: 42,
-        margin: "0 auto 18px",
+        width: 48,
+        height: 48,
+        marginBottom: 18,
         border: "4px solid #e2e8f0",
         borderTop: "4px solid #0ea5e9",
         borderRadius: "50%",
@@ -30,7 +39,7 @@ const ContentMetadata: React.FC<{
   initialTitle: string;
   perSubject?: string;
   onClose: () => void;
-}> = ({ contentId, initialTitle,perSubject, onClose }) => {
+}> = ({ contentId, initialTitle, perSubject, onClose }) => {
   const [title, setTitle] = useState(initialTitle);
   const [subject, setSubject] = useState(perSubject || "");
   const { subjects } = useSubject();
@@ -61,23 +70,34 @@ const ContentMetadata: React.FC<{
         {error && <p style={{ color: "#b91c1c" }}>{error}</p>}
 
         <label className={styles.label}>Title</label>
-        <input className={styles.input} value={title} onChange={(e) => setTitle(e.target.value)} />
+        <input
+          className={styles.input}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
 
         <label className={styles.label} style={{ marginTop: 12 }}>
           Subject
         </label>
-        <select className={styles.input} value={subject} onChange={(e) => setSubject(e.target.value)}>
+        <select
+          className={styles.input}
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+        >
           <option value="">Select subject…</option>
-          {subjects &&
-            subjects.map((s: any) => (
-              <option key={s._id} value={s._id}>
-                {s.title}
-              </option>
-            ))}
+          {subjects?.map((s: any) => (
+            <option key={s._id} value={s._id}>
+              {s.title}
+            </option>
+          ))}
         </select>
 
         <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
-          <button onClick={onClose} className={styles.primaryButton} style={{ background: "#64748b", color: "#fff" }}>
+          <button
+            onClick={onClose}
+            className={styles.primaryButton}
+            style={{ background: "#64748b", color: "#fff" }}
+          >
             Cancel
           </button>
           <button onClick={save} disabled={busy} className={styles.primaryButton}>
@@ -118,10 +138,11 @@ const GenerateSummary: React.FC = () => {
   const handleLocalUpload = (e: React.ChangeEvent<HTMLInputElement>) =>
     setUploaded((p) => [...p, ...Array.from(e.target.files || [])]);
 
-  // FIXED: Changed to handle single file from Google Drive
-  const handleDriveUpload = (file: File) => setUploaded((p) => [...p, file]);
+  const handleDriveUpload = (files: File[]) =>
+    setUploaded((p) => [...p, ...files]);
 
-  const removeFile = (i: number) => setUploaded((p) => p.filter((_, idx) => idx !== i));
+  const removeFile = (i: number) =>
+    setUploaded((p) => p.filter((_, idx) => idx !== i));
 
   /* generate summary */
   const handleGenerate = async () => {
@@ -156,33 +177,52 @@ const GenerateSummary: React.FC = () => {
     }
   };
 
+  /* pick subject from URL (optional) */
   const location = useLocation();
-
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const id = params.get("id");
-    const type = params.get("subjectTitle");
-
     setSubject(id || "");
   }, [location.search]);
 
-  /* write HTML into sandboxed <iframe> */
+  /* write HTML + dynamic height */
   useEffect(() => {
-    if (iframeRef.current && htmlContent) {
-      const doc = iframeRef.current.contentDocument;
-      if (doc) {
-        doc.open();
-        doc.write(htmlContent);
-        doc.close();
+    if (!iframeRef.current || !htmlContent) return;
 
-        // auto-height
-        setTimeout(() => {
-          if (iframeRef.current) {
-            iframeRef.current.style.height = doc.body.scrollHeight + 30 + "px";
-          }
-        }, 120);
-      }
-    }
+    const iframe = iframeRef.current;
+    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (!doc) return;
+
+    // Inject HTML
+    doc.open();
+    doc.write(htmlContent);
+    doc.close();
+
+    // Resize helper
+    const setHeight = () => {
+      if (!iframe || !doc) return;
+      const height = Math.max(
+        doc.body.scrollHeight,
+        doc.documentElement.scrollHeight
+      );
+      iframe.style.height = height + "px";
+    };
+
+    // Observe size changes inside iframe
+    const ro = new ResizeObserver(setHeight);
+    ro.observe(doc.documentElement);
+
+    // extra hooks for fonts / images / viewport changes
+    iframe.addEventListener("load", setHeight);
+    window.addEventListener("resize", setHeight);
+    setTimeout(setHeight, 250);
+
+    // clean-up
+    return () => {
+      ro.disconnect();
+      iframe.removeEventListener("load", setHeight);
+      window.removeEventListener("resize", setHeight);
+    };
   }, [htmlContent]);
 
   /* loaders */
@@ -205,17 +245,27 @@ const GenerateSummary: React.FC = () => {
           />
         )}
 
-        {error && <p style={{ color: "#b91c1c", margin: "12px 0" }}>{error}</p>}
+        {error && (
+          <p style={{ color: "#b91c1c", margin: "12px 0" }}>{error}</p>
+        )}
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
           {contentId && (
-            <button onClick={() => setShowMeta(true)} className={styles.primaryButton} style={{ width: 200, height: 40 }}>
+            <button
+              onClick={() => setShowMeta(true)}
+              className={styles.primaryButton}
+              style={{ width: 200, height: 40 }}
+            >
               {metaDone ? "Edit Summary Details" : "Set Summary Details"}
             </button>
           )}
         </div>
 
-        <iframe ref={iframeRef} title="generated-summary" style={{ width: "100%", border: "none" }} />
+        <iframe
+          ref={iframeRef}
+          title="generated-summary"
+          style={{ width: "100%", border: "none", overflow: "hidden" }}
+        />
       </>
     );
   }
@@ -228,9 +278,27 @@ const GenerateSummary: React.FC = () => {
         <div className={styles.headerIcon}>📝</div>
         <div>
           <h2 className={styles.pageTitle}>Generate New Summary</h2>
-          <p className={styles.pageSubtitle}>Upload material and get a polished summary</p>
+          <p className={styles.pageSubtitle}>
+            Upload material and get a polished summary
+          </p>
         </div>
       </div>
+
+      {error && (
+        <p
+          style={{
+            background: "#fee2e2",
+            color: "#b91c1c",
+            padding: "10px 14px",
+            borderLeft: "4px solid #dc2626",
+            borderRadius: "6px",
+            marginTop: 12,
+            fontWeight: 600,
+          }}
+        >
+          {error}
+        </p>
+      )}
 
       {/* form card */}
       <div className={styles.formCard}>
@@ -242,20 +310,21 @@ const GenerateSummary: React.FC = () => {
           placeholder="Add any specific requirements…"
         />
 
-        <>
-          <label className={styles.label} style={{ marginTop: 12 }}>
-            Subject
-          </label>
-          <select className={styles.input} value={subject} onChange={(e) => setSubject(e.target.value)}>
-            <option value="">Select subject…</option>
-            {subjects &&
-              subjects.map((s: any) => (
-                <option key={s._id} value={s._id}>
-                  {s.title}
-                </option>
-              ))}
-          </select>
-        </>
+        <label className={styles.label} style={{ marginTop: 12 }}>
+          Subject
+        </label>
+        <select
+          className={styles.input}
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+        >
+          <option value="">Select subject…</option>
+          {subjects?.map((s: any) => (
+            <option key={s._id} value={s._id}>
+              {s.title}
+            </option>
+          ))}
+        </select>
 
         <h3 className={styles.uploadSectionTitle}>Upload Files</h3>
 
@@ -265,14 +334,25 @@ const GenerateSummary: React.FC = () => {
             <p>
               <strong>Click to upload</strong>
             </p>
-            <p style={{ fontSize: 13, color: "#64748b" }}>Accepts PDF or TXT</p>
-            <input id="localFile" type="file" multiple onChange={handleLocalUpload} style={{ display: "none" }} />
+            <p style={{ fontSize: 13, color: "#64748b" }}>
+              Accepts PDF or TXT
+            </p>
+            <input
+              id="localFile"
+              type="file"
+              multiple
+              onChange={handleLocalUpload}
+              style={{ display: "none" }}
+            />
           </label>
 
           <span className={styles.orText}>or</span>
 
-          {/* FIXED: Changed prop name from onFilesSelected to onFileSelected */}
-          <GoogleDrivePicker className={styles.driveButton} onFileSelected={handleDriveUpload} ref={hiddenDrivePicker} />
+          <GoogleDrivePicker
+            className={styles.driveButton}
+            onFilesSelected={handleDriveUpload}
+            ref={hiddenDrivePicker}
+          />
         </div>
 
         {uploaded.length > 0 && (
@@ -280,16 +360,19 @@ const GenerateSummary: React.FC = () => {
             {uploaded.map((f, i) => (
               <li key={i} className={styles.fileItem}>
                 <span className={styles.fileName}>{f.name}</span>
-                <span className={styles.fileInfo}>{(f.size / 1024).toFixed(1)} KB</span>
-                <button className={styles.removeButton} onClick={() => removeFile(i)}>
+                <span className={styles.fileInfo}>
+                  {(f.size / 1024).toFixed(1)} KB
+                </span>
+                <button
+                  className={styles.removeButton}
+                  onClick={() => removeFile(i)}
+                >
                   Remove
                 </button>
               </li>
             ))}
           </ul>
         )}
-
-        {error && <p style={{ color: "#b91c1c", marginTop: 12, fontWeight: 500 }}>{error}</p>}
 
         <button onClick={handleGenerate} className={styles.primaryButton}>
           Generate Summary
