@@ -8,12 +8,21 @@ import { useLocation } from "react-router-dom";
 
 /* ─── loader ─── */
 const Loader: React.FC<{ msg: string }> = ({ msg }) => (
-  <div style={{ padding: "48px 0", textAlign: "center" }}>
+  <div
+    style={{
+      minHeight: "70vh",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      textAlign: "center",
+    }}
+  >
     <div
       style={{
-        width: 42,
-        height: 42,
-        margin: "0 auto 18px",
+        width: 48,
+        height: 48,
+        marginBottom: 18,
         border: "4px solid #e2e8f0",
         borderTop: "4px solid #0ea5e9",
         borderRadius: "50%",
@@ -62,25 +71,34 @@ const ContentMetadata: React.FC<{
         {error && <p style={{ color: "#b91c1c" }}>{error}</p>}
 
         <label className={styles.label}>Title</label>
-        <input className={styles.input} value={title} onChange={(e) => setTitle(e.target.value)} />
+        <input
+          className={styles.input}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
 
-        <>
-          <label className={styles.label} style={{ marginTop: 12 }}>
-            Subject
-          </label>
-          <select className={styles.input} value={subject} onChange={(e) => setSubject(e.target.value)}>
-            <option value="">Select subject…</option>
-            {subjects &&
-              subjects.map((s: any) => (
-                <option key={s._id} value={s._id}>
-                  {s.title}
-                </option>
-              ))}
-          </select>
-        </>
+        <label className={styles.label} style={{ marginTop: 12 }}>
+          Subject
+        </label>
+        <select
+          className={styles.input}
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+        >
+          <option value="">Select subject…</option>
+          {subjects?.map((s: any) => (
+            <option key={s._id} value={s._id}>
+              {s.title}
+            </option>
+          ))}
+        </select>
 
         <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
-          <button onClick={onClose} className={styles.primaryButton} style={{ background: "#64748b", color: "#fff" }}>
+          <button
+            onClick={onClose}
+            className={styles.primaryButton}
+            style={{ background: "#64748b", color: "#fff" }}
+          >
             Cancel
           </button>
           <button onClick={save} disabled={busy} className={styles.primaryButton}>
@@ -98,7 +116,9 @@ const GenerateExam: React.FC = () => {
   const [prompt, setPrompt] = useState("");
   const [numAmerican, setNumAmerican] = useState(8);
   const [numOpen, setNumOpen] = useState(3);
-  const [difficulty, setDifficulty] = useState<"Easy" | "Moderate" | "Hard">("Moderate");
+  const [difficulty, setDifficulty] = useState<
+    "Easy" | "Moderate" | "Hard"
+  >("Moderate");
   const [subject, setSubject] = useState("");
 
   /* uploads */
@@ -118,15 +138,16 @@ const GenerateExam: React.FC = () => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const hiddenDrivePicker = useRef<HTMLInputElement>(null);
   const { subjects } = useSubject();
-  
+
   /* upload helpers */
   const handleLocalUpload = (e: React.ChangeEvent<HTMLInputElement>) =>
     setUploaded((p) => [...p, ...Array.from(e.target.files || [])]);
 
-  // FIXED: Changed to handle single file from Google Drive
-  const handleDriveUpload = (file: File) => setUploaded((p) => [...p, file]);
+  const handleDriveUpload = (files: File[]) =>
+    setUploaded((p) => [...p, ...files]);
 
-  const removeFile = (i: number) => setUploaded((p) => p.filter((_, idx) => idx !== i));
+  const removeFile = (i: number) =>
+    setUploaded((p) => p.filter((_, idx) => idx !== i));
 
   /* generate exam */
   const handleGenerate = async () => {
@@ -164,37 +185,52 @@ const GenerateExam: React.FC = () => {
     }
   };
 
+  /* pick subject from URL (optional) */
   const location = useLocation();
-
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const id = params.get("id");
-
     setSubject(id || "");
-    console.log("Subject ID from URL:", id);
-  }, []);
+  }, [location.search]);
 
-  /* write HTML into sandboxed <iframe> */
+  /* write HTML + dynamic height */
   useEffect(() => {
-    if (iframeRef.current && htmlContent) {
-      const doc = iframeRef.current.contentDocument;
-      if (doc) {
-        doc.open();
-        doc.write(htmlContent);
-        doc.close();
+    if (!iframeRef.current || !htmlContent) return;
 
-        // auto-height after styles/scripts finish
-        setTimeout(() => {
-          const iframe = iframeRef.current;
-          const doc = iframe?.contentDocument;
-          const body = doc?.body;
+    const iframe = iframeRef.current;
+    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (!doc) return;
 
-          if (iframe && body) {
-            iframe.style.height = `${body.scrollHeight + 30}px`;
-          }
-        }, 120);
-      }
-    }
+    // Inject HTML
+    doc.open();
+    doc.write(htmlContent);
+    doc.close();
+
+    // Resize helper
+    const setHeight = () => {
+      if (!iframe || !doc) return;
+      const height = Math.max(
+        doc.body.scrollHeight,
+        doc.documentElement.scrollHeight
+      );
+      iframe.style.height = height + "px";
+    };
+
+    // Observe size changes inside iframe
+    const ro = new ResizeObserver(setHeight);
+    ro.observe(doc.documentElement);
+
+    // extra hooks for fonts / images / viewport changes
+    iframe.addEventListener("load", setHeight);
+    window.addEventListener("resize", setHeight);
+    setTimeout(setHeight, 250);
+
+    // clean-up
+    return () => {
+      ro.disconnect();
+      iframe.removeEventListener("load", setHeight);
+      window.removeEventListener("resize", setHeight);
+    };
   }, [htmlContent]);
 
   /* loaders */
@@ -217,17 +253,27 @@ const GenerateExam: React.FC = () => {
           />
         )}
 
-        {error && <p style={{ color: "#b91c1c", margin: "12px 0" }}>{error}</p>}
+        {error && (
+          <p style={{ color: "#b91c1c", margin: "12px 0" }}>{error}</p>
+        )}
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
           {contentId && (
-            <button onClick={() => setShowMeta(true)} className={styles.primaryButton} style={{ width: 200 }}>
+            <button
+              onClick={() => setShowMeta(true)}
+              className={styles.primaryButton}
+              style={{ width: 200 }}
+            >
               {metaDone ? "Edit Exam Details" : "Set Exam Details"}
             </button>
           )}
         </div>
 
-        <iframe ref={iframeRef} title="generated-exam" style={{ width: "100%", border: "none", marginTop: 20 }} />
+        <iframe
+          ref={iframeRef}
+          title="generated-exam"
+          style={{ width: "100%", border: "none", overflow: "hidden" }}
+        />
       </>
     );
   }
@@ -240,9 +286,27 @@ const GenerateExam: React.FC = () => {
         <div className={styles.headerIcon}>📝</div>
         <div>
           <h2 className={styles.pageTitle}>Generate New Exam</h2>
-          <p className={styles.pageSubtitle}>Upload material and create an exam in seconds</p>
+          <p className={styles.pageSubtitle}>
+            Upload material and create an exam in seconds
+          </p>
         </div>
       </div>
+
+      {error && (
+        <p
+          style={{
+            background: "#fee2e2",
+            color: "#b91c1c",
+            padding: "10px 14px",
+            borderLeft: "4px solid #dc2626",
+            borderRadius: "6px",
+            marginTop: 12,
+            fontWeight: 600,
+          }}
+        >
+          {error}
+        </p>
+      )}
 
       {/* form card */}
       <div className={styles.formCard}>
@@ -294,14 +358,17 @@ const GenerateExam: React.FC = () => {
         <label className={styles.label} style={{ marginTop: 12 }}>
           Subject
         </label>
-        <select className={styles.input} value={subject} onChange={(e) => setSubject(e.target.value)}>
+        <select
+          className={styles.input}
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+        >
           <option value="">Select subject…</option>
-          {subjects &&
-            subjects.map((s: any) => (
-              <option key={s._id} value={s._id}>
-                {s.title}
-              </option>
-            ))}
+          {subjects?.map((s: any) => (
+            <option key={s._id} value={s._id}>
+              {s.title}
+            </option>
+          ))}
         </select>
 
         {/* upload bloc */}
@@ -313,14 +380,25 @@ const GenerateExam: React.FC = () => {
             <p>
               <strong>Click to upload</strong>
             </p>
-            <p style={{ fontSize: 13, color: "#64748b" }}>PDF only, up to 10&nbsp;MB</p>
-            <input id="localFile" type="file" multiple onChange={handleLocalUpload} style={{ display: "none" }} />
+            <p style={{ fontSize: 13, color: "#64748b" }}>
+              PDF only, up to 10&nbsp;MB
+            </p>
+            <input
+              id="localFile"
+              type="file"
+              multiple
+              onChange={handleLocalUpload}
+              style={{ display: "none" }}
+            />
           </label>
 
           <span className={styles.orText}>or</span>
 
-          {/* FIXED: Changed prop name from onFilesSelected to onFileSelected */}
-          <GoogleDrivePicker className={styles.driveButton} onFileSelected={handleDriveUpload} ref={hiddenDrivePicker} />
+          <GoogleDrivePicker
+            className={styles.driveButton}
+            onFilesSelected={handleDriveUpload}
+            ref={hiddenDrivePicker}
+          />
         </div>
 
         {uploaded.length > 0 && (
@@ -328,16 +406,19 @@ const GenerateExam: React.FC = () => {
             {uploaded.map((f, i) => (
               <li key={i} className={styles.fileItem}>
                 <span className={styles.fileName}>{f.name}</span>
-                <span className={styles.fileInfo}>{(f.size / 1024).toFixed(1)} KB</span>
-                <button className={styles.removeButton} onClick={() => removeFile(i)}>
+                <span className={styles.fileInfo}>
+                  {(f.size / 1024).toFixed(1)} KB
+                </span>
+                <button
+                  className={styles.removeButton}
+                  onClick={() => removeFile(i)}
+                >
                   Remove
                 </button>
               </li>
             ))}
           </ul>
         )}
-
-        {error && <p style={{ color: "#b91c1c", marginTop: 12, fontWeight: 500 }}>{error}</p>}
 
         <button onClick={handleGenerate} className={styles.primaryButton}>
           Generate Exam
