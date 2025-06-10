@@ -34,12 +34,21 @@ const Loader: React.FC<{ msg: string }> = ({ msg }) => (
 );
 
 /* ─── metadata modal ─── */
-const ContentMetadata: React.FC<{
+interface ContentMetadataProps {
   contentId: string;
   initialTitle: string;
   perSubject?: string;
   onClose: () => void;
-}> = ({ contentId, initialTitle, perSubject, onClose }) => {
+  onSaved: () => void;            // NEW: callback on successful save
+}
+
+const ContentMetadata: React.FC<ContentMetadataProps> = ({
+  contentId,
+  initialTitle,
+  perSubject,
+  onClose,
+  onSaved,
+}) => {
   const [title, setTitle] = useState(initialTitle);
   const [subject, setSubject] = useState(perSubject || "");
   const { subjects } = useSubject();
@@ -54,6 +63,7 @@ const ContentMetadata: React.FC<{
     try {
       setBusy(true);
       await contentApi.updateContent(contentId, { title, subject });
+      onSaved();        // let parent know it succeeded
       onClose();
     } catch {
       setError("Failed to update summary details.");
@@ -127,6 +137,7 @@ const GenerateSummary: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [flash, setFlash] = useState<string | null>(null);  // NEW: flash message
 
   const [subject, setSubject] = useState("");
   const { subjects } = useSubject();
@@ -242,11 +253,31 @@ const GenerateSummary: React.FC = () => {
               setShowMeta(false);
               setMetaDone(true);
             }}
+            onSaved={() => {
+              setFlash("Summary saved successfully!");
+              setTimeout(() => setFlash(null), 3000);
+            }}
           />
         )}
 
         {error && (
           <p style={{ color: "#b91c1c", margin: "12px 0" }}>{error}</p>
+        )}
+
+        {flash && (
+          <p
+            style={{
+              background: "#dcfce7",
+              color: "#15803d",
+              padding: "10px 14px",
+              borderLeft: "4px solid #16a34a",
+              borderRadius: "6px",
+              margin: "12px 0",
+              fontWeight: 600,
+            }}
+          >
+            {flash}
+          </p>
         )}
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>

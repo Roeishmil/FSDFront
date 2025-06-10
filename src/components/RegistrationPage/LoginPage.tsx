@@ -90,18 +90,6 @@ const LoginPage: FC<Props> = ({
   /* ─────────────────────────── */
   return (
     <div className={style.Container}>
-      {showLogoutMessage && (
-        <div className={style.logoutMessage}>
-          <span>🔒 You have been signed out due to inactivity</span>
-          <button
-            onClick={onDismissLogoutMessage}
-            className={style.dismissBtn}
-            title="Dismiss"
-          >
-            ×
-          </button>
-        </div>
-      )}
 
       <div className={style.Box}>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>

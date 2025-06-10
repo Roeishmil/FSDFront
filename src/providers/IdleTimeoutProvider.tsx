@@ -20,7 +20,7 @@ interface IdleTimeoutProviderProps {
 
 export const IdleTimeoutProvider: React.FC<IdleTimeoutProviderProps> = ({
   children,
-  timeoutMinutes = 2,
+  timeoutMinutes = 20,
   showWarning = true,
   warningMinutes = 0.5,
   onIdle
