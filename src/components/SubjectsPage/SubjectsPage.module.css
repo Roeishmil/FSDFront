@@ -113,34 +113,12 @@
   padding: 0.5rem 0.65rem;
   border: none;
   border-radius: 0.5rem;
+  background-color: #eff6ff;
+  color: black;
   font-size: 0.85rem;
   cursor: pointer;
   transition: background 0.2s ease;
 }
-
-
-.viewButton {
-  background: #eff6ff;  /* blue-50 */
-  color: #1e40af;  /* blue-800 */
-}
-.viewButton:hover { background: #dbeafe;}
-
-
-
-.editButton {
-  background: #fef9c3;      /* yellow-100 */
-  color: #92400e;           /* amber-700 */
-}
-
-.editButton:hover { background: #fef08a; }
-
-
-/* delete – pastel red */
-.deleteButton {
-  background: #fee2e2;      /* red-100 */
-  color: #991b1b;           /* red-700 */
-}
-.deleteButton:hover { background: #fecaca; }
 
 
 

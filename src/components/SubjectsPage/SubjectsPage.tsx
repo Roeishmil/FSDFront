@@ -179,15 +179,15 @@ const SubjectsPage: FC = () => {
                   {/* actions */}
                   <div className={SubjectsPageStyle.actionRow}>
                     <button className={SubjectsPageStyle.viewButton} onClick={() => handleViewContent(subject)}>
-                      <Eye size={14} />
-                      View Content
+                      <Eye size={20} />
+                      Content
                     </button>
                     <button className={SubjectsPageStyle.editButton} onClick={() => handleEdit(subject)}>
-                      <Pencil size={14} />
+                      <Pencil size={20} />
                       Edit
                     </button>
                     <button className={SubjectsPageStyle.deleteButton} onClick={() => handleDelete(subject._id)}>
-                      <Trash2 size={14} />
+                      <Trash2 size={20} />
                       Delete
                     </button>
                   </div>
