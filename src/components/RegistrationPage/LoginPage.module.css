@@ -80,6 +80,11 @@ h2{
 
 /* ─────────  GOOGLE  ───────── */
 .googleLoginWrapper>div{width:100%!important}
+.googleLoginWrapper{
+  display: flex;
+  justify-content:center;
+  align-items:center;
+} 
 
 /* alerts (unchanged) */
 .alertError,.alertSuccess{font-size:14px;padding:10px 14px;margin-bottom:16px;border-radius:8px}
