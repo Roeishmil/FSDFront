@@ -4,7 +4,7 @@ import styles from "./GeneratedContent.module.css";
 import { contentApi } from "../../api";
 import ContentModal from "./ContentModal";
 import { ContentItem } from "./types";
-import { Eye, Pencil, Share2 } from "lucide-react";
+import { ArchiveRestore, Eye, Pencil, Share2, Trash2 } from "lucide-react";
 import EditContentModal from "./EditContentModal";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import RestoreConfirmationModal from "./RestoreConfirmationModal";
@@ -213,17 +213,21 @@ const GeneratedContent: React.FC = () => {
               <div className={styles.cardActionsEdit}>
                 <div className={styles.cardActions}>
                   <button className={styles.viewButton} onClick={() => setSelectedItem(c)}>
-                    <Eye size={20} /> Content
+                    <Eye size={18} /> Content
                   </button>
                   {viewMode === "active" && (
                     <button className={styles.editButtonEdit} onClick={() => setEditingItem(c)}>
-                      <Pencil size={20} /> Edit
+                      <Pencil size={18} /> Edit
                     </button>
                   )}
                   {viewMode === "active" ? (
-                    <button className={styles.deleteButton} onClick={() => handleDeleteClick(c)} disabled={deleting}>🗑 Delete</button>
+                    <button className={styles.deleteButton} onClick={() => handleDeleteClick(c)} disabled={deleting}>
+                      <Trash2 size={18} /> Delete
+                    </button>
                   ) : (
-                    <button className={styles.restoreButton} onClick={() => handleRestoreClick(c)} disabled={restoring}>🔄 Restore</button>
+                    <button className={styles.restoreButton} onClick={() => handleRestoreClick(c)} disabled={restoring}>
+                      <ArchiveRestore size={18} /> Restore
+                    </button>
                   )}
                 </div>
               </div>
