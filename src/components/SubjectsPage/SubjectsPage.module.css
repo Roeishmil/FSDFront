@@ -104,6 +104,10 @@
 /* actions */
 .actionRow {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.5px;
+  width: fit-content;
   gap: 0.5rem;
 }
 .viewButton,
@@ -113,35 +117,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.35rem;
+  gap: 0.2rem;
   padding: 0.5rem 0.65rem;
   border: none;
   border-radius: 0.5rem;
+  background-color: #eff6ff;
+  color: black;
   font-size: 0.85rem;
   cursor: pointer;
   transition: background 0.2s ease;
 }
-.viewButton {
-  background: #eff6ff;
-  color: #1e40af;
-}
-.viewButton:hover {
-  background: #dbeafe;
-}
-.editButton {
-  background: #fef9c3;
-  color: #92400e;
-}
-.editButton:hover {
-  background: #fef08a;
-}
-.deleteButton {
-  background: #fee2e2;
-  color: #991b1b;
-}
-.deleteButton:hover {
-  background: #fecaca;
-}
+
+
 
 /* ─────────  CONTENT VIEWER  ───────── */
 .contentViewerOverlay {

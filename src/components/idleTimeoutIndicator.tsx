@@ -9,7 +9,7 @@ interface IdleTimeoutIndicatorProps {
 
 const IdleTimeoutIndicator: React.FC<IdleTimeoutIndicatorProps> = ({
   showCountdown = true,
-  timeoutMinutes = 2,
+  timeoutMinutes = 2880,
   className = ''
 }) => {
   const { lastActivity } = useIdleTimeoutContext();
