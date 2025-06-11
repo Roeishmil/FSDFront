@@ -200,8 +200,8 @@ const GeneratedContent: React.FC = () => {
               <div className={styles.cardHeader}>
                 {c.copyContent && <Share2 size={18} className={styles.shareIcon} />}
                 <strong>{c.title}</strong>
-                <span>{c.date}</span>
               </div>
+               <span>{c.date}</span>
               <div className={styles.cardTags}>
                 {c.subjectTitle && <span className={styles.tag}>{c.subjectTitle}</span>}
                 <span className={styles.tag}>{c.contentType}</span>
