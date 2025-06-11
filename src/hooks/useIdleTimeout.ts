@@ -9,7 +9,7 @@ interface UseIdleTimeoutOptions {
 }
 
 const useIdleTimeout = ({
-  timeout = 2 * 60 * 1000, // 2 minutes default
+  timeout = 2880 * 60 * 1000, // 2 days default
   onIdle,
   events = [
     'mousedown',

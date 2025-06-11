@@ -147,7 +147,7 @@ function App() {
         )}
 
         {isAuthenticated ? (
-          <IdleTimeoutProvider timeoutMinutes={2} showWarning={true} warningMinutes={0.5} onIdle={handleIdleLogout}>
+          <IdleTimeoutProvider timeoutMinutes={2880} showWarning={true} warningMinutes={0.5} onIdle={handleIdleLogout}>
             <div className={AppStyle.sidenav}>
               <Sidenav />
             </div>
