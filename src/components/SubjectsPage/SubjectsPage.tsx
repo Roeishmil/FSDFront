@@ -28,8 +28,8 @@ interface Subject {
   userId: string;
   testCount?: number;
   summaryCount?: number;
-  tests?: number;
-  summaries?: number;
+  tests?: any[] | number;
+  summaries?: any[] | number;
 }
 
 /* ─── component ─── */
@@ -51,6 +51,50 @@ const SubjectsPage: FC = () => {
     reset,
     formState,
   } = useForm<FormData>({ resolver: zodResolver(schema) });
+
+  /* ── Helper function to get correct counts ── */
+  const getCounts = (subject: Subject) => {
+    // Helper function to safely get count from various possible data structures
+    const getCount = (
+      countField: number | undefined,
+      arrayField: any[] | number | undefined
+    ): number => {
+      // If we have a direct count field, use it
+      if (typeof countField === 'number') {
+        return countField;
+      }
+      
+      // If arrayField is a number, use it
+      if (typeof arrayField === 'number') {
+        return arrayField;
+      }
+      
+      // If arrayField is an array, return its length
+      if (Array.isArray(arrayField)) {
+        return arrayField.length;
+      }
+      
+      // Default to 0
+      return 0;
+    };
+
+    const examCount = getCount(subject.testCount, subject.tests);
+    const summaryCount = getCount(subject.summaryCount, subject.summaries);
+
+    // console.log(`Subject: ${subject.title}`, {
+    //   testCount: subject.testCount,
+    //   tests: subject.tests,
+    //   summaryCount: subject.summaryCount,
+    //   summaries: subject.summaries,
+    //   calculatedExamCount: examCount,
+    //   calculatedSummaryCount: summaryCount
+    // });
+
+    return {
+      tests: examCount,
+      summaries: summaryCount
+    };
+  };
 
   /* ── CRUD handlers ── */
   const handleAddSubject = () => {
@@ -135,14 +179,7 @@ const SubjectsPage: FC = () => {
             <p>No subjects found.</p>
           ) : (
             subjects.map((subject) => {
-              const tests =
-                (subject as any).testCount ??
-                (subject as any).tests?.length ??
-                0;
-              const summaries =
-                (subject as any).summaryCount ??
-                (subject as any).summaries?.length ??
-                0;
+              const counts = getCounts(subject);
 
               return (
                 <li key={subject._id} className={SubjectsPageStyle.subjectItem}>
@@ -160,11 +197,11 @@ const SubjectsPage: FC = () => {
                   <div className={SubjectsPageStyle.countsRow}>
                     <div className={SubjectsPageStyle.countBadge}>
                       <FileText size={14} />
-                      <span>Tests:&nbsp;{tests}</span>
+                      <span>Exams:&nbsp;{counts.tests}</span>
                     </div>
                     <div className={SubjectsPageStyle.countBadge}>
                       <Sparkles size={14} />
-                      <span>Summaries:&nbsp;{summaries}</span>
+                      <span>Summaries:&nbsp;{counts.summaries}</span>
                     </div>
                   </div>
 

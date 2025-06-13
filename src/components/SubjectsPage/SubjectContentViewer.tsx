@@ -62,11 +62,11 @@ const SubjectContentViewer: FC<{
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log(subject);
+        //console.log(subject);
         setLoading(true);
         // Fetch content for this specific subject
         const allContent = await contentApi.fetchContent(user?._id, subject._id);
-        console.log("User content:", allContent);
+        //console.log("User content:", allContent);
 
         // Normalize the content items
         const normalizedContent = allContent.map((item) => ({

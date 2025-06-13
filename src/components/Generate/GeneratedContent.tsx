@@ -168,7 +168,7 @@ const GeneratedContent: React.FC = () => {
         <div className={styles.tabs}>
           {["All", "Summary", "Exam"].map(t => (
             <button key={t} className={filter === t ? styles.active : ""} onClick={() => setFilter(t as any)}>
-              {t === "All" ? "All Content" : `${t}s`}
+          {t === "All" ? "All Content" : t === "Summary" ? "Summaries" : `${t}s`}
             </button>
           ))}
         </div>
