@@ -74,56 +74,78 @@ const SharedContent: React.FC = () => {
     <div className={styles.sharedContent}>
       <h2>Shared Content</h2>
 
-      <div className={styles.filters}>
-        <div className={styles.tabs}>
-          {["All", "Summary", "Exam"].map((t) => (
-            <button key={t} className={filter === t ? styles.active : ""} onClick={() => setFilter(t as any)}>
-              {t === "All" ? "All Content" : `${t}s`}
-            </button>
-          ))}
-        </div>
-        
-        <div className={styles.searchFilters}>
-          <input
-            type="text"
-            placeholder="Search by title..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className={styles.searchInput}
-          />
-          
-          <input
-            type="text"
-            placeholder="Search by subject..."
-            value={subjectSearch}
-            onChange={(e) => setSubjectSearch(e.target.value)}
-            className={styles.searchInput}
-            list="subjects-list"
-          />
-          
-          <datalist id="subjects-list">
-            {uniqueSubjects.map((subject) => (
-              <option key={subject} value={subject} />
-            ))}
-          </datalist>
 
-          {(search || subjectSearch || filter !== "All") && (
-            <button className={styles.clearFilters} onClick={clearFilters}>
-              Clear Filters
-            </button>
-          )}
-        </div>
-      </div>
+<div className={styles.filters}>
+  <div className={styles.tabs}>
+    {["All", "Summary", "Exam"].map((t) => (
+      <button key={t} className={filter === t ? styles.active : ""} onClick={() => setFilter(t as any)}>
+    {t === "All" ? "All Content" : t === "Summary" ? "Summaries" : `${t}s`}
+      </button>
+    ))}
+  </div>
+  
+  <div className={styles.searchFilters}>
+    <input
+      type="text"
+      placeholder="Search by title..."
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      className={styles.searchInput}
+    />
+    
+    <input
+      type="text"
+      placeholder="Search by subject..."
+      value={subjectSearch}
+      onChange={(e) => setSubjectSearch(e.target.value)}
+      className={styles.searchInput}
+      list="subjects-list"
+    />
+    
+    <datalist id="subjects-list">
+      {uniqueSubjects.map((subject) => (
+        <option key={subject} value={subject} />
+      ))}
+    </datalist>
 
-      {/* Active filters display */}
-      {(search || subjectSearch || filter !== "All") && (
-        <div className={styles.activeFilters}>
-          <span>Active filters:</span>
-          {filter !== "All" && <span className={styles.filterTag}>Type: {filter}</span>}
-          {search && <span className={styles.filterTag}>Title: "{search}"</span>}
-          {subjectSearch && <span className={styles.filterTag}>Subject: "{subjectSearch}"</span>}
-        </div>
-      )}
+    {(search || subjectSearch || filter !== "All") && (
+      <button className={styles.clearFilters} onClick={clearFilters}>
+        Clear All
+      </button>
+    )}
+  </div>
+</div>
+
+{/* Enhanced Active filters display */}
+{(search || subjectSearch || filter !== "All") && (
+  <div className={styles.activeFilters}>
+    <span>Active filters:</span>
+    {filter !== "All" && (
+      <span className={styles.filterTag} data-type="type">
+        Type: {filter}
+      </span>
+    )}
+    {search && (
+      <span className={styles.filterTag} data-type="title">
+        Title: "{search}"
+      </span>
+    )}
+    {subjectSearch && (
+      <span className={styles.filterTag} data-type="subject">
+        Subject: "{subjectSearch}"
+      </span>
+    )}
+  </div>
+)}
+
+{!loading && !error && (
+  <div className={styles.resultsInfo}>
+    {filteredContent.length === contentItems.length 
+      ? `Showing all ${contentItems.length} items`
+      : `Showing ${filteredContent.length} of ${contentItems.length} items`
+    }
+  </div>
+)}
 
       {loading ? (
         <div className={styles.loading}>Loading content...</div>

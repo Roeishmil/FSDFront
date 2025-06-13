@@ -339,3 +339,157 @@
 }
 
 
+/* Add these styles to your SharedContent.module.css file */
+
+.searchFilters {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.clearFilters {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.clearFilters:hover {
+  background: #fecaca;
+  border-color: #f87171;
+}
+
+.activeFilters {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.75rem 0 1.5rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  color: #475569;
+  flex-wrap: wrap;
+}
+
+.activeFilters > span:first-child {
+  font-weight: 600;
+  color: #334155;
+  margin-right: 0.25rem;
+}
+
+.filterTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #ffffff;
+  color: #1e293b;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.filterTag::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: #3b82f6;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Different colors for different filter types */
+.filterTag:has-text("Type:") {
+  border-color: #c084fc;
+  background: #faf5ff;
+}
+
+.filterTag:has-text("Type:")::before {
+  background: #a855f7;
+}
+
+.filterTag:has-text("Title:") {
+  border-color: #60a5fa;
+  background: #eff6ff;
+}
+
+.filterTag:has-text("Title:")::before {
+  background: #3b82f6;
+}
+
+.filterTag:has-text("Subject:") {
+  border-color: #34d399;
+  background: #ecfdf5;
+}
+
+.filterTag:has-text("Subject:")::before {
+  background: #10b981;
+}
+
+/* Alternative approach using data attributes if you want to add them to JSX */
+.filterTag[data-type="type"] {
+  border-color: #c084fc;
+  background: #faf5ff;
+}
+
+.filterTag[data-type="type"]::before {
+  background: #a855f7;
+}
+
+.filterTag[data-type="title"] {
+  border-color: #60a5fa;
+  background: #eff6ff;
+}
+
+.filterTag[data-type="title"]::before {
+  background: #3b82f6;
+}
+
+.filterTag[data-type="subject"] {
+  border-color: #34d399;
+  background: #ecfdf5;
+}
+
+.filterTag[data-type="subject"]::before {
+  background: #10b981;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .activeFilters {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .activeFilters > span:first-child {
+    margin-bottom: 0.25rem;
+  }
+  
+  .searchFilters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .searchInput {
+    min-width: unset;
+  }
+}.resultsInfo {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0;
+  text-align: right;
+  border-bottom: 1px solid #f1f5f9;
+}

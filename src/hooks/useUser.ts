@@ -124,11 +124,11 @@ const useUser = (data?: any) => {
       localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem("userId", userData._id);
       
-      console.log("User data fetched successfully:", {
-        userId: userData._id,
-        hasImage: !!userData.imgUrl,
-        imagePreview: userData.imgUrl ? userData.imgUrl.substring(0, 50) + '...' : 'none'
-      });
+      // console.log("User data fetched successfully:", {
+      //   userId: userData._id,
+      //   hasImage: !!userData.imgUrl,
+      //   imagePreview: userData.imgUrl ? userData.imgUrl.substring(0, 50) + '...' : 'none'
+      // });
       
       return userData;
     } catch (error) {
@@ -157,10 +157,10 @@ const useUser = (data?: any) => {
       try {
         const parsed = JSON.parse(storedUser);
         setUser(parsed);
-        console.log("User loaded from localStorage:", {
-          userId: parsed._id,
-          hasImage: !!parsed.imgUrl
-        });
+        // console.log("User loaded from localStorage:", {
+        //   userId: parsed._id,
+        //   hasImage: !!parsed.imgUrl
+        // });
       } catch (e) {
         console.warn("Failed to parse stored user data, will fetch from server");
         localStorage.removeItem("user");
@@ -182,11 +182,11 @@ const useUser = (data?: any) => {
       setIsLoading(true);
       setError(null);
       
-      console.log("Updating user:", {
-        userId: userData._id,
-        hasImage: !!userData.imgUrl,
-        fields: Object.keys(userData)
-      });
+      // console.log("Updating user:", {
+      //   userId: userData._id,
+      //   hasImage: !!userData.imgUrl,
+      //   fields: Object.keys(userData)
+      // });
       
       const response = await userService.updateUser(userData);
       const updatedUser = response.data;
@@ -196,11 +196,11 @@ const useUser = (data?: any) => {
       localStorage.setItem("user", JSON.stringify(updatedUser));
       localStorage.setItem("userId", updatedUser._id);
       
-      console.log("User updated successfully:", {
-        userId: updatedUser._id,
-        hasImage: !!updatedUser.imgUrl,
-        imagePreview: updatedUser.imgUrl ? updatedUser.imgUrl.substring(0, 50) + '...' : 'none'
-      });
+      // console.log("User updated successfully:", {
+      //   userId: updatedUser._id,
+      //   hasImage: !!updatedUser.imgUrl,
+      //   imagePreview: updatedUser.imgUrl ? updatedUser.imgUrl.substring(0, 50) + '...' : 'none'
+      // });
       
       return updatedUser;
     } catch (error) {

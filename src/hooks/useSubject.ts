@@ -23,7 +23,7 @@ export function useSubject() {
       setLoading(true);
       setError(null);
       const data = await subjectsApi.fetchSubjects(user?._id);
-      console.log(data);
+      //console.log(data);
       setSubjects(data);
     } catch (err) {
       setError((err as Error).message);

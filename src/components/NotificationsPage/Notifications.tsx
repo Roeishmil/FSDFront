@@ -74,7 +74,7 @@ const NotificationsPage = () => {
   };
   const getSubjectTitle = (subjectId: string) => {  
     const subject = subjects.find(s => s._id === subjectId);
-    console.log(subject);
+   // console.log(subject);
     return subject?.title || subjectId;
   };
 

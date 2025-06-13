@@ -16,8 +16,7 @@ const FileUpload: React.FC = () => {
     if (files && files.length > 0) {
       const newFiles = Array.from(files);
       setUploadedFiles(prev => [...prev, ...newFiles]);
-      console.log('Files uploaded:', newFiles.map(f => f.name));
-      // Here you can implement additional logic like uploading to your backend
+     // console.log('Files uploaded:', newFiles.map(f => f.name));
     }
   };
 

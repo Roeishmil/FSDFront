@@ -2,7 +2,7 @@ import axios from "axios";
 import { IUser, ISubject, INotification } from "./Interfaces";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-console.log('url', BASE_URL);
+//console.log('url', BASE_URL);
 
 // Cache for promises to prevent duplicate requests
 let examPromise: Promise<string> | null = null;
