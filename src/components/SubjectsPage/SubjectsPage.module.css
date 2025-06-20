@@ -127,6 +127,11 @@
   cursor: pointer;
   transition: background 0.2s ease;
 }
+.viewButton:hover,
+.editButton:hover,
+.deleteButton:hover {
+  background: #dbeafe;
+}
 
 
 
@@ -294,13 +299,7 @@
   padding: 0.2rem 0.5rem;
   border-radius: 0.25rem;
 }
-.viewButton {
-  background: #eff6ff;
-  color: #1e40af;
-}
-.viewButton:hover {
-  background: #dbeafe;
-}
+
 
 .loading,
 .error,
