@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 interface GoogleDrivePickerProps {
-  onFileSelected?: (file: File) => void;
+  onFilesSelected: (files: File[]) => void;
   className?: string;
 }
 
@@ -22,7 +22,7 @@ declare global {
   }
 }
 
-const GoogleDrivePicker: React.FC<GoogleDrivePickerProps> = ({ onFileSelected, className }) => {
+const GoogleDrivePicker: React.FC<GoogleDrivePickerProps> = ({ onFilesSelected, className }) => {
   const [isReady, setIsReady] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState('Initializing...');
 
@@ -204,7 +204,7 @@ const GoogleDrivePicker: React.FC<GoogleDrivePickerProps> = ({ onFileSelected, c
   }, []);
 
   const handleGoogleDriveClick = async () => {
-    if (!onFileSelected) {
+    if (!onFilesSelected) {
       alert('File selection handler not configured');
       return;
     }
@@ -320,7 +320,7 @@ const GoogleDrivePicker: React.FC<GoogleDrivePickerProps> = ({ onFileSelected, c
         const file = new File([blob], fileName, { type: finalMimeType });
         
         setLoadingStatus('File ready');
-        onFileSelected(file);
+        onFilesSelected([file]);
         
       } catch (error) {
         setLoadingStatus('Download failed');
